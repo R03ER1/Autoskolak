@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@color/background">
+
+	<LinearLayout
+		android:id="@+id/homeHeader"
+		android:layout_width="match_parent"
+		android:layout_height="72dp"
+		android:orientation="horizontal"
+		android:gravity="center"
+		android:paddingStart="16dp"
+		android:paddingEnd="16dp"
+		android:background="#CC000000"
+		android:elevation="8dp">
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/streakButton"
+			style="@style/Widget.MaterialComponents.Button.TextButton"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:minHeight="36dp"
+			app:icon="@drawable/ic_streak"
+			app:iconGravity="textStart"
+			app:iconPadding="8dp"
+			app:iconSize="24dp"
+			app:iconTint="@null"
+			android:text="0"
+			android:textAllCaps="false"
+			android:textColor="@color/text_primary"
+			android:textSize="22sp"
+			app:rippleColor="@color/button_pressed"
+			app:backgroundTint="@android:color/transparent" />
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/xpButton"
+			style="@style/Widget.MaterialComponents.Button.TextButton"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:minHeight="36dp"
+			app:icon="@drawable/ic_coin"
+			app:iconGravity="textStart"
+			app:iconPadding="8dp"
+			app:iconSize="24dp"
+			app:iconTint="@null"
+			android:text="0"
+			android:textAllCaps="false"
+			android:textColor="@color/text_primary"
+			android:textSize="22sp"
+			app:rippleColor="@color/button_pressed"
+			app:backgroundTint="@android:color/transparent" />
+
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/heartsButton"
+			style="@style/Widget.MaterialComponents.Button.TextButton"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:minHeight="36dp"
+			app:icon="@drawable/ic_live"
+			app:iconGravity="textStart"
+			app:iconPadding="8dp"
+			app:iconSize="24dp"
+			app:iconTint="@null"
+			android:text="0"
+			android:textAllCaps="false"
+			android:textColor="@color/text_primary"
+			android:textSize="22sp"
+			app:rippleColor="@color/button_pressed"
+			app:backgroundTint="@android:color/transparent" />
+
+	</LinearLayout>
+
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_marginTop="72dp"
+		android:layout_marginBottom="64dp">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:padding="16dp">
+
+			<!-- Delete All Button - Moved to top -->
+			<com.google.android.material.card.MaterialCardView
+				android:id="@+id/card_achievements"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="12dp"
+				app:cardUseCompatPadding="true"
+				app:cardElevation="2dp"
+				app:cardBackgroundColor="@color/card_dark"
+				android:foreground="?attr/selectableItemBackground"
+				android:clickable="true"
+				android:focusable="true">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:padding="16dp">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Úspěchy"
+						android:textColor="@color/text_primary"
+						android:textSize="16sp"
+						android:textStyle="bold" />
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Zobrazit dosažené úspěchy a odměny"
+						android:textColor="@color/text_primary"
+						android:textSize="14sp"
+						android:alpha="0.8" />
+
+				</LinearLayout>
+
+			</com.google.android.material.card.MaterialCardView>
+
+			<!-- Delete All Button - Moved to top -->
+			<com.google.android.material.card.MaterialCardView
+				android:id="@+id/card_clear_all"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="12dp"
+				app:cardUseCompatPadding="true"
+				app:cardElevation="2dp"
+				app:cardBackgroundColor="@color/card_dark"
+				android:foreground="?attr/selectableItemBackground"
+				android:clickable="true"
+				android:focusable="true">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:padding="16dp">
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Vymazat vše"
+						android:textColor="@color/text_primary"
+						android:textSize="16sp"
+						android:textStyle="bold" />
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Vymaže veškerá lokální data"
+						android:textColor="@color/text_primary"
+						android:textSize="14sp"
+						android:alpha="0.8" />
+
+				</LinearLayout>
+
+			</com.google.android.material.card.MaterialCardView>
+
+			<!-- Debugging Section -->
+			<com.google.android.material.card.MaterialCardView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="12dp"
+				app:cardUseCompatPadding="true"
+				app:cardElevation="2dp"
+				app:cardBackgroundColor="@color/card_dark">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical">
+
+					<!-- Debugging Header -->
+					<LinearLayout
+						android:id="@+id/debugging_header"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:gravity="center_vertical"
+						android:padding="16dp"
+						android:clickable="true"
+						android:focusable="true"
+						android:background="?attr/selectableItemBackground">
+
+						<LinearLayout
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:orientation="vertical">
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Debugging"
+								android:textColor="@color/text_primary"
+								android:textSize="16sp"
+								android:textStyle="bold" />
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Testovací a ladící nástroje"
+								android:textColor="@color/text_primary"
+								android:textSize="14sp"
+								android:alpha="0.8" />
+
+						</LinearLayout>
+
+						<ImageView
+							android:id="@+id/debugging_arrow"
+							android:layout_width="24dp"
+							android:layout_height="24dp"
+							android:src="@drawable/ic_arrow_drop_down"
+							android:rotation="0"
+							android:contentDescription="Rozbalit/sbalit" />
+
+					</LinearLayout>
+
+					<!-- Debugging Content (initially hidden) -->
+					<LinearLayout
+						android:id="@+id/debugging_content"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:visibility="gone">
+
+						<!-- Infinite Lives Toggle -->
+						<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:paddingTop="0dp">
+
+							<LinearLayout
+								android:layout_width="0dp"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:orientation="vertical">
+
+								<TextView
+									android:id="@+id/title_test1"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Nekonečné životy (pro testing)"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Povolit start lekcí i bez životů"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
+
+							<com.google.android.material.switchmaterial.SwitchMaterial
+								android:id="@+id/switch_test1"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:theme="@style/ThemeOverlay.Autokolk.SwitchNeutral"
+								app:thumbTint="@color/switch_thumb_tint"
+								app:trackTint="@color/switch_track_tint"
+								app:rippleColor="@color/button_pressed"
+								app:useMaterialThemeColors="false" />
+
+						</LinearLayout>
+
+						<!-- Hunger Test Card -->
+						<LinearLayout
+							android:id="@+id/card_hunger_test"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:clickable="true"
+							android:focusable="true"
+							android:background="?attr/selectableItemBackground">
+
+							<LinearLayout
+								android:layout_width="0dp"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:orientation="vertical">
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Test hladu Alexe"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Nastavit hlad Alexe (pro testování)"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
+
+						</LinearLayout>
+
+						<!-- Streak Test Card -->
+						<LinearLayout
+							android:id="@+id/card_streak_test"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:clickable="true"
+							android:focusable="true"
+							android:background="?attr/selectableItemBackground">
+
+							<LinearLayout
+								android:layout_width="0dp"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:orientation="vertical">
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Test streaku"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Nastavit streak (pro testování)"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
+
+						</LinearLayout>
+
+						<!-- Points Test Card -->
+						<LinearLayout
+							android:id="@+id/card_points_test"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:clickable="true"
+							android:focusable="true"
+							android:background="?attr/selectableItemBackground">
+
+							<LinearLayout
+								android:layout_width="0dp"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:orientation="vertical">
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Test bodů"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Nastavit body (pro testování)"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
+
+						</LinearLayout>
+
+						<!-- Hearts Test Card -->
+						<LinearLayout
+							android:id="@+id/card_hearts_test"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:clickable="true"
+							android:focusable="true"
+							android:background="?attr/selectableItemBackground">
+
+							<LinearLayout
+								android:layout_width="0dp"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:orientation="vertical">
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Test životů"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Nastavit životy (0–15) pro testování)"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
+
+						</LinearLayout>
+
+						<!-- Rename Lion Card -->
+						<LinearLayout
+							android:id="@+id/card_rename_lion"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:clickable="true"
+							android:focusable="true"
+							android:background="?attr/selectableItemBackground">
+
+							<LinearLayout
+								android:layout_width="0dp"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:orientation="vertical">
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Přejmenovat lva"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Změnit jméno lva (výchozí: Alex)"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
+
+						</LinearLayout>
+
+						<!-- Debug: Hunger info box -->
+						<LinearLayout
+							android:id="@+id/card_hunger_debug"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="vertical"
+							android:padding="16dp">
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Hlad – debug stav"
+								android:textColor="@color/text_primary"
+								android:textSize="16sp"
+								android:textStyle="bold" />
+
+							<TextView
+								android:id="@+id/hunger_debug_text"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Načítám…"
+								android:textColor="@color/text_primary"
+								android:textSize="14sp"
+								android:alpha="0.8" />
+
+						</LinearLayout>
+
+					</LinearLayout>
+
+					<!-- Trigger Random Event (Debug) Card -->
+					<LinearLayout
+						android:id="@+id/card_trigger_event"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:gravity="center_vertical"
+						android:padding="16dp"
+						android:clickable="true"
+						android:focusable="true"
+						android:background="?attr/selectableItemBackground">
+
+						<LinearLayout
+							android:layout_width="0dp"
+							android:layout_height="wrap_content"
+							android:layout_weight="1"
+							android:orientation="vertical">
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Spustit náhodnou událost"
+								android:textColor="@color/text_primary"
+								android:textSize="16sp"
+								android:textStyle="bold" />
+
+							<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:text="Okamžitě zobrazí náhodnou událost (pro testování)"
+								android:textColor="@color/text_primary"
+								android:textSize="14sp"
+								android:alpha="0.8" />
+
+						</LinearLayout>
+
+					</LinearLayout>
+
+				</LinearLayout>
+
+		</com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/settings_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_gravity="center_horizontal"
+			android:text="Robert Sadílek 2025 • Verze: 0.1.40"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:alpha="0.7"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground" />
+
+		</LinearLayout>
+
+	</ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+		android:id="@+id/bottomNavigation"
+		android:layout_width="match_parent"
+		android:layout_height="64dp"
+		android:layout_gravity="bottom"
+		android:background="@android:color/transparent"
+		android:elevation="0dp"
+        app:labelVisibilityMode="unlabeled"
+        app:itemIconSize="24dp"
+		app:itemBackground="?attr/selectableItemBackground"
+		app:backgroundTint="@android:color/transparent"
+		app:itemActiveIndicatorStyle="@style/Widget.Autokolk.BottomNav.ActiveIndicator"
+		app:itemTextAppearanceActive="@style/TextAppearance.Autokolk.BottomNav.Large"
+		app:itemTextAppearanceInactive="@style/TextAppearance.Autokolk.BottomNav.Large"
+		app:itemTextColor="@color/text_primary"
+		app:menu="@menu/bottom_nav_menu" />
+
+</FrameLayout>
+
+

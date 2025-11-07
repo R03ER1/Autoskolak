@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Track background -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="9dp"/>
+            <solid android:color="#33000000" />
+        </shape>
+    </item>
+
+    <!-- Progress bar with gradient -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="9dp"/>
+                <gradient
+                    android:type="linear"
+                    android:angle="45"
+                    android:startColor="#0B5D5E"
+                    android:centerColor="#0E6F72"
+                    android:endColor="#0A84A6"/>
+            </shape>
+        </clip>
+    </item>
+</layer-list>
+
+

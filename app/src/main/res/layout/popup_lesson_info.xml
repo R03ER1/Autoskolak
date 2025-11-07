@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:minWidth="280dp"
+    android:background="@drawable/bg_popup"
+    android:elevation="8dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/popupTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:gravity="center_horizontal"
+        android:maxLines="3"
+        android:text="Lekce"/>
+
+    <TextView
+        android:id="@+id/popupCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:gravity="center_horizontal"
+        android:text="Kategorie"/>
+
+    <TextView
+        android:id="@+id/popupProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="center_horizontal"
+        android:text=""/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/popupStartButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Start"
+        style="@style/Widget.Autokolk.Button.Primary"/>
+
+</LinearLayout>
+
+
