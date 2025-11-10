@@ -7,6 +7,27 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [0.1.45] - 2025-11-10
+- Added: Confetti animation to random event overlay - colorful particles fall from the top when events are shown.
+- Synced version string in Settings and Gradle to 0.1.45.
+
+## [0.1.44] - 2025-11-10
+- Added: Random event overlay animations - lion image slides up from bottom, texts pop up with scale animation.
+- Synced version string in Settings and Gradle to 0.1.44.
+
+## [0.1.43] - 2025-11-10
+- Changed: Random event headline ("Událost!") is now much larger (80sp) and spans the full screen width while staying on a single line.
+- Synced version string in Settings and Gradle to 0.1.43.
+
+## [0.1.42] - 2025-11-10
+- Added: Floating hunger bar on Alex food screen fixed to the top, showing current hunger percent.
+- Changed: Hunger bar updates live as you purchase food.
+- Synced version string in Settings and Gradle to 0.1.42.
+
+## [0.1.41] - 2025-11-10
+- Fixed: Top bar bottom sheets now show the + button only for Streak. Points and Hearts show the close button only.
+- Synced version string in Settings and Gradle to 0.1.41.
+
 ## [0.1.40] - 2025-11-06
 - Changed: Clicking "Vymazat vše" now also resets all achievements (Úspěchy).
 - Synced version string in Settings and Gradle to 0.1.40.

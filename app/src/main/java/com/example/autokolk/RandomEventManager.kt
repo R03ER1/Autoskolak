@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
@@ -125,26 +126,44 @@ class RandomEventManager(private val context: Context) {
         overlay.isFocusable = true
 
         // Title and message
-        overlay.findViewById<TextView>(R.id.eventTitle)?.text = "Událost!"
-        overlay.findViewById<TextView>(R.id.eventMessage)?.text = event.message
+        val titleView = overlay.findViewById<TextView>(R.id.eventTitle)
+        val messageView = overlay.findViewById<TextView>(R.id.eventMessage)
+        val imageView = overlay.findViewById<ImageView>(R.id.eventImage)
+        
+        titleView?.text = "Událost!"
+        messageView?.text = event.message
         try {
             val input = activity.assets.open("images/alex/AlexCool.png")
             val bmp = android.graphics.BitmapFactory.decodeStream(input)
             input.close()
-            overlay.findViewById<ImageView>(R.id.eventImage)?.setImageBitmap(bmp)
+            imageView?.setImageBitmap(bmp)
         } catch (_: Throwable) {
-            overlay.findViewById<ImageView>(R.id.eventImage)?.setImageResource(R.drawable.ic_alex)
+            imageView?.setImageResource(R.drawable.ic_alex)
         }
 
         // Apply immediately
         val progress = LessonProgress(activity)
         event.apply(progress)
 
+        val confettiView = overlay.findViewById<ConfettiView>(R.id.confettiView)
         overlay.findViewById<MaterialButton>(R.id.eventOk)?.setOnClickListener {
+            confettiView?.stop()
             root.removeView(overlay)
             onDismiss()
         }
         root.addView(overlay)
+        
+        // Start animations after view is laid out
+        overlay.post {
+            imageView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom))
+            titleView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_scale))
+            messageView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_scale))
+            
+            // Start confetti animation after a small delay to ensure view is measured
+            confettiView?.postDelayed({
+                confettiView?.start()
+            }, 100)
+        }
     }
 
     /** Shows a random event immediately, ignoring schedule and tutorial gating. For debugging. */

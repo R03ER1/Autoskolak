@@ -26,6 +26,10 @@ class AlexActivity : AppCompatActivity() {
     private lateinit var streakButton: MaterialButton
     private lateinit var xpButton: MaterialButton
     private lateinit var heartsButton: MaterialButton
+    // Hunger overlay views for food screen
+    private var hungerOverlayView: View? = null
+    private var hungerOverlayProgress: android.widget.ProgressBar? = null
+    private var hungerOverlayLabel: TextView? = null
     
     // Simple overlay system variables
     private lateinit var page1Container: FrameLayout
@@ -207,12 +211,8 @@ class AlexActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.setOnClickListener {
-            val intent = android.content.Intent(this, MainActivity::class.java)
-            intent.putExtra(MainActivity.EXTRA_RANDOM_COUNT, 10)
-            startActivity(intent)
-            dialog.dismiss()
-        }
+        // Hide + button for streak sheet
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -227,6 +227,8 @@ class AlexActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
+        // Hide + button for points sheet
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -435,12 +437,16 @@ class AlexActivity : AppCompatActivity() {
         val lionName = getLionName()
         page2View.findViewById<TextView>(R.id.foodTitle)?.text = "Jídlo pro $lionName"
         setFoodImages(page2View)
+        // Show floating hunger bar overlay for food screen
+        showHungerOverlay()
         addCloseButton()
         setupPage2ClickHandlers(page2View)
         showPage2()
     }
 
     private fun loadShopOverlay() {
+        // Remove hunger overlay if present (only shown for food)
+        removeHungerOverlay()
         val page2View = LayoutInflater.from(this).inflate(R.layout.fragment_alex_shop_sunglasses, page2ContentContainer, false)
         page2ContentContainer.removeAllViews()
         page2ContentContainer.addView(page2View)
@@ -585,6 +591,44 @@ class AlexActivity : AppCompatActivity() {
         showPage2()
     }
     
+    private fun showHungerOverlay() {
+        // If already shown, just update it
+        if (hungerOverlayView != null) {
+            updateHungerOverlay()
+            return
+        }
+        val overlay = LayoutInflater.from(this).inflate(R.layout.view_hunger_overlay, page2Overlay, false)
+        val lp = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = android.view.Gravity.TOP or android.view.Gravity.CENTER_HORIZONTAL
+        }
+        overlay.layoutParams = lp
+        hungerOverlayView = overlay
+        hungerOverlayProgress = overlay.findViewById(R.id.hungerProgress)
+        hungerOverlayLabel = overlay.findViewById(R.id.hungerProgressLabel)
+        page2Overlay.addView(overlay)
+        updateHungerOverlay()
+    }
+
+    private fun updateHungerOverlay() {
+        val progressBar = hungerOverlayProgress ?: return
+        val label = hungerOverlayLabel ?: return
+        val hunger = HungerManager(this).getCurrentHunger()
+        progressBar.max = HungerManager.MAX_HUNGER
+        progressBar.progress = hunger
+        label.text = "$hunger%"
+    }
+
+    private fun removeHungerOverlay() {
+        val view = hungerOverlayView ?: return
+        try { page2Overlay.removeView(view) } catch (_: Throwable) { }
+        hungerOverlayView = null
+        hungerOverlayProgress = null
+        hungerOverlayLabel = null
+    }
+
     private fun setFoodImages(container: View) {
         fun loadImage(imageView: android.widget.ImageView?, baseName: String, assetName: String) {
             if (imageView == null) return
@@ -672,6 +716,8 @@ class AlexActivity : AppCompatActivity() {
             refreshPointsHeader()
             // Update page 1 health display
             updatePage1Health()
+            // Update hunger overlay on food screen
+            updateHungerOverlay()
             try { AchievementsManager(this@AlexActivity).onFed(foodKey) } catch (_: Throwable) { }
         }
 
@@ -704,6 +750,7 @@ class AlexActivity : AppCompatActivity() {
             showFoodPopup("+ MAX")
             refreshPointsHeader()
             updatePage1Health()
+            updateHungerOverlay()
             try { AchievementsManager(this@AlexActivity).onFed("pivo") } catch (_: Throwable) { }
         }
 
@@ -831,6 +878,8 @@ class AlexActivity : AppCompatActivity() {
     }
     
     private fun hidePage2() {
+        // Clean any floating overlays when closing
+        removeHungerOverlay()
         page2Overlay.visibility = View.GONE
     }
 }

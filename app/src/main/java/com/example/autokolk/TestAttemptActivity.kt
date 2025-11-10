@@ -7,6 +7,7 @@ import com.google.android.material.button.MaterialButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -143,6 +144,8 @@ class TestAttemptActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
+        // Hide + button for non-streak sheets
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 

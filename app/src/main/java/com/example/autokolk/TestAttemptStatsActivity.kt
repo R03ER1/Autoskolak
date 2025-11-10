@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class TestAttemptStatsActivity : AppCompatActivity() {
@@ -133,12 +134,8 @@ class TestAttemptStatsActivity : AppCompatActivity() {
         view.findViewById<android.widget.ImageView>(R.id.bottomSheetFlame).setImageResource(R.drawable.ic_streak)
         view.findViewById<TextView>(R.id.bottomSheetStreakNumber).text = streak.toString()
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener { dialog.dismiss() }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.setOnClickListener {
-            val intent = android.content.Intent(this, MainActivity::class.java)
-            intent.putExtra(MainActivity.EXTRA_RANDOM_COUNT, 10)
-            startActivity(intent)
-            dialog.dismiss()
-        }
+        // Hide + button for streak sheet
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -150,12 +147,8 @@ class TestAttemptStatsActivity : AppCompatActivity() {
         view.findViewById<android.widget.ImageView>(R.id.bottomSheetFlame).setImageResource(R.drawable.ic_coin)
         view.findViewById<TextView>(R.id.bottomSheetStreakNumber).text = points.toString()
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener { dialog.dismiss() }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.setOnClickListener {
-            val intent = android.content.Intent(this, MainActivity::class.java)
-            intent.putExtra(MainActivity.EXTRA_RANDOM_COUNT, 10)
-            startActivity(intent)
-            dialog.dismiss()
-        }
+        // Hide + button for non-streak sheets
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 

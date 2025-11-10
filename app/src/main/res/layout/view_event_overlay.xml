@@ -18,12 +18,18 @@
 
         <TextView
             android:id="@+id/eventTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Událost!"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:textSize="22sp"
+            android:textSize="80sp"
+            android:singleLine="true"
+            android:ellipsize="none"
+            android:gravity="center"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="40sp"
+            android:autoSizeMaxTextSize="80sp"
             android:layout_marginBottom="8dp"/>
 
         <TextView
@@ -59,6 +65,12 @@
         android:translationY="280dp"
         android:scaleType="fitCenter"
         android:contentDescription="Alex"/>
+
+    <com.example.autokolk.ConfettiView
+        android:id="@+id/confettiView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"/>
 
 </FrameLayout>
 

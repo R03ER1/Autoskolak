@@ -134,12 +134,8 @@ class PracticeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.setOnClickListener {
-            val intent = android.content.Intent(this, MainActivity::class.java)
-            intent.putExtra(MainActivity.EXTRA_RANDOM_COUNT, 10)
-            startActivity(intent)
-            dialog.dismiss()
-        }
+        // Hide + button for streak sheet
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -154,6 +150,8 @@ class PracticeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
+        // Hide + button for non-streak sheets
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
         dialog.show()
     }
 
