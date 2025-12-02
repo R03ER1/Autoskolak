@@ -155,14 +155,33 @@ class RandomEventManager(private val context: Context) {
         
         // Start animations after view is laid out
         overlay.post {
-            imageView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom))
-            titleView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_scale))
-            messageView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_scale))
-            
-            // Start confetti animation after a small delay to ensure view is measured
-            confettiView?.postDelayed({
-                confettiView?.start()
-            }, 100)
+            try {
+                imageView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.slide_in_bottom))
+                titleView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_scale))
+                messageView?.startAnimation(AnimationUtils.loadAnimation(context, R.anim.pop_scale))
+                
+                // Start confetti animation after a small delay to ensure view is measured
+                // Wrap in try-catch to prevent crashes if confetti fails
+                try {
+                    confettiView?.postDelayed({
+                        try {
+                            if (confettiView?.isAttachedToWindow == true && confettiView?.visibility == View.VISIBLE) {
+                                // Run confetti for ~2 seconds, then fade out and hide
+                                confettiView?.visibility = View.VISIBLE
+                                confettiView?.startFor(2000L, 300L)
+                            }
+                        } catch (e: Exception) {
+                            // Silently fail confetti if there's an issue
+                            e.printStackTrace()
+                        }
+                    }, 300)
+                } catch (e: Exception) {
+                    // If confetti view itself causes issues, just skip it
+                    e.printStackTrace()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

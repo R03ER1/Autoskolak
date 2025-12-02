@@ -68,6 +68,10 @@
             android:name=".ChangelogActivity"
             android:exported="false"
             android:theme="@style/Theme.Autokolk.NoActionBar" />
+        <activity
+            android:name=".AlexDeathActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Autokolk.NoActionBar" />
 
         <service
             android:name=".HeartRefillJobService"

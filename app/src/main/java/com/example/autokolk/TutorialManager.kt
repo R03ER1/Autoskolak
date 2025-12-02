@@ -3,6 +3,9 @@ package com.example.autokolk
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import android.text.SpannableString
@@ -14,6 +17,7 @@ import android.graphics.BitmapFactory
 
 object TutorialManager {
     private const val PREFS = "tutorial_overlays"
+    private const val TYPING_DELAY_MS = 25L // Fast typing animation - 25ms per character
 
     fun hasShown(activity: android.app.Activity, key: String): Boolean {
         val prefs = activity.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
@@ -23,6 +27,42 @@ object TutorialManager {
     private fun markShown(activity: android.app.Activity, key: String) {
         val prefs = activity.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
         prefs.edit().putBoolean(key, true).apply()
+    }
+
+    private fun animateTypingText(textView: TextView, finalText: CharSequence, handler: Handler) {
+        textView.text = "" // Start with empty text
+        val text = finalText.toString()
+        var currentIndex = 0
+        
+        fun typeNextChar() {
+            if (currentIndex < text.length && textView.parent != null) {
+                val nextChar = text[currentIndex]
+                // Check if this is part of a [mince] token
+                val remainingText = text.substring(currentIndex)
+                if (remainingText.startsWith("[mince]")) {
+                    // Add the entire token at once
+                    val currentText = textView.text.toString()
+                    textView.text = currentText + "[mince]"
+                    currentIndex += 7 // Skip the entire token
+                } else {
+                    // Add single character
+                    val currentText = textView.text.toString()
+                    textView.text = currentText + nextChar
+                    currentIndex++
+                }
+                
+                if (currentIndex < text.length) {
+                    handler.postDelayed({ typeNextChar() }, TYPING_DELAY_MS)
+                } else {
+                    // Animation complete, apply spannable if needed
+                    if (finalText is Spannable) {
+                        textView.text = finalText
+                    }
+                }
+            }
+        }
+        
+        typeNextChar()
     }
 
     fun showIfNeeded(activity: android.app.Activity, key: String, message: String, afterDismiss: (() -> Unit)? = null) {
@@ -38,9 +78,12 @@ object TutorialManager {
         val overlay = LayoutInflater.from(activity).inflate(R.layout.view_tutorial_overlay, root, false)
         overlay.isClickable = true
         overlay.isFocusable = true
-        // Replace token [mince] with inline coin icon
-        val textView = overlay.findViewById<TextView>(R.id.tutorialText)
-        if (textView != null) {
+        // Replace token [mince] with inline coin icon and prepare for typing animation
+        val handler = Handler(Looper.getMainLooper())
+        val okButton = overlay.findViewById<MaterialButton>(R.id.tutorialOk)
+        val tutorialText = overlay.findViewById<TextView>(R.id.tutorialText)
+        val tutorialImage = overlay.findViewById<ImageView>(R.id.tutorialImage)
+        if (tutorialText != null) {
             val token = "[mince]"
             if (message.contains(token)) {
                 val spannable = SpannableString(message)
@@ -51,7 +94,7 @@ object TutorialManager {
                         val drawable = ContextCompat.getDrawable(activity, R.drawable.ic_coin)
                         if (drawable != null) {
                             // Scale icon to match text line height
-                            val lineHeight = textView.textSize.toInt()
+                            val lineHeight = tutorialText.textSize.toInt()
                             val size = (lineHeight * 1.2f).toInt()
                             drawable.setBounds(0, 0, size, size)
                             val imageSpan = ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM)
@@ -60,9 +103,15 @@ object TutorialManager {
                     } catch (_: Throwable) { }
                     start = message.indexOf(token, end)
                 }
-                textView.text = spannable
+                // Animate typing with spannable
+                tutorialText.post {
+                    animateTypingText(tutorialText, spannable, handler)
+                }
             } else {
-                textView.text = message
+                // Animate typing with plain text
+                tutorialText.post {
+                    animateTypingText(tutorialText, message, handler)
+                }
             }
         }
         // Load Alex image next to the text
@@ -81,14 +130,40 @@ object TutorialManager {
             val input = activity.assets.open("images/alex/" + finalName)
             val bmp = BitmapFactory.decodeStream(input)
             input.close()
-            overlay.findViewById<ImageView>(R.id.tutorialImage)?.setImageBitmap(bmp)
+            tutorialImage?.setImageBitmap(bmp)
         } catch (_: Throwable) { }
-        overlay.findViewById<MaterialButton>(R.id.tutorialOk)?.setOnClickListener {
-            root.removeView(overlay)
-            markShown(activity, key)
-            afterDismiss?.invoke()
+        
+        okButton?.setOnClickListener {
+            // Disable button to prevent multiple clicks
+            okButton.isEnabled = false
+            okButton.isClickable = false
+            
+            // Animate lion sliding down
+            tutorialImage?.let { img ->
+                val slideDownAnim = AnimationUtils.loadAnimation(activity, R.anim.slide_lion_to_bottom)
+                img.startAnimation(slideDownAnim)
+            }
+            
+            // Animate text and button fading out
+            val fadeOutAnim = AnimationUtils.loadAnimation(activity, R.anim.fade_out_slow)
+            tutorialText?.startAnimation(fadeOutAnim)
+            okButton.startAnimation(fadeOutAnim)
+            
+            // Remove view after animations complete (use the longer duration)
+            handler.postDelayed({
+                root.removeView(overlay)
+                markShown(activity, key)
+                afterDismiss?.invoke()
+            }, 400) // Match the fade out duration
         }
         root.addView(overlay)
+        // Animate the lion sliding from the bottom after the view is added
+        tutorialImage?.let { img ->
+            img.post {
+                val animation = AnimationUtils.loadAnimation(activity, R.anim.slide_lion_from_bottom)
+                img.startAnimation(animation)
+            }
+        }
     }
 
     fun showSequenceIfNeeded(activity: android.app.Activity, keysAndMessages: List<Pair<String, String>>) {

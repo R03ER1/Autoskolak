@@ -109,6 +109,16 @@ class AlexActivity : AppCompatActivity() {
             }
         }
         
+        // Check if lion is dead before loading content
+        val manager = HungerManager(this)
+        val hunger = manager.getCurrentHunger()
+        if (hunger <= 0) {
+            val intent = android.content.Intent(this, AlexDeathActivity::class.java)
+            startActivity(intent)
+            // Don't load content if dead
+            return
+        }
+        
         // Load page 1 content
         loadPage1Content()
         
@@ -131,6 +141,13 @@ class AlexActivity : AppCompatActivity() {
         val lionName = getLionName()
         val manager = HungerManager(this)
         val hunger = manager.getCurrentHunger()
+        
+        // Check if lion is dead and show death screen
+        if (hunger <= 0) {
+            val intent = android.content.Intent(this, AlexDeathActivity::class.java)
+            startActivity(intent)
+            return
+        }
         
         // Update hunger message as title
         page1Container.findViewById<TextView>(R.id.pageTitle)?.text = getHungerMessage(hunger, lionName)

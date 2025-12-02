@@ -47,26 +47,74 @@ class ConfettiView @JvmOverloads constructor(
     private val handler = Handler(Looper.getMainLooper())
     private var isAnimating = false
     private val particleCount = 50
+    private var isFadingOut = false
     
     fun start() {
         if (isAnimating) return
+        if (!isAttachedToWindow) return
         
         // Wait for view to be measured
-        if (width == 0 || height == 0) {
-            post { start() }
+        if (width <= 0 || height <= 0) {
+            post {
+                if (isAttachedToWindow && width > 0 && height > 0) {
+                    start()
+                }
+            }
             return
         }
         
-        isAnimating = true
-        particles.clear()
-        
-        // Create initial particles
-        for (i in 0 until particleCount) {
-            createParticle()
+        try {
+            isAnimating = true
+            particles.clear()
+            
+            // Create initial particles
+            for (i in 0 until particleCount) {
+                createParticle()
+            }
+            
+            // Start animation loop
+            handler.post(animationRunnable)
+        } catch (e: Exception) {
+            isAnimating = false
+            e.printStackTrace()
         }
-        
-        // Start animation loop
-        handler.post(animationRunnable)
+    }
+
+    fun startFor(durationMs: Long, fadeOutMs: Long = 300L) {
+        start()
+        // Schedule fade out and cleanup
+        postDelayed({
+            try {
+                if (!isAttachedToWindow) return@postDelayed
+                if (!isAnimating) return@postDelayed
+                isFadingOut = true
+                animate()
+                    .alpha(0f)
+                    .setDuration(fadeOutMs)
+                    .withEndAction {
+                        try {
+                            stop()
+                            particles.clear()
+                            alpha = 1f
+                            visibility = View.GONE
+                            invalidate()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        } finally {
+                            isFadingOut = false
+                        }
+                    }
+                    .start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                stop()
+                particles.clear()
+                alpha = 1f
+                visibility = View.GONE
+                invalidate()
+                isFadingOut = false
+            }
+        }, durationMs)
     }
     
     fun stop() {
@@ -91,47 +139,67 @@ class ConfettiView @JvmOverloads constructor(
     
     private val animationRunnable = object : Runnable {
         override fun run() {
-            if (!isAnimating) return
+            if (!isAnimating || !isAttachedToWindow) {
+                isAnimating = false
+                return
+            }
             
-            // Update particles
-            val iterator = particles.iterator()
-            while (iterator.hasNext()) {
-                val particle = iterator.next()
-                particle.y += particle.speedY
-                particle.x += particle.speedX
-                particle.rotation += particle.rotationSpeed
+            try {
+                if (width <= 0 || height <= 0) {
+                    handler.postDelayed(this, 50)
+                    return
+                }
                 
-                // Remove particles that are off screen
-                if (particle.y > height + particle.size) {
-                    iterator.remove()
-                    // Create new particle at top
-                    if (particles.size < particleCount) {
-                        createParticle()
+                // Update particles
+                val iterator = particles.iterator()
+                while (iterator.hasNext()) {
+                    val particle = iterator.next()
+                    particle.y += particle.speedY
+                    particle.x += particle.speedX
+                    particle.rotation += particle.rotationSpeed
+                    
+                    // Remove particles that are off screen
+                    if (particle.y > height + particle.size) {
+                        iterator.remove()
+                        // Create new particle at top
+                        if (particles.size < particleCount && width > 0 && height > 0) {
+                            createParticle()
+                        }
                     }
                 }
+                
+                // Add new particles occasionally
+                if (particles.size < particleCount && width > 0 && height > 0 && Random.nextFloat() < 0.3f) {
+                    createParticle()
+                }
+                
+                invalidate()
+                handler.postDelayed(this, 16) // ~60 FPS
+            } catch (e: Exception) {
+                isAnimating = false
+                e.printStackTrace()
             }
-            
-            // Add new particles occasionally
-            if (particles.size < particleCount && Random.nextFloat() < 0.3f) {
-                createParticle()
-            }
-            
-            invalidate()
-            handler.postDelayed(this, 16) // ~60 FPS
         }
     }
     
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         
-        for (particle in particles) {
-            paint.color = particle.color
-            canvas.save()
-            canvas.translate(particle.x, particle.y)
-            canvas.rotate(particle.rotation)
-            canvas.drawRect(-particle.size / 2, -particle.size / 2, 
-                          particle.size / 2, particle.size / 2, paint)
-            canvas.restore()
+        try {
+            if (width <= 0 || height <= 0) return
+            if (!isAnimating && !isFadingOut && particles.isEmpty()) return
+            
+            for (particle in particles) {
+                paint.color = particle.color
+                canvas.save()
+                canvas.translate(particle.x, particle.y)
+                canvas.rotate(particle.rotation)
+                canvas.drawRect(-particle.size / 2, -particle.size / 2, 
+                              particle.size / 2, particle.size / 2, paint)
+                canvas.restore()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
     

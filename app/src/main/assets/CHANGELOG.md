@@ -7,6 +7,21 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [0.1.48] - 2025-01-XX
+- Added: Death screen for Alex when hunger reaches 0, showing a message about starvation and a dead lion image rotated 90 degrees.
+- Added: Hold-to-revive mechanic - user must hold a circular button for 5 seconds to revive the lion.
+- Added: During the hold, the lion image slowly rotates back to upright position.
+- Added: After successful revival, the lion changes to happy state and hunger is restored to 50%.
+- Synced version string in Settings and Gradle to 0.1.48.
+
+## [0.1.47] - 2025-11-10
+- Added: Lion image in introduction tutorials now animates sliding up from the bottom.
+- Synced version string in Settings and Gradle to 0.1.47.
+
+## [0.1.46] - 2025-11-10
+- Changed: Confetti now auto-disappears — runs for ~2s, then fades out and clears.
+- Synced version string in Settings and Gradle to 0.1.46.
+
 ## [0.1.45] - 2025-11-10
 - Added: Confetti animation to random event overlay - colorful particles fall from the top when events are shown.
 - Synced version string in Settings and Gradle to 0.1.45.
