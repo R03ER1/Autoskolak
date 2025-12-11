@@ -11,6 +11,12 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/imageassets" />
+            <option value="$PROJECT_DIR$/videoassets1" />
+            <option value="$PROJECT_DIR$/videoassets2" />
+            <option value="$PROJECT_DIR$/videoassets3" />
+            <option value="$PROJECT_DIR$/videoassets4" />
+            <option value="$PROJECT_DIR$/videoassets5" />
           </set>
         </option>
       </GradleProjectSettings>

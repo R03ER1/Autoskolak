@@ -7,6 +7,44 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [0.1.57] - 2025-12-03
+- Changed: Split `videoassets` module into 5 smaller Dynamic Feature Modules (videoassets1-5) to comply with 200MB size limit per module. Each module contains approximately 11 videos, balanced by file size (~160MB per module).
+- Changed: Converted video modules back from Play Asset Delivery to Dynamic Feature Modules using SplitInstall API.
+- Changed: Updated video loading code in MainActivity to use SplitInstall API instead of Asset Delivery API.
+- Changed: Replaced Play Asset Delivery dependency with Play Feature Delivery for dynamic feature modules.
+
+## [0.1.56] - 2025-12-03
+- Changed: Converted `videoassets` module from Dynamic Feature Module to Play Asset Delivery (Asset Pack) to resolve 200MB size limit issue. Asset Packs support up to 1.5GB per pack, allowing all video assets to be delivered on-demand without size restrictions.
+- Changed: Updated video loading code in MainActivity to use Asset Delivery API instead of SplitInstall API.
+- Added: Play Asset Delivery dependency for handling large video asset downloads.
+
+## [0.1.55] - 2025-12-03
+- Added: Dynamic feature module `imageassets` for all lesson and Alex images, moved from base assets to reduce base module size.
+- Added: Automatic Play Core request for `imageassets` in `App.onCreate` so image assets are available early in app lifecycle.
+
+## [0.1.54] - 2025-12-03
+- Added: Dynamic feature module `videoassets` is now requested via Play Core SplitInstall so videos are delivered on-demand.
+- Added: Play Feature Delivery dependency to handle installation of the `videoassets` module at runtime.
+
+## [0.1.53] - 2025-12-03
+- Fixed: Changed package name from reserved "com.example.autokolk" to "cz.autokolk" to comply with Google Play requirements.
+- Fixed: Added bundle configuration to reduce AAB size (language, density, and ABI splits enabled).
+- Note: For apps exceeding 200MB, consider using Play Asset Delivery for large video assets or compressing assets further.
+
+## [0.1.52] - 2025-12-03
+- Fixed: ConstraintLayout lint error in activity_results.xml - resultsText now correctly constrains to buttonsContainer instead of homeButton (which is nested inside).
+
+## [0.1.51] - 2025-12-03
+- Added: Password protection for developer options - the debugging dropdown and random event trigger now require password "Vasik31zaz" to access. Once unlocked, access is saved and remains available.
+- Synced version string in Settings and Gradle to 0.1.51.
+
+## [0.1.50] - 2025-12-03
+- Fixed: Alex death screen no longer reappears after completing revive - added a revive timestamp that provides a 2-second grace period after revival, preventing death screen from showing immediately. Also changed `setCurrentHunger()` to use `.commit()` for synchronous writes and removed the 1-second delay before finishing the death activity.
+
+## [0.1.49] - 2025-12-03
+- Fixed: Reviving Alex no longer immediately reopens the death screen — hunger decay baseline now resets when hunger is manually changed, preventing instant re-decay to 0.
+- Synced version string in Settings and Gradle to 0.1.49.
+
 ## [0.1.48] - 2025-01-XX
 - Added: Death screen for Alex when hunger reaches 0, showing a message about starvation and a dead lion image rotated 90 degrees.
 - Added: Hold-to-revive mechanic - user must hold a circular button for 5 seconds to revive the lion.

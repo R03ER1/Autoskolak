@@ -66,7 +66,7 @@
         android:scaleType="fitCenter"
         android:contentDescription="Alex"/>
 
-    <com.example.autokolk.ConfettiView
+    <cz.autokolk.ConfettiView
         android:id="@+id/confettiView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

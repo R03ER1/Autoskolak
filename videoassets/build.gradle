@@ -1,0 +1,27 @@
+// Asset Pack module configuration
+// Asset packs are configured in the main app's build.gradle via assetPacks = [':videoassets']
+// Asset Pack modules must use com.android.library plugin
+
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace = "cz.autokolk.videoassets"
+    compileSdk 34
+    
+    defaultConfig {
+        minSdk = 24
+    }
+    
+    buildTypes {
+        release {
+            // Asset Pack build type
+        }
+    }
+    
+    // Asset Pack modules need to expose their assets for packaging
+    // The packElements variant is created automatically by AGP when assetPacks is declared
+    // But we need to ensure the module is properly configured as a library
+}
+

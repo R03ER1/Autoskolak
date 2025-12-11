@@ -496,41 +496,41 @@
 
 						</LinearLayout>
 
-					</LinearLayout>
-
-					<!-- Trigger Random Event (Debug) Card -->
-					<LinearLayout
-						android:id="@+id/card_trigger_event"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="horizontal"
-						android:gravity="center_vertical"
-						android:padding="16dp"
-						android:clickable="true"
-						android:focusable="true"
-						android:background="?attr/selectableItemBackground">
-
+						<!-- Trigger Random Event (Debug) Card -->
 						<LinearLayout
-							android:layout_width="0dp"
+							android:id="@+id/card_trigger_event"
+							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_weight="1"
-							android:orientation="vertical">
+							android:orientation="horizontal"
+							android:gravity="center_vertical"
+							android:padding="16dp"
+							android:clickable="true"
+							android:focusable="true"
+							android:background="?attr/selectableItemBackground">
 
-							<TextView
-								android:layout_width="wrap_content"
+							<LinearLayout
+								android:layout_width="0dp"
 								android:layout_height="wrap_content"
-								android:text="Spustit náhodnou událost"
-								android:textColor="@color/text_primary"
-								android:textSize="16sp"
-								android:textStyle="bold" />
+								android:layout_weight="1"
+								android:orientation="vertical">
 
-							<TextView
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:text="Okamžitě zobrazí náhodnou událost (pro testování)"
-								android:textColor="@color/text_primary"
-								android:textSize="14sp"
-								android:alpha="0.8" />
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Spustit náhodnou událost"
+									android:textColor="@color/text_primary"
+									android:textSize="16sp"
+									android:textStyle="bold" />
+
+								<TextView
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:text="Okamžitě zobrazí náhodnou událost (pro testování)"
+									android:textColor="@color/text_primary"
+									android:textSize="14sp"
+									android:alpha="0.8" />
+
+							</LinearLayout>
 
 						</LinearLayout>
 
@@ -547,7 +547,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_gravity="center_horizontal"
-			android:text="Robert Sadílek 2025 • Verze: 0.1.48"
+			android:text="Robert Sadílek 2025 • Verze: 0.1.56"
             android:textColor="@color/text_primary"
             android:textSize="12sp"
             android:alpha="0.7"

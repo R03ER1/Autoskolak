@@ -5,7 +5,7 @@
     android:padding="16dp">
 
     <!-- Background path lines -->
-    <com.example.autokolk.CurvyPathView
+    <cz.autokolk.CurvyPathView
         android:id="@+id/pathBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
