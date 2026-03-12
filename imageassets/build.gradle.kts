@@ -4,9 +4,7 @@ plugins {
 }
 android {
     namespace = "cz.autokolk.imageassets"
-    compileSdk {
-        version = release(34)
-    }
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:targetApi="33" />
 
     <application
@@ -14,64 +15,85 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Autokolk.NoActionBar"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
         <activity
-            android:name=".HomeActivity"
-            android:exported="true">
+            android:name=".LoadingActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".HomeActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ResultsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".StreakActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ReadingLessonActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AlexActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PracticeActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".TestAttemptActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".TestAttemptStatsActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".TestResultsActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AchievementsActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ChangelogActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AlexDeathActivity"
             android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar" />
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".HeartRefillJobService"

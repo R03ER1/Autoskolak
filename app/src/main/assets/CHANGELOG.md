@@ -7,6 +7,16 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [1.0.2] - 2026-03-12
+- Changed: Forced all activities to portrait orientation so the app always stays in vertical mode and does not rotate to landscape.
+
+## [1.0.1] - 2026-03-12
+- Added: New startup loading screen that blocks the app until the `imageassets` dynamic feature module (with all lesson and Alex images) is installed.
+- Changed: Home screen is now opened only after required image packages are fully available to prevent missing images when users start using the app immediately after install.
+
+## [0.1.58] - 2025-12-11
+- Changed: Version bump for release submission.
+
 ## [0.1.57] - 2025-12-03
 - Changed: Split `videoassets` module into 5 smaller Dynamic Feature Modules (videoassets1-5) to comply with 200MB size limit per module. Each module contains approximately 11 videos, balanced by file size (~160MB per module).
 - Changed: Converted video modules back from Play Asset Delivery to Dynamic Feature Modules using SplitInstall API.

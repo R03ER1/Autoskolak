@@ -547,7 +547,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_gravity="center_horizontal"
-			android:text="Robert Sadílek 2025 • Verze: 0.1.56"
+			android:text="Robert Sadílek 2025 • Verze: 1.0.2"
             android:textColor="@color/text_primary"
             android:textSize="12sp"
             android:alpha="0.7"

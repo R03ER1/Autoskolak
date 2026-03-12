@@ -4,9 +4,7 @@ plugins {
 }
 android {
     namespace = "cz.autokolk.videoassets4"
-    compileSdk {
-        version = release(34)
-    }
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -37,4 +35,3 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
-

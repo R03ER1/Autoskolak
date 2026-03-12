@@ -1,9 +1,11 @@
 ---
+description: 
 alwaysApply: true
 ---
+
 If you do an update, update the verion in activity_settings.xml. Update it for +0.0.01
 
 The version number is made from 3 numbers, make only the last one +1. For example, from 0.0.9, make 0.0.10 or from 3.15.2 make 3.15.3.
 
 
-Then note what you changed in  autokolk/CHANGELOG.md. After that, copy the new changelog to autokolk/src/main/assets/CHANGELOG.md and apply the new version name to versionName in build.gradle
+Then note what you changed in  autokolk/CHANGELOG.md and into autokolk/src/main/assets/CHANGELOG.md and apply the new version name to versionName in build.gradle

@@ -7,4 +7,13 @@
     <string name="title_videoassets4">Video Assets 4</string>
     <string name="title_videoassets5">Video Assets 5</string>
     <string name="title_imageassets">Image Assets</string>
+
+    <!-- Loading screen -->
+    <string name="loading_status_title">Připravuji otázky…</string>
+    <string name="loading_detail_initial">Stahuji obrázky a další obsah. Může to trvat několik sekund.</string>
+    <string name="loading_detail_with_percent">Stahuji obsah (%1$d%%)…</string>
+    <string name="loading_status_error">Nepodařilo se připravit obsah</string>
+    <string name="loading_detail_error">Instalace balíčku s obrázky selhala. Zkontrolujte připojení k internetu a zkuste to znovu.</string>
+    <string name="loading_retry">Zkusit znovu</string>
+    <string name="loading_icon_description">Ikona aplikace Autoškolák</string>
 </resources>

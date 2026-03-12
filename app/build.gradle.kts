@@ -15,8 +15,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.57"
+        versionCode = 4
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,7 +28,7 @@ android {
                 val keystoreProperties = Properties()
                 FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
                 val storeFileProp = keystoreProperties.getProperty("storeFile")
-                if (storeFileProp != null) {
+                if (storeFileProp != null && storeFileProp.isNotBlank()) {
                     // Resolve relative path from root project
                     val keystoreFile = if (storeFileProp.startsWith("/") || storeFileProp.matches(Regex("^[A-Za-z]:.*"))) {
                         file(storeFileProp)
@@ -37,18 +37,33 @@ android {
                     }
                     if (keystoreFile.exists()) {
                         storeFile = keystoreFile
-                        storePassword = keystoreProperties.getProperty("storePassword")
-                        keyAlias = keystoreProperties.getProperty("keyAlias")
-                        keyPassword = keystoreProperties.getProperty("keyPassword")
+                        val storePasswordProp = keystoreProperties.getProperty("storePassword")
+                        val keyAliasProp = keystoreProperties.getProperty("keyAlias")
+                        val keyPasswordProp = keystoreProperties.getProperty("keyPassword")
+                        
+                        if (storePasswordProp != null && storePasswordProp.isNotBlank()) {
+                            storePassword = storePasswordProp
+                        }
+                        if (keyAliasProp != null && keyAliasProp.isNotBlank()) {
+                            keyAlias = keyAliasProp
+                        }
+                        if (keyPasswordProp != null && keyPasswordProp.isNotBlank()) {
+                            keyPassword = keyPasswordProp
+                        }
+                    } else {
+                        println("WARNING: Keystore file not found at: ${keystoreFile.absolutePath}")
                     }
                 }
             } else if (project.hasProperty("MYAPP_RELEASE_STORE_FILE")) {
                 val storeFileProp = project.findProperty("MYAPP_RELEASE_STORE_FILE") as String?
                 if (storeFileProp != null) {
-                    storeFile = file(storeFileProp)
-                    storePassword = project.findProperty("MYAPP_RELEASE_STORE_PASSWORD") as String
-                    keyAlias = project.findProperty("MYAPP_RELEASE_KEY_ALIAS") as String
-                    keyPassword = project.findProperty("MYAPP_RELEASE_KEY_PASSWORD") as String
+                    val keystoreFile = file(storeFileProp)
+                    if (keystoreFile.exists()) {
+                        storeFile = keystoreFile
+                        storePassword = project.findProperty("MYAPP_RELEASE_STORE_PASSWORD") as String
+                        keyAlias = project.findProperty("MYAPP_RELEASE_KEY_ALIAS") as String
+                        keyPassword = project.findProperty("MYAPP_RELEASE_KEY_PASSWORD") as String
+                    }
                 }
             }
         }
@@ -62,11 +77,20 @@ android {
                 "proguard-rules.pro"
             )
             val releaseSigning = signingConfigs.findByName("release")
-            signingConfig = if (releaseSigning?.storeFile != null && releaseSigning.storeFile?.exists() == true) {
-                releaseSigning
+            if (releaseSigning?.storeFile != null && releaseSigning.storeFile?.exists() == true) {
+                signingConfig = releaseSigning
             } else {
-                signingConfigs.getByName("debug")
+                // Fallback to debug signing only for APK builds
+                // Note: AAB generation requires a valid release signing config
+                signingConfig = signingConfigs.getByName("debug")
             }
+        }
+    }
+    
+    // Bundle configuration
+    bundle {
+        language {
+            enableSplit = false
         }
     }
     

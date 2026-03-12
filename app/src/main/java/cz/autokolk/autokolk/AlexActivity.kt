@@ -15,6 +15,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import java.net.HttpURLConnection
+import java.net.URL
+import org.json.JSONObject
+import kotlin.concurrent.thread
 
 class AlexActivity : AppCompatActivity() {
     private lateinit var lessonProgress: LessonProgress
@@ -887,23 +892,78 @@ class AlexActivity : AppCompatActivity() {
             val imageView = container.findViewById<android.widget.ImageView>(R.id.alexImage)
             if (imageView == null) return
 
+            val moduleInstalled = try {
+                SplitInstallManagerFactory.create(this).installedModules.contains("imageassets")
+            } catch (_: Throwable) { false }
+            val imageName = if (hunger <= 0) "AlexDead.png" else getAlexImageName(hunger)
+            // #region agent log
+            debugLog(
+                hypothesisId = "H1",
+                location = "AlexActivity.kt:updateAlexImage:pre",
+                message = "before_load",
+                data = mapOf(
+                    "hunger" to hunger,
+                    "imageName" to imageName,
+                    "moduleInstalled" to moduleInstalled,
+                    "sunglassesEnabled" to LessonProgress(this).isSunglassesEnabled()
+                )
+            )
+            // #endregion
+
             if (hunger <= 0) {
                 // Show dead Alex rotated 90 degrees to the right
-                assets.open("alex/AlexDead.png").use { input ->
+                assets.open("alex/$imageName").use { input ->
                     val bmp = android.graphics.BitmapFactory.decodeStream(input)
                     imageView.setImageBitmap(bmp)
+                    // #region agent log
+                    debugLog(
+                        hypothesisId = "H2",
+                        location = "AlexActivity.kt:updateAlexImage:dead",
+                        message = "load_success",
+                        data = mapOf(
+                            "imageName" to imageName,
+                            "width" to bmp?.width,
+                            "height" to bmp?.height,
+                            "moduleInstalled" to moduleInstalled
+                        )
+                    )
+                    // #endregion
                 }
                 imageView.rotation = 90f
             } else {
-                val imageName = getAlexImageName(hunger)
                 assets.open("images/alex/$imageName").use { input ->
                     val bmp = android.graphics.BitmapFactory.decodeStream(input)
                     imageView.setImageBitmap(bmp)
+                    // #region agent log
+                    debugLog(
+                        hypothesisId = "H2",
+                        location = "AlexActivity.kt:updateAlexImage:alive",
+                        message = "load_success",
+                        data = mapOf(
+                            "imageName" to imageName,
+                            "width" to bmp?.width,
+                            "height" to bmp?.height,
+                            "moduleInstalled" to moduleInstalled
+                        )
+                    )
+                    // #endregion
                 }
                 // Ensure normal orientation for non-dead states
                 imageView.rotation = 0f
             }
-        } catch (_: Throwable) { }
+        } catch (e: Throwable) {
+            // #region agent log
+            debugLog(
+                hypothesisId = "H3",
+                location = "AlexActivity.kt:updateAlexImage:catch",
+                message = "load_failed",
+                data = mapOf(
+                    "message" to (e.message ?: "unknown"),
+                    "cause" to (e.cause?.message ?: "none")
+                )
+            )
+            // #endregion
+        }
     }
     
     private fun showPage2() {
@@ -914,5 +974,56 @@ class AlexActivity : AppCompatActivity() {
         // Clean any floating overlays when closing
         removeHungerOverlay()
         page2Overlay.visibility = View.GONE
+    }
+
+    private fun debugLog(
+        hypothesisId: String,
+        location: String,
+        message: String,
+        data: Map<String, Any?>
+    ) {
+        try {
+            // #region agent log
+            val payload = JSONObject().apply {
+                put("sessionId", "debug-session")
+                put("runId", "pre-fix")
+                put("hypothesisId", hypothesisId)
+                put("location", location)
+                put("message", message)
+                put("data", JSONObject(data))
+                put("timestamp", System.currentTimeMillis())
+            }.toString()
+
+            thread {
+                val endpoints = listOf(
+                    "http://127.0.0.1:7242/ingest/fb755fe0-ce46-4b6a-aa4a-ef69553db45f",
+                    // Emulator-to-host alias fallback
+                    "http://10.0.2.2:7242/ingest/fb755fe0-ce46-4b6a-aa4a-ef69553db45f",
+                    // Localhost (some devices map this differently)
+                    "http://localhost:7242/ingest/fb755fe0-ce46-4b6a-aa4a-ef69553db45f"
+                )
+                for (urlStr in endpoints) {
+                    try {
+                        val url = URL(urlStr)
+                        val conn = (url.openConnection() as HttpURLConnection).apply {
+                            requestMethod = "POST"
+                            setRequestProperty("Content-Type", "application/json")
+                            doOutput = true
+                            connectTimeout = 4000
+                            readTimeout = 4000
+                        }
+                        conn.outputStream.use { it.write(payload.toByteArray(Charsets.UTF_8)) }
+                        conn.inputStream.use { /* drain */ }
+                        conn.disconnect()
+                        break
+                    } catch (_: Throwable) {
+                        // try next endpoint
+                    }
+                }
+            }
+            // #endregion
+        } catch (_: Throwable) {
+            // Swallow logging failures to avoid crashing
+        }
     }
 }
