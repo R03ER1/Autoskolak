@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [1.0.3] - 2026-03-19
+- Added: First-run consent dialog asking users to accept terms of use and privacy policy with a link to the hosted policy page.
+
 ## [1.0.2] - 2026-03-12
 - Changed: Forced all activities to portrait orientation so the app always stays in vertical mode and does not rotate to landscape.
 

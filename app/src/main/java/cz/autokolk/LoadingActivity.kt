@@ -1,11 +1,15 @@
 package cz.autokolk
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
@@ -14,6 +18,11 @@ import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
 
 class LoadingActivity : AppCompatActivity() {
 
@@ -43,7 +52,7 @@ class LoadingActivity : AppCompatActivity() {
             }
             SplitInstallSessionStatus.INSTALLED -> {
                 Log.d("LoadingActivity", "Image module '$imageModuleName' installed")
-                navigateToHome()
+                ensureTermsAcceptedThenNavigate()
             }
             SplitInstallSessionStatus.INSTALLING,
             SplitInstallSessionStatus.PENDING,
@@ -102,7 +111,7 @@ class LoadingActivity : AppCompatActivity() {
         // If the image module is already installed, we can proceed immediately.
         if (splitInstallManager.installedModules.contains(imageModuleName)) {
             Log.d("LoadingActivity", "Image module already installed, navigating to HomeActivity")
-            navigateToHome()
+            ensureTermsAcceptedThenNavigate()
             return
         }
 
@@ -147,6 +156,77 @@ class LoadingActivity : AppCompatActivity() {
         statusText.text = getString(R.string.loading_status_error)
         detailText.text = getString(R.string.loading_detail_error)
         retryButton.visibility = View.VISIBLE
+    }
+
+    private fun ensureTermsAcceptedThenNavigate() {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val key = "terms_accepted_v1"
+        if (prefs.getBoolean(key, false)) {
+            navigateToHome()
+            return
+        }
+
+        val fullText = "Používáním aplikace souhlasíte s podmínkami používání a zásadami ochrany soukromí."
+        val linkText = "podmínkami používání a zásadami ochrany soukromí"
+        val start = fullText.indexOf(linkText)
+        val spannable = SpannableString(fullText)
+        if (start >= 0) {
+            val end = start + linkText.length
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    try {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://sites.google.com/view/dos-pachos-studio/zásady-ochrany-soukromí")
+                        )
+                        startActivity(intent)
+                    } catch (_: Throwable) {
+                    }
+                }
+            }
+            spannable.setSpan(clickableSpan, start, end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            val linkColor = ContextCompat.getColor(this, R.color.text_primary)
+            spannable.setSpan(
+                ForegroundColorSpan(linkColor),
+                start,
+                end,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                UnderlineSpan(),
+                start,
+                end,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        val messageView = TextView(this).apply {
+            text = spannable
+            movementMethod = LinkMovementMethod.getInstance()
+            setTextColor(ContextCompat.getColor(this@LoadingActivity, R.color.text_primary))
+            textSize = 14f
+            setPadding(
+                (24 * resources.displayMetrics.density).toInt(),
+                (16 * resources.displayMetrics.density).toInt(),
+                (24 * resources.displayMetrics.density).toInt(),
+                (8 * resources.displayMetrics.density).toInt()
+            )
+            gravity = Gravity.START
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Podmínky používání")
+            .setView(messageView)
+            .setCancelable(false)
+            .setPositiveButton("OK") { _, _ ->
+                prefs.edit().putBoolean(key, true).apply()
+                navigateToHome()
+            }
+            .show()
     }
 
     private fun navigateToHome() {
