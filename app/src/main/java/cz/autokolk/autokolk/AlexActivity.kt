@@ -9,7 +9,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
@@ -21,7 +20,7 @@ import java.net.URL
 import org.json.JSONObject
 import kotlin.concurrent.thread
 
-class AlexActivity : AppCompatActivity() {
+class AlexActivity : AutokolkActivity() {
     private lateinit var lessonProgress: LessonProgress
     private lateinit var streakButton: MaterialButton
     private lateinit var xpButton: MaterialButton
@@ -249,8 +248,9 @@ class AlexActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for streak sheet
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -265,8 +265,9 @@ class AlexActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for points sheet
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -317,6 +318,9 @@ class AlexActivity : AppCompatActivity() {
             startActivity(intent)
             dialog.dismiss()
         }
+        val plusButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)
+        val okButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk)
+        HeartsRewardAds.wireForHeartsSheet(this, view, lessonProgress, number, plusButton, okButton)
         dialog.show()
     }
 

@@ -1,6 +1,9 @@
 package cz.autokolk
 
+import android.app.Activity
 import android.content.Context
+import android.os.Build
+import android.os.Looper
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -96,11 +99,13 @@ class AchievementsManager(private val context: Context) {
 
     private fun checkTiers(prefix: String, value: Int, tiers: IntArray) {
         tiers.forEachIndexed { idx, threshold ->
-            val unlockedKey = "${prefix}_tier_${idx+1}_unlocked"
+            val unlockedKey = "${prefix}_tier_${idx + 1}_unlocked"
             if (!prefs.getBoolean(unlockedKey, false) && value >= threshold) {
-                // Unlock and reward
-                prefs.edit().putBoolean(unlockedKey, true).apply()
+                prefs.edit().putBoolean(unlockedKey, true).commit()
                 reward()
+                achievementTitleForTierPrefix(prefix)?.let { title ->
+                    notifyAchievementUnlock(title, countUnlockedTierStars(prefix, tiers.size))
+                }
             }
         }
     }
@@ -108,8 +113,63 @@ class AchievementsManager(private val context: Context) {
     private fun checkSingleTarget(keyPrefix: String, value: Int, target: Int) {
         val unlockedKey = "${keyPrefix}_unlocked"
         if (!prefs.getBoolean(unlockedKey, false) && value >= target) {
-            prefs.edit().putBoolean(unlockedKey, true).apply()
+            prefs.edit().putBoolean(unlockedKey, true).commit()
             reward()
+            achievementTitleForFoodPrefix(keyPrefix)?.let { title ->
+                notifyAchievementUnlock(title, 3)
+            }
+        }
+    }
+
+    private fun achievementTitleForTierPrefix(prefix: String): String? = when (prefix) {
+        "streak" -> "Streak"
+        "fixes" -> "Chyby – opravy"
+        "answers_correct" -> "Otázky – správně zodpovězeno"
+        "coins_earned" -> "Penízky – získané"
+        "coins_spent" -> "Penízky – utracené"
+        "feed_streak" -> "Alex – streak krmení"
+        else -> null
+    }
+
+    private fun achievementTitleForFoodPrefix(keyPrefix: String): String? = when (keyPrefix) {
+        "food_mrkev" -> "Alex – mrkev"
+        "food_zmrzlina" -> "Alex – zmrzlina"
+        "food_kure" -> "Alex – kuře"
+        "food_klobaska" -> "Alex – klobás"
+        "food_pivo" -> "Alex – pivo"
+        "food_kameni" -> "Alex – kamení"
+        else -> null
+    }
+
+    private fun countUnlockedTierStars(prefix: String, tierCount: Int): Int {
+        var n = 0
+        for (i in 1..tierCount) {
+            if (prefs.getBoolean("${prefix}_tier_${i}_unlocked", false)) n++
+        }
+        return n
+    }
+
+    private fun starsValueLine(count: Int): String {
+        val noun = when {
+            count == 1 -> "hvězdička"
+            count in 2..4 -> "hvězdičky"
+            else -> "hvězdiček"
+        }
+        return "Máš $count $noun"
+    }
+
+    private fun notifyAchievementUnlock(achievementName: String, starCount: Int) {
+        val act = context as? Activity ?: return
+        val valueLine = starsValueLine(starCount)
+        val show = Runnable {
+            if (act.isFinishing) return@Runnable
+            if (Build.VERSION.SDK_INT >= 17 && act.isDestroyed) return@Runnable
+            EventStyleOverlay.show(act, "Úspěch!", achievementName, valueLine, null)
+        }
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            show.run()
+        } else {
+            act.runOnUiThread(show)
         }
     }
 

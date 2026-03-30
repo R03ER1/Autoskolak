@@ -3,13 +3,12 @@ package cz.autokolk
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class TestAttemptStatsActivity : AppCompatActivity() {
+class TestAttemptStatsActivity : AutokolkActivity() {
     private lateinit var lessonProgress: LessonProgress
     private lateinit var streakButton: com.google.android.material.button.MaterialButton
     private lateinit var xpButton: com.google.android.material.button.MaterialButton
@@ -147,8 +146,9 @@ class TestAttemptStatsActivity : AppCompatActivity() {
         view.findViewById<android.widget.ImageView>(R.id.bottomSheetFlame).setImageResource(R.drawable.ic_coin)
         view.findViewById<TextView>(R.id.bottomSheetStreakNumber).text = points.toString()
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener { dialog.dismiss() }
-        // Hide + button for non-streak sheets
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 

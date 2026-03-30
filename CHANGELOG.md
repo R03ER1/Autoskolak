@@ -7,6 +7,35 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.7] - 2026-03-30
+- Changed: Practice — „Tvoje chyby“ section title uses red accent for visibility.
+
+## [2.0.6] - 2026-03-30
+- Added: Practice screen — "Tvoje chyby" bucket: tracks wrong answers from lessons, practice categories, random quiz, and tests; sorts by consecutive wrong streak; ✅/❌ chips like other categories; fixing here marks correct until you miss the same question again anywhere.
+
+## [2.0.5] - 2026-03-30
+- Changed: Vývojářské heslo už není v kódu — načítá se z `local.properties` (`developerOptionsPassword`) jen při debug buildu. V release buildu je sekce Debugging skrytá úplně.
+
+## [2.0.4] - 2026-03-26
+- Changed: Obrazovka streaku po lekci — stejné tlačítko (teal gradient) a typografie jako na obrazovce výsledků; černé pozadí, velký plamen a číslo zůstávají.
+
+## [2.0.3] - 2026-03-26
+- Added: When an achievement star is earned, a full-screen overlay matches random events (Alex with sunglasses, confetti, pop animations, OK) and shows the achievement name plus how many stars you have in that category.
+
+## [2.0.2] - 2026-03-26
+- Fixed: Random event overlay now loads Alex with sunglasses from `images/AlexCool.png` (imageassets module); the wrong paw fallback (`ic_alex`) appeared when the old path `alex/AlexCool.png` did not exist.
+- Changed: Event overlay typography — slightly smaller “Událost!” headline, larger description text, and coin/life/hunger change on its own line below.
+
+## [2.0.1] - 2026-03-26
+- Fixed: On Android 15+ (target SDK 35), window content no longer draws under the status and navigation bars; portrait-only setting is unchanged. Implemented via `AutokolkActivity` (`WindowCompat.setDecorFitsSystemWindows`) and theme `windowOptOutEdgeToEdgeEnforcement` on API 35.
+
+## [2.0.0] - 2026-03-19
+- Release: Přidány AdMob reklamy (interstitial po lekci) a rewarded reklama za srdce.
+
+## [1.0.4] - 2026-03-19
+- Added: Integrated Google Mobile Ads SDK (AdMob), including `APPLICATION_ID` in manifest and SDK initialization in `App`.
+- Added: Interstitial AdMob ad is now requested and shown after each completed lesson/review on the results screen.
+
 ## [1.0.3] - 2026-03-19
 - Added: First-run consent dialog asking users to accept terms of use and privacy policy with a link to the hosted policy page.
 

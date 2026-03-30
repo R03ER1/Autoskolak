@@ -23,13 +23,13 @@
             android:text="Událost!"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:textSize="80sp"
+            android:textSize="68sp"
             android:singleLine="true"
             android:ellipsize="none"
             android:gravity="center"
             android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="40sp"
-            android:autoSizeMaxTextSize="80sp"
+            android:autoSizeMinTextSize="34sp"
+            android:autoSizeMaxTextSize="68sp"
             android:layout_marginBottom="8dp"/>
 
         <TextView
@@ -37,10 +37,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textSize="23sp"
             android:gravity="center"
-            android:lineSpacingExtra="2dp"
+            android:lineSpacingExtra="4dp"
             android:text="Událost text"/>
+
+        <TextView
+            android:id="@+id/eventValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="26sp"
+            android:gravity="center"
+            android:text="+0 mincí"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/eventOk"

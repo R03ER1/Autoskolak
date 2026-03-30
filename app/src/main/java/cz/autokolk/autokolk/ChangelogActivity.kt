@@ -2,10 +2,9 @@ package cz.autokolk
 
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 
-class ChangelogActivity : AppCompatActivity() {
+class ChangelogActivity : AutokolkActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_changelog)

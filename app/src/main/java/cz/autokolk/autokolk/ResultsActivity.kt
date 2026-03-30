@@ -3,12 +3,20 @@ package cz.autokolk
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.button.MaterialButton
 
-class ResultsActivity : AppCompatActivity() {
+class ResultsActivity : AutokolkActivity() {
+    private var lessonInterstitialAd: InterstitialAd? = null
+    private var adShownForThisResult = false
 
     companion object {
         private const val EXTRA_CORRECT_ANSWERS = "extra_correct_answers"
@@ -18,6 +26,7 @@ class ResultsActivity : AppCompatActivity() {
         const val EXTRA_FIRST_OF_DAY = "extra_first_of_day"
         const val EXTRA_IS_PRACTICE = "extra_is_practice"
         const val EXTRA_PRACTICE_CATEGORY = "extra_practice_category"
+        private const val LESSON_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-7904041740523292/1806063612"
 
         fun createIntent(
             context: Context, 
@@ -41,6 +50,10 @@ class ResultsActivity : AppCompatActivity() {
 
         // Set the status bar color to black
         window.statusBarColor = ContextCompat.getColor(this, R.color.black)
+
+        // Resolve overlay/content views
+        val adLoadingOverlay = findViewById<View>(R.id.adLoadingOverlay)
+        val resultsContent = findViewById<View>(R.id.resultsContent)
 
         val correctAnswers = intent.getIntExtra(EXTRA_CORRECT_ANSWERS, 0)
         val totalQuestions = intent.getIntExtra(EXTRA_TOTAL_QUESTIONS, 0)
@@ -149,5 +162,60 @@ class ResultsActivity : AppCompatActivity() {
                 homeButton.setOnClickListener { finish() }
             }
         }
+
+        maybeShowLessonInterstitial(isPractice, isRandom, adLoadingOverlay, resultsContent)
+    }
+
+    private fun maybeShowLessonInterstitial(
+        isPractice: Boolean,
+        isRandom: Boolean,
+        adLoadingOverlay: View,
+        resultsContent: View
+    ) {
+        // Show interstitial only for completed lessons/reviews, not for practice or random quiz.
+        if (isPractice || isRandom || adShownForThisResult) {
+            // Ensure content is visible and overlay hidden when we skip ad
+            adLoadingOverlay.visibility = View.GONE
+            resultsContent.visibility = View.VISIBLE
+            return
+        }
+
+        // While loading/showing ad, show fullscreen overlay and hide content
+        adLoadingOverlay.visibility = View.VISIBLE
+        resultsContent.visibility = View.INVISIBLE
+
+        InterstitialAd.load(
+            this,
+            LESSON_INTERSTITIAL_AD_UNIT_ID,
+            AdRequest.Builder().build(),
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    lessonInterstitialAd = interstitialAd
+                    lessonInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                        override fun onAdDismissedFullScreenContent() {
+                            lessonInterstitialAd = null
+                            adLoadingOverlay.visibility = View.GONE
+                            resultsContent.visibility = View.VISIBLE
+                        }
+
+                        override fun onAdFailedToShowFullScreenContent(adError: com.google.android.gms.ads.AdError) {
+                            Log.w("ResultsActivity", "Interstitial failed to show: ${adError.message}")
+                            lessonInterstitialAd = null
+                            adLoadingOverlay.visibility = View.GONE
+                            resultsContent.visibility = View.VISIBLE
+                        }
+                    }
+                    adShownForThisResult = true
+                    lessonInterstitialAd?.show(this@ResultsActivity)
+                }
+
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    Log.w("ResultsActivity", "Interstitial failed to load: ${loadAdError.message}")
+                    lessonInterstitialAd = null
+                    adLoadingOverlay.visibility = View.GONE
+                    resultsContent.visibility = View.VISIBLE
+                }
+            }
+        )
     }
 } 

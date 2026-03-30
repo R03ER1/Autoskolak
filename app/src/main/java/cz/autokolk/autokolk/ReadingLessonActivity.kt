@@ -9,11 +9,10 @@ import android.widget.ImageView
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 
-class ReadingLessonActivity : AppCompatActivity() {
+class ReadingLessonActivity : AutokolkActivity() {
     companion object {
         const val EXTRA_CATEGORY = "extra_category"
         const val EXTRA_LESSON_NUMBER = "extra_lesson_number"

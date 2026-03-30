@@ -7,6 +7,35 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.7] - 2026-03-30
+- Změna: Procvičování — nadpis „Tvoje chyby“ je červený pro lepší viditelnost.
+
+## [2.0.6] - 2026-03-30
+- Novinka: Procvičování — „Tvoje chyby“: ukládá špatné odpovědi z lekcí, kategorií, náhodného kvízu i testu; řazení podle po sobě jdoucích chyb; žetony ✅/❌ jako u kategorií; oprava tady platí, dokud znovu neuděláš chybu kdekoli v aplikaci.
+
+## [2.0.5] - 2026-03-30
+- Změna: Heslo k vývojářským možnostem je v `local.properties` (`developerOptionsPassword`), ne v kódu; v ostré verzi aplikace sekce Debugging není.
+
+## [2.0.4] - 2026-03-26
+- Změna: Obrazovka streaku po lekci — stejné tlačítko (teal gradient) a typografie jako na obrazovce výsledků; černé pozadí, velký plamen a číslo zůstávají.
+
+## [2.0.3] - 2026-03-26
+- Novinka: Po získání hvězdičky u úspěchu se zobrazí stejný overlay jako u náhodné události (Alex s brýlemi, konfety, animace, OK) s názvem úspěchu a počtem hvězdiček v dané kategorii.
+
+## [2.0.2] - 2026-03-26
+- Oprava: Náhodná událost znovu zobrazuje Alexe s brýlemi (`images/AlexCool.png`); dříve spadlo na ikonu tlapky kvůli špatné cestě k souboru.
+- Změna: Overlay události — menší nadpis „Událost!“, větší popis, změna mincí/životů/hladu na samostatném řádku.
+
+## [2.0.1] - 2026-03-26
+- Oprava: Na Androidu 15+ už obsah nezasahuje pod systémové lišty (stavba a navigace); portrét zůstává vynucený.
+
+## [2.0.0] - 2026-03-19
+- Release: Přidány AdMob reklamy (interstitial po lekci) a rewarded reklama za srdce.
+
+## [1.0.4] - 2026-03-19
+- Added: Integrated Google Mobile Ads SDK (AdMob), including `APPLICATION_ID` in manifest and SDK initialization in `App`.
+- Added: Interstitial AdMob ad is now requested and shown after each completed lesson/review on the results screen.
+
 ## [1.0.3] - 2026-03-19
 - Added: First-run consent dialog asking users to accept terms of use and privacy policy with a link to the hosted policy page.
 

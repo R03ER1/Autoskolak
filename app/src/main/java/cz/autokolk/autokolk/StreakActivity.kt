@@ -2,11 +2,10 @@ package cz.autokolk
 
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 
-class StreakActivity : AppCompatActivity() {
+class StreakActivity : AutokolkActivity() {
     companion object {
         const val EXTRA_FROM_TEST = "extra_from_test"
     }

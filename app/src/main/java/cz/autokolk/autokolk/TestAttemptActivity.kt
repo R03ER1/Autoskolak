@@ -4,14 +4,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class TestAttemptActivity : AppCompatActivity() {
+class TestAttemptActivity : AutokolkActivity() {
     private lateinit var lessonProgress: LessonProgress
     private lateinit var streakButton: MaterialButton
     private lateinit var xpButton: MaterialButton
@@ -144,8 +144,9 @@ class TestAttemptActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for non-streak sheets
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -160,6 +161,9 @@ class TestAttemptActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
+        // Hide actions that are only for hearts
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -201,15 +205,18 @@ class TestAttemptActivity : AppCompatActivity() {
             handler?.removeCallbacksAndMessages(null)
             handler = null
         }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
+        val okButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk)
+        val plusButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)
+        okButton.setOnClickListener {
             dialog.dismiss()
         }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.setOnClickListener {
+        plusButton?.setOnClickListener {
             val intent = android.content.Intent(this, MainActivity::class.java)
             intent.putExtra(MainActivity.EXTRA_RANDOM_COUNT, 10)
             startActivity(intent)
             dialog.dismiss()
         }
+        HeartsRewardAds.wireForHeartsSheet(this, view, lessonProgress, number, plusButton, okButton)
         dialog.show()
     }
 }

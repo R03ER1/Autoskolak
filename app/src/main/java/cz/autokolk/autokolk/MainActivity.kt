@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.ImageView
 import android.widget.VideoView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import java.io.BufferedReader
@@ -39,7 +38,7 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AutokolkActivity() {
     companion object {
         const val EXTRA_LESSON_NUMBER = "extra_lesson_number"
         const val EXTRA_DISPLAY_LESSON_NUMBER = "extra_display_lesson_number"
@@ -447,23 +446,43 @@ class MainActivity : AppCompatActivity() {
             }
             // If launched for practice category, load category questions
             val isPracticeCategory = category.isNotBlank()
+            val isUserMistakes = category.equals(LessonProgress.CATEGORY_USER_MISTAKES, ignoreCase = true)
             val allLessonQuestions = if (isPracticeCategory) {
-                val all = lessonProgress.getQuestionsForCategory(category)
-                val (correctIds, wrongIds) = lessonProgress.getPracticeStatus(category)
-                val unanswered = all.filter { q -> q.id !in correctIds && q.id !in wrongIds }
-                val wrongOnly = all.filter { q -> q.id in wrongIds }
-                val correctOnly = all.filter { q -> q.id in correctIds }
-                when {
-                    // Backward compatibility with old flag
-                    practiceWrongOnly && wrongOnly.isNotEmpty() -> wrongOnly
-                    // New explicit modes
-                    practiceMode == PRACTICE_MODE_WRONG -> wrongOnly.ifEmpty { all }
-                    practiceMode == PRACTICE_MODE_CORRECT -> correctOnly.ifEmpty { all }
-                    practiceMode == PRACTICE_MODE_UNANSWERED -> unanswered.ifEmpty { all }
-                    // Default behavior
-                    unanswered.isNotEmpty() -> unanswered
-                    wrongOnly.isNotEmpty() -> wrongOnly
-                    else -> all
+                if (isUserMistakes) {
+                    val (correctIds, wrongIds) = lessonProgress.getPracticeStatus(LessonProgress.CATEGORY_USER_MISTAKES)
+                    val wrongOnly = lessonProgress.getQuestionsForIds(wrongIds).sortedWith(
+                        compareByDescending<Question> { lessonProgress.getMistakeConsecutiveCount(it.id) }
+                            .thenBy { it.id.toIntOrNull() ?: 0 }
+                    )
+                    val correctOnly = lessonProgress.getQuestionsForIds(correctIds)
+                    val unanswered = emptyList<Question>()
+                    when {
+                        practiceWrongOnly && wrongOnly.isNotEmpty() -> wrongOnly
+                        practiceMode == PRACTICE_MODE_WRONG -> wrongOnly
+                        practiceMode == PRACTICE_MODE_CORRECT -> correctOnly
+                        practiceMode == PRACTICE_MODE_UNANSWERED -> unanswered
+                        wrongOnly.isNotEmpty() -> wrongOnly
+                        correctOnly.isNotEmpty() -> correctOnly
+                        else -> emptyList()
+                    }
+                } else {
+                    val all = lessonProgress.getQuestionsForCategory(category)
+                    val (correctIds, wrongIds) = lessonProgress.getPracticeStatus(category)
+                    val unanswered = all.filter { q -> q.id !in correctIds && q.id !in wrongIds }
+                    val wrongOnly = all.filter { q -> q.id in wrongIds }
+                    val correctOnly = all.filter { q -> q.id in correctIds }
+                    when {
+                        // Backward compatibility with old flag
+                        practiceWrongOnly && wrongOnly.isNotEmpty() -> wrongOnly
+                        // New explicit modes
+                        practiceMode == PRACTICE_MODE_WRONG -> wrongOnly.ifEmpty { all }
+                        practiceMode == PRACTICE_MODE_CORRECT -> correctOnly.ifEmpty { all }
+                        practiceMode == PRACTICE_MODE_UNANSWERED -> unanswered.ifEmpty { all }
+                        // Default behavior
+                        unanswered.isNotEmpty() -> unanswered
+                        wrongOnly.isNotEmpty() -> wrongOnly
+                        else -> all
+                    }
                 }
             } else {
                 lessonProgress.getQuestionsForLesson(lessonNumber)
@@ -471,8 +490,8 @@ class MainActivity : AppCompatActivity() {
 
             // In review mode, show only previously incorrect questions for this lesson
             questions = if (isPracticeCategory) {
-                // Practice uses selected list with shuffling
-                allLessonQuestions.shuffled()
+                // Practice: shuffle except "Tvoje chyby", where order is by consecutive-wrong streak
+                if (isUserMistakes) allLessonQuestions else allLessonQuestions.shuffled()
             } else if (isReviewMode) {
                 val state = lessonProgress.getLessonState(lessonNumber)
                 val filtered = allLessonQuestions.mapNotNull { question ->
@@ -757,23 +776,23 @@ class MainActivity : AppCompatActivity() {
         if (question.userAnswer != null && !isTestMode) return // Already answered
 
         question.userAnswer = normalizeAnswerKey(selectedAnswer)
-        // Save practice answer immediately if in practice mode
-        if (!isTestMode && category.isNotBlank()) {
+        if (!isTestMode) {
             val isCorrect = normalizeAnswerKey(selectedAnswer) == resolveCorrectKey(question)
-            lessonProgress.savePracticeAnswer(category, question.id, isCorrect)
-            try { AchievementsManager(this).onAnswer(isCorrect) } catch (_: Throwable) { }
-        } else if (!isTestMode) {
-            // In lessons (not practice), consume a heart on wrong answer
-            val isCorrect = normalizeAnswerKey(selectedAnswer) == resolveCorrectKey(question)
-            // Skip consuming hearts in random sessions (EXTRA_RANDOM_COUNT > 0)
-            val isRandom = intent.getIntExtra(EXTRA_RANDOM_COUNT, 0) > 0
-            if (!isCorrect && !isRandom) {
-                try {
-                    val consumed = lessonProgress.consumeHeart()
-                    if (consumed) {
-                        HeartRefillJobService.scheduleNext(this@MainActivity, lessonProgress)
-                    }
-                } catch (_: Throwable) { }
+            lessonProgress.recordMistakeStreak(question.id, isCorrect)
+            if (category.isNotBlank()) {
+                lessonProgress.savePracticeAnswer(category, question.id, isCorrect)
+                try { AchievementsManager(this).onAnswer(isCorrect) } catch (_: Throwable) { }
+            } else {
+                // In lessons (not practice), consume a heart on wrong answer
+                val isRandom = intent.getIntExtra(EXTRA_RANDOM_COUNT, 0) > 0
+                if (!isCorrect && !isRandom) {
+                    try {
+                        val consumed = lessonProgress.consumeHeart()
+                        if (consumed) {
+                            HeartRefillJobService.scheduleNext(this@MainActivity, lessonProgress)
+                        }
+                    } catch (_: Throwable) { }
+                }
             }
         }
         if (!isTestMode) {
@@ -930,7 +949,9 @@ class MainActivity : AppCompatActivity() {
             for (q in questions) {
                 val given = normalizeAnswerKey(q.userAnswer ?: "")
                 val correct = resolveCorrectKey(q)
-                if (given.isNotEmpty() && given == correct) {
+                val ok = given.isNotEmpty() && given == correct
+                lessonProgress.recordMistakeStreak(q.id, ok)
+                if (ok) {
                     val w = testQuestionWeightById[q.id] ?: 0
                     totalPoints += w
                     correctCount += 1
@@ -1325,6 +1346,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun mapCategoryDisplayName(code: String): String {
         val name = when (code.lowercase()) {
+            LessonProgress.CATEGORY_USER_MISTAKES.lowercase() -> "tvoje chyby"
             "prav" -> "pravidla provozu a dopravní předpisy"
             "bez" -> "bezpečnost jízdy"
             "def" -> "základní definice"

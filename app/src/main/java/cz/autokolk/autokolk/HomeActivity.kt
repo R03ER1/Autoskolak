@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import android.widget.ImageButton
 import android.view.animation.AnimationUtils
@@ -32,7 +31,7 @@ import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AutokolkActivity() {
     private lateinit var lessonProgress: LessonProgress
     private lateinit var buttonContainer: LinearLayout
     private lateinit var homeScrollView: android.widget.ScrollView
@@ -885,8 +884,9 @@ class HomeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for streak sheet
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -926,8 +926,9 @@ class HomeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for non-streak sheets
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -942,8 +943,9 @@ class HomeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for non-streak sheets
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -955,6 +957,8 @@ class HomeActivity : AppCompatActivity() {
         val emoji = view.findViewById<android.widget.ImageView>(R.id.bottomSheetFlame)
         val number = view.findViewById<TextView>(R.id.bottomSheetStreakNumber)
         val subtitle = view.findViewById<TextView>(R.id.bottomSheetSubtitle)
+        val plusButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)
+        val okButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk)
         emoji.setImageResource(R.drawable.ic_live)
         var hearts = lessonProgress.getCurrentHearts()
         number.text = hearts.toString()
@@ -985,15 +989,16 @@ class HomeActivity : AppCompatActivity() {
             handler?.removeCallbacksAndMessages(null)
             handler = null
         }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
+        okButton.setOnClickListener {
             dialog.dismiss()
         }
-        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.setOnClickListener {
+        plusButton?.setOnClickListener {
             val intent = android.content.Intent(this, MainActivity::class.java)
             intent.putExtra(MainActivity.EXTRA_RANDOM_COUNT, 10)
             startActivity(intent)
             dialog.dismiss()
         }
+        HeartsRewardAds.wireForHeartsSheet(this, view, lessonProgress, number, plusButton, okButton)
         dialog.show()
     }
 

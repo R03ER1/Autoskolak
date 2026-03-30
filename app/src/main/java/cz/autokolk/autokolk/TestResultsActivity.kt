@@ -3,7 +3,6 @@ package cz.autokolk
 import android.os.Bundle
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -13,7 +12,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class TestResultsActivity : AppCompatActivity() {
+class TestResultsActivity : AutokolkActivity() {
     companion object {
         const val EXTRA_TOTAL_POINTS = "extra_total_points"
         const val EXTRA_MAX_POINTS = "extra_max_points"

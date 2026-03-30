@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.play.core.splitinstall.SplitInstallManager
@@ -24,7 +23,7 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 
-class LoadingActivity : AppCompatActivity() {
+class LoadingActivity : AutokolkActivity() {
 
     private lateinit var splitInstallManager: SplitInstallManager
     private val imageModuleName = "imageassets"

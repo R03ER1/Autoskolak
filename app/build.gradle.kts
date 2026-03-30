@@ -15,8 +15,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 12
+        versionName = "2.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -70,12 +70,29 @@ android {
     }
 
     buildTypes {
+        debug {
+            val localProps = Properties()
+            val localFile = rootProject.file("local.properties")
+            if (localFile.exists()) {
+                localFile.inputStream().use { localProps.load(it) }
+            }
+            val rawPass = localProps.getProperty("developerOptionsPassword")?.trim().orEmpty()
+            val escaped = rawPass
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+            buildConfigField("boolean", "DEVELOPER_OPTIONS_ENABLED", "true")
+            buildConfigField("String", "DEVELOPER_OPTIONS_PASSWORD", "\"$escaped\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("boolean", "DEVELOPER_OPTIONS_ENABLED", "false")
+            buildConfigField("String", "DEVELOPER_OPTIONS_PASSWORD", "\"\"")
             val releaseSigning = signingConfigs.findByName("release")
             if (releaseSigning?.storeFile != null && releaseSigning.storeFile?.exists() == true) {
                 signingConfig = releaseSigning
@@ -103,6 +120,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     setDynamicFeatures(setOf(
@@ -142,4 +160,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     // Apache Commons CSV for CSV parsing
     implementation("org.apache.commons:commons-csv:1.10.0")
+    // Google Mobile Ads SDK (AdMob)
+    implementation("com.google.android.gms:play-services-ads:23.5.0")
 }

@@ -7,10 +7,9 @@ import android.os.Looper
 import android.view.MotionEvent
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 
-class AlexDeathActivity : AppCompatActivity() {
+class AlexDeathActivity : AutokolkActivity() {
     private lateinit var deadLionImage: ImageView
     private lateinit var holdButton: ImageView
     private lateinit var holdProgressText: TextView

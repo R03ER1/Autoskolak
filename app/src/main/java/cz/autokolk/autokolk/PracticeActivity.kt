@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -14,7 +13,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.graphics.drawable.GradientDrawable
 
-class PracticeActivity : AppCompatActivity() {
+class PracticeActivity : AutokolkActivity() {
     private lateinit var lessonProgress: LessonProgress
     private lateinit var streakButton: MaterialButton
     private lateinit var xpButton: MaterialButton
@@ -134,8 +133,9 @@ class PracticeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for streak sheet
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -150,8 +150,9 @@ class PracticeActivity : AppCompatActivity() {
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk).setOnClickListener {
             dialog.dismiss()
         }
-        // Hide + button for non-streak sheets
+        // Hide actions that are only for hearts
         view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)?.visibility = View.GONE
+        view.findViewById<View>(R.id.bottomSheetRewardContainer)?.visibility = View.GONE
         dialog.show()
     }
 
@@ -202,6 +203,9 @@ class PracticeActivity : AppCompatActivity() {
             startActivity(intent)
             dialog.dismiss()
         }
+        val plusButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetPlus)
+        val okButton = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.bottomSheetOk)
+        HeartsRewardAds.wireForHeartsSheet(this, view, lessonProgress, number, plusButton, okButton)
         dialog.show()
     }
 
@@ -212,6 +216,8 @@ class PracticeActivity : AppCompatActivity() {
         // Title already present as first child; ensure spacing
         val titleView = findViewById<TextView>(R.id.pageTitle)
         titleView?.text = "💪 Practice"
+
+        container.addView(createUserMistakesBox())
 
         val desiredOrder = listOf("def", "bez", "prav", "znak", "res", "voz", "souv", "cdt")
         val categoryGroups = lessonProgress.getCategoryGroups()
@@ -347,6 +353,122 @@ class PracticeActivity : AppCompatActivity() {
         outer.addView(chipsRow)
 
         // Click starts practice for this category
+        outer.isClickable = true
+        outer.setOnClickListener {
+            val intent = android.content.Intent(this, MainActivity::class.java)
+            intent.putExtra(MainActivity.EXTRA_CATEGORY, categoryCode)
+            startActivity(intent)
+        }
+
+        return outer
+    }
+
+    private fun createUserMistakesBox(): View {
+        val categoryCode = LessonProgress.CATEGORY_USER_MISTAKES
+        val outer = LinearLayout(this)
+        outer.orientation = LinearLayout.VERTICAL
+        val outerLp = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        outerLp.topMargin = dp(12)
+        outer.layoutParams = outerLp
+        outer.setPadding(dp(16), dp(14), dp(16), dp(14))
+
+        val background = GradientDrawable()
+        background.setColor(Color.parseColor("#1E1E1E"))
+        background.cornerRadius = dp(12).toFloat()
+        outer.background = background
+
+        val title = TextView(this)
+        title.text = "Tvoje chyby"
+        title.setTextColor(ContextCompat.getColor(this, R.color.wrong_answer))
+        title.textSize = 18f
+        title.setPadding(0, 0, 0, dp(6))
+        outer.addView(title)
+
+        val (correctIds, wrongIds) = lessonProgress.getPracticeStatus(categoryCode)
+        val correctCount = correctIds.size
+        val wrongCount = wrongIds.size
+
+        fun addSubRow(label: String, count: Int) {
+            val row = LinearLayout(this)
+            row.orientation = LinearLayout.HORIZONTAL
+            val rowLp = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            row.layoutParams = rowLp
+            val left = TextView(this)
+            left.text = label
+            left.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
+            left.textSize = 14f
+            val leftLp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT)
+            leftLp.weight = 1f
+            left.layoutParams = leftLp
+            val right = TextView(this)
+            right.text = count.toString()
+            right.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
+            right.textSize = 14f
+            row.addView(left)
+            row.addView(right)
+            outer.addView(row)
+        }
+
+        addSubRow("• K procvičení (řazeno podle po sobě jdoucích chyb)", wrongCount)
+        addSubRow("• Opravené tady (✅)", correctCount)
+
+        val chipsRow = LinearLayout(this)
+        chipsRow.orientation = LinearLayout.HORIZONTAL
+        chipsRow.gravity = android.view.Gravity.CENTER_HORIZONTAL
+        val chipsLp = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        chipsLp.topMargin = dp(8)
+        chipsRow.layoutParams = chipsLp
+
+        fun makeChip(text: String): TextView {
+            val tv = TextView(this)
+            tv.text = text
+            tv.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
+            tv.textSize = 13f
+            tv.setPadding(dp(8), dp(4), dp(8), dp(4))
+            val chipBg = GradientDrawable()
+            chipBg.setColor(Color.parseColor("#2A2A2A"))
+            chipBg.cornerRadius = dp(8).toFloat()
+            tv.background = chipBg
+            tv.isClickable = true
+            tv.isFocusable = true
+            tv.gravity = android.view.Gravity.CENTER
+            val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT)
+            lp.weight = 1f
+            lp.leftMargin = dp(4)
+            lp.rightMargin = dp(4)
+            tv.layoutParams = lp
+            return tv
+        }
+
+        val correctChip = makeChip("✅ $correctCount")
+        val wrongChip = makeChip("❌ $wrongCount")
+
+        correctChip.setOnClickListener {
+            val intent = android.content.Intent(this, MainActivity::class.java)
+            intent.putExtra(MainActivity.EXTRA_CATEGORY, categoryCode)
+            intent.putExtra(MainActivity.EXTRA_PRACTICE_MODE, MainActivity.PRACTICE_MODE_CORRECT)
+            startActivity(intent)
+        }
+        wrongChip.setOnClickListener {
+            val intent = android.content.Intent(this, MainActivity::class.java)
+            intent.putExtra(MainActivity.EXTRA_CATEGORY, categoryCode)
+            intent.putExtra(MainActivity.EXTRA_PRACTICE_MODE, MainActivity.PRACTICE_MODE_WRONG)
+            startActivity(intent)
+        }
+
+        chipsRow.addView(correctChip)
+        chipsRow.addView(wrongChip)
+        outer.addView(chipsRow)
+
         outer.isClickable = true
         outer.setOnClickListener {
             val intent = android.content.Intent(this, MainActivity::class.java)

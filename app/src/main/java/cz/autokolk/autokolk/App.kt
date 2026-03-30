@@ -2,6 +2,7 @@ package cz.autokolk
 
 import android.app.Application
 import android.util.Log
+import com.google.android.gms.ads.MobileAds
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
@@ -13,6 +14,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MobileAds.initialize(this)
         val lp = LessonProgress(this)
         HeartRefillJobService.scheduleNext(this, lp)
 

@@ -40,6 +40,8 @@ class LessonProgress(private val context: Context) {
     private val gson = Gson()
 
     companion object {
+        /** Virtual practice category: mistakes from anywhere in the app (not in Questions.csv). */
+        const val CATEGORY_USER_MISTAKES = "user_mistakes"
         const val QUESTIONS_PER_LESSON = 10
         private const val MAX_HEARTS = 15
         private const val RECHARGE_INTERVAL_MS = 30L * 60L * 1000L
@@ -117,6 +119,42 @@ class LessonProgress(private val context: Context) {
         val incorrectQuestionIds: Set<String>? = null
     )
 
+    // -------------------- Consecutive wrong answers (app-wide) --------------------
+    private fun readMistakeStreakMap(): MutableMap<String, Int> {
+        val json = prefs.getString("mistake_consecutive_wrong", null)
+        if (json.isNullOrEmpty()) return mutableMapOf()
+        return try {
+            val type = object : TypeToken<MutableMap<String, Int>>() {}.type
+            gson.fromJson<MutableMap<String, Int>>(json, type) ?: mutableMapOf()
+        } catch (_: Exception) {
+            mutableMapOf()
+        }
+    }
+
+    private fun writeMistakeStreakMap(map: Map<String, Int>) {
+        prefs.edit().putString("mistake_consecutive_wrong", gson.toJson(map)).apply()
+    }
+
+    /**
+     * Tracks how many wrong answers in a row the user gave for this question anywhere in the app.
+     * Any correct answer resets the streak to zero for that question.
+     */
+    fun recordMistakeStreak(questionId: String, isCorrect: Boolean) {
+        val id = questionId.trim()
+        if (id.isEmpty()) return
+        val map = readMistakeStreakMap()
+        if (isCorrect) {
+            map.remove(id)
+        } else {
+            map[id] = (map[id] ?: 0) + 1
+        }
+        writeMistakeStreakMap(map)
+    }
+
+    fun getMistakeConsecutiveCount(questionId: String): Int {
+        return readMistakeStreakMap()[questionId.trim()] ?: 0
+    }
+
     // -------------------- Practice mode storage --------------------
     private data class PracticeStore(
         val answersByCategory: MutableMap<String, MutableMap<String, Boolean>> = mutableMapOf()
@@ -146,8 +184,21 @@ class LessonProgress(private val context: Context) {
     }
 
     fun getPracticeStatus(category: String): Pair<Set<String>, Set<String>> {
+        val cat = category.lowercase()
+        if (cat == CATEGORY_USER_MISTAKES.lowercase()) {
+            val store = readPracticeStore()
+            val byCategory = store.answersByCategory[cat] ?: emptyMap()
+            val streaks = readMistakeStreakMap()
+            val correct = byCategory.filter { (id, ok) ->
+                ok && (streaks[id] ?: 0) == 0
+            }.keys
+            val wrong = mutableSetOf<String>()
+            streaks.forEach { (id, n) -> if (n > 0) wrong.add(id) }
+            byCategory.forEach { (id, ok) -> if (!ok) wrong.add(id) }
+            return Pair(correct, wrong)
+        }
         val store = readPracticeStore()
-        val byCategory = store.answersByCategory[category.lowercase()] ?: emptyMap()
+        val byCategory = store.answersByCategory[cat] ?: emptyMap()
         val correct = byCategory.filterValues { it }.keys
         val wrong = byCategory.filterValues { !it }.keys
         return Pair(correct, wrong)
@@ -203,6 +254,62 @@ class LessonProgress(private val context: Context) {
             csvParser.close()
             reader.close()
             questions
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    /** Load questions for given CSV ids in one pass (order not preserved). */
+    fun getQuestionsForIds(ids: Set<String>): List<Question> {
+        if (ids.isEmpty()) return emptyList()
+        val wanted = ids.map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        if (wanted.isEmpty()) return emptyList()
+        return try {
+            val inputStream = context.assets.open("Questions.csv")
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val csvParser = CSVParser(reader, CSVFormat.DEFAULT
+                .withDelimiter(';')
+                .withQuote('"')
+                .withIgnoreEmptyLines(true)
+                .withTrim()
+            )
+
+            fun normalizeCategory(rawCategory: String, rawSub: String): Pair<String, String> {
+                val catTrim = rawCategory.trim()
+                return when (catTrim.lowercase()) {
+                    "c" -> "cdt" to "C"
+                    "d" -> "cdt" to "D"
+                    "t" -> "cdt" to "T"
+                    else -> catTrim to rawSub.trim()
+                }
+            }
+
+            val out = mutableListOf<Question>()
+            for (record in csvParser.records.drop(1)) {
+                val qid = record[0].trim()
+                if (qid !in wanted) continue
+                val questionNumber = record[0].padStart(4, '0')
+                val notes = record[9]
+                val hasImage = notes.contains("obrázek", ignoreCase = true)
+                val hasVideo = notes.contains("video", ignoreCase = true)
+                out.add(
+                    Question(
+                        id = record[0],
+                        questionText = record[4],
+                        optionA = record[5],
+                        optionB = record[6],
+                        optionC = record[7],
+                        correctAnswer = record[8].lowercase(),
+                        category = normalizeCategory(record[1], record[2]).first,
+                        imagePath = if (hasImage) resolveImagePath(questionNumber) else null,
+                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null
+                    )
+                )
+            }
+            csvParser.close()
+            reader.close()
+            out
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()

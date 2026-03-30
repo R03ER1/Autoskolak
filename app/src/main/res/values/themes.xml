@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Autokolk" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Autokolk.Base" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand colors -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
@@ -32,6 +32,8 @@
         <!-- Button styles -->
         <item name="materialButtonStyle">@style/Widget.Autokolk.Button</item>
     </style>
+
+    <style name="Theme.Autokolk" parent="Theme.Autokolk.Base" />
 
     <!-- Theme for MainActivity without action bar -->
     <style name="Theme.Autokolk.NoActionBar" parent="Theme.Autokolk">

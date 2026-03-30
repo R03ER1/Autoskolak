@@ -47,6 +47,49 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="12dp" />
 
+    <!-- Rewarded ad section -->
+    <LinearLayout
+        android:id="@+id/bottomSheetRewardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bottomSheetReward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Život za reklamu"
+            android:textColor="@color/white"
+            android:background="@drawable/button_gradient_green_blue"
+            app:backgroundTint="@null"
+            android:layout_gravity="center_horizontal" />
+
+        <LinearLayout
+            android:id="@+id/bottomSheetRewardLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Načítám reklamu…"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/bottomSheetOk"
         android:layout_width="wrap_content"
