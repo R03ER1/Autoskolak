@@ -33,7 +33,7 @@
 | 2 | Přidání Navigation Compose | 1 | ✅ |
 | 3 | Přidání Lottie Compose | 1 | ✅ |
 | 4 | Přidání custom fontu (Nunito / Quicksand) | 1 | ✅ |
-| 5 | Přidání Accompanist a dalších utility knihoven | 1 | ⬜ |
+| 5 | Přidání Accompanist a dalších utility knihoven | 1 | ✅ |
 | 6 | Přidání Haze knihovny pro glassmorphism | 1 | ⬜ |
 | 7 | Přidání haptic feedback utility | 1 | ⬜ |
 | 8 | Přidání sound engine | 1 | ⬜ |

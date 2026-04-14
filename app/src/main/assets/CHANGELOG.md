@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.20] - 2026-04-14
+- Novinka: Přidány knihovny Accompanist Permissions 0.37.3, Drawable Painter 0.37.3, Coil Compose 3.4.0, Compose Foundation a Animation (příprava pro Pager, async obrázky, animace).
+
 ## [2.0.19] - 2026-04-14
 - Novinka: Přidán font Quicksand (5 řezů: Light, Regular, Medium, SemiBold, Bold) pro nový design aplikace.
 

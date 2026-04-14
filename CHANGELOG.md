@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.20] - 2026-04-14
+- Added: Accompanist Permissions 0.37.3 a Drawable Painter 0.37.3, Coil Compose 3.4.0, Compose Foundation a Animation (příprava pro Pager, async obrázky, animace).
+
 ## [2.0.19] - 2026-04-14
 - Added: Quicksand font family (5 weights: Light, Regular, Medium, SemiBold, Bold) pro Compose Typography.
 
