@@ -128,6 +128,7 @@ fun AutokolkTheme(
     CompositionLocalProvider(LocalIsDarkTheme provides isDark) {
         MaterialTheme(
             colorScheme = colorScheme,
+            typography = AutokolkTypography,
             content = content,
         )
     }

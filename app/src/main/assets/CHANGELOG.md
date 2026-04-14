@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.30] - 2026-04-14
+- Added: Compose typografie — `Type.kt` s rodinou fontů Quicksand a `AutokolkTypography` (Material 3 hierarchie), zapojeno do `AutokolkTheme` přes `MaterialTheme.typography`.
+
 ## [2.0.29] - 2026-04-14
 - Novinka: Compose ColorScheme & MaterialTheme — `darkColorScheme()` a `lightColorScheme()` napojeny na `AutokolkTheme`, preference tmavého/světlého režimu uložená v SharedPreferences přes `ThemeMode` enum, `LocalIsDarkTheme` dostupný ve všech composables.
 
