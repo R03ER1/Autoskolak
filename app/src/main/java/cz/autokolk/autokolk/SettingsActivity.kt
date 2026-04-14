@@ -20,6 +20,12 @@ import android.view.View
 import android.graphics.drawable.ColorDrawable
 
 class SettingsActivity : AutokolkActivity() {
+
+    companion object {
+        /** Změň v repu podle potřeby; stejné heslo platí pro debug i release. */
+        private const val DEVELOPER_OPTIONS_PASSWORD = "autokolk_dev"
+    }
+
     private lateinit var lessonProgress: LessonProgress
     private lateinit var streakButton: MaterialButton
     private lateinit var xpButton: MaterialButton
@@ -60,35 +66,23 @@ class SettingsActivity : AutokolkActivity() {
         xpButton.setOnClickListener { showPointsBottomSheet() }
         heartsButton.setOnClickListener { showHeartsBottomSheet() }
 
-        if (BuildConfig.DEVELOPER_OPTIONS_ENABLED) {
-            // Check if developer options are unlocked and hide content if locked
-            if (!devPrefs.getBoolean("unlocked", false)) {
-                debuggingContent.visibility = LinearLayout.GONE
-            }
+        // Check if developer options are unlocked and hide content if locked
+        if (!devPrefs.getBoolean("unlocked", false)) {
+            debuggingContent.visibility = LinearLayout.GONE
+        }
 
-            // Debugging dropdown toggle
-            debuggingHeader.setOnClickListener {
-                if (BuildConfig.DEVELOPER_OPTIONS_PASSWORD.isEmpty()) {
-                    android.widget.Toast.makeText(
-                        this,
-                        "Nastavte v local.properties klíč developerOptionsPassword a znovu sestavte projekt.",
-                        android.widget.Toast.LENGTH_LONG
-                    ).show()
-                    return@setOnClickListener
-                }
-                if (devPrefs.getBoolean("unlocked", false)) {
-                    toggleDebuggingDropdown()
-                } else {
-                    showPasswordDialog { unlocked ->
-                        if (unlocked) {
-                            devPrefs.edit().putBoolean("unlocked", true).apply()
-                            toggleDebuggingDropdown()
-                        }
+        // Debugging dropdown toggle
+        debuggingHeader.setOnClickListener {
+            if (devPrefs.getBoolean("unlocked", false)) {
+                toggleDebuggingDropdown()
+            } else {
+                showPasswordDialog { unlocked ->
+                    if (unlocked) {
+                        devPrefs.edit().putBoolean("unlocked", true).apply()
+                        toggleDebuggingDropdown()
                     }
                 }
             }
-        } else {
-            findViewById<View>(R.id.debugging_section_card).visibility = View.GONE
         }
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigation)
@@ -148,61 +142,51 @@ class SettingsActivity : AutokolkActivity() {
             overridePendingTransition(0, 0)
         }
 
-        if (BuildConfig.DEVELOPER_OPTIONS_ENABLED) {
-            // Infinite lives toggle
-            val prefs = getSharedPreferences("lesson_progress", MODE_PRIVATE)
-            val infiniteSwitch = findViewById<SwitchMaterial>(R.id.switch_test1)
-            infiniteSwitch?.isChecked = prefs.getBoolean("infinite_lives", false)
-            infiniteSwitch?.setOnCheckedChangeListener { _, isChecked ->
-                prefs.edit().putBoolean("infinite_lives", isChecked).apply()
-            }
+        // Infinite lives toggle
+        val prefs = getSharedPreferences("lesson_progress", MODE_PRIVATE)
+        val infiniteSwitch = findViewById<SwitchMaterial>(R.id.switch_test1)
+        infiniteSwitch?.isChecked = prefs.getBoolean("infinite_lives", false)
+        infiniteSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean("infinite_lives", isChecked).apply()
+        }
 
-            // Hunger test card
-            findViewById<android.view.View>(R.id.card_hunger_test)?.setOnClickListener {
-                showHungerTestDialog()
-            }
+        // Hunger test card
+        findViewById<android.view.View>(R.id.card_hunger_test)?.setOnClickListener {
+            showHungerTestDialog()
+        }
 
-            // Streak test card
-            findViewById<android.view.View>(R.id.card_streak_test)?.setOnClickListener {
-                showStreakTestDialog()
-            }
+        // Streak test card
+        findViewById<android.view.View>(R.id.card_streak_test)?.setOnClickListener {
+            showStreakTestDialog()
+        }
 
-            // Points test card
-            findViewById<android.view.View>(R.id.card_points_test)?.setOnClickListener {
-                showPointsTestDialog()
-            }
+        // Points test card
+        findViewById<android.view.View>(R.id.card_points_test)?.setOnClickListener {
+            showPointsTestDialog()
+        }
 
-            // Hearts (lives) test card
-            findViewById<android.view.View>(R.id.card_hearts_test)?.setOnClickListener {
-                showHeartsTestDialog()
-            }
+        // Hearts (lives) test card
+        findViewById<android.view.View>(R.id.card_hearts_test)?.setOnClickListener {
+            showHeartsTestDialog()
+        }
 
-            // Trigger random event (debug)
-            findViewById<android.view.View>(R.id.card_trigger_event)?.setOnClickListener {
-                if (BuildConfig.DEVELOPER_OPTIONS_PASSWORD.isEmpty()) {
-                    android.widget.Toast.makeText(
-                        this,
-                        "Nastavte v local.properties klíč developerOptionsPassword a znovu sestavte projekt.",
-                        android.widget.Toast.LENGTH_LONG
-                    ).show()
-                    return@setOnClickListener
+        // Trigger random event (debug)
+        findViewById<android.view.View>(R.id.card_trigger_event)?.setOnClickListener {
+            val isUnlocked = devPrefs.getBoolean("unlocked", false)
+            if (isUnlocked) {
+                val manager = RandomEventManager(this)
+                manager.showRandomNow(this) {
+                    updatePointsHeader()
+                    updateHeartsHeader()
                 }
-                val isUnlocked = devPrefs.getBoolean("unlocked", false)
-                if (isUnlocked) {
-                    val manager = RandomEventManager(this)
-                    manager.showRandomNow(this) {
-                        updatePointsHeader()
-                        updateHeartsHeader()
-                    }
-                } else {
-                    showPasswordDialog { unlocked ->
-                        if (unlocked) {
-                            devPrefs.edit().putBoolean("unlocked", true).apply()
-                            val manager = RandomEventManager(this)
-                            manager.showRandomNow(this) {
-                                updatePointsHeader()
-                                updateHeartsHeader()
-                            }
+            } else {
+                showPasswordDialog { unlocked ->
+                    if (unlocked) {
+                        devPrefs.edit().putBoolean("unlocked", true).apply()
+                        val manager = RandomEventManager(this)
+                        manager.showRandomNow(this) {
+                            updatePointsHeader()
+                            updateHeartsHeader()
                         }
                     }
                 }
@@ -216,10 +200,8 @@ class SettingsActivity : AutokolkActivity() {
             overridePendingTransition(0, 0)
         }
 
-        if (BuildConfig.DEVELOPER_OPTIONS_ENABLED) {
-            findViewById<android.view.View>(R.id.card_rename_lion)?.setOnClickListener {
-                showRenameLionDialog()
-            }
+        findViewById<android.view.View>(R.id.card_rename_lion)?.setOnClickListener {
+            showRenameLionDialog()
         }
 
         // Clear-all card
@@ -242,20 +224,16 @@ class SettingsActivity : AutokolkActivity() {
                     updateStreakHeader()
                     updatePointsHeader()
                     updateHeartsHeader()
-                    if (BuildConfig.DEVELOPER_OPTIONS_ENABLED) {
-                        // Refresh hunger debug box to reflect kamení disabled
-                        updateHungerDebugBox()
-                        findViewById<SwitchMaterial>(R.id.switch_test1)?.isChecked = false
-                    }
+                    // Refresh hunger debug box to reflect kamení disabled
+                    updateHungerDebugBox()
+                    findViewById<SwitchMaterial>(R.id.switch_test1)?.isChecked = false
                     android.widget.Toast.makeText(this, "Vše vymazáno", android.widget.Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("Zrušit") { dialog, _ -> dialog.dismiss() }
                 .show()
         }
-        if (BuildConfig.DEVELOPER_OPTIONS_ENABLED) {
-            updateHungerDebugBox()
-            handler.postDelayed(hungerDebugUpdater, 60_000L)
-        }
+        updateHungerDebugBox()
+        handler.postDelayed(hungerDebugUpdater, 60_000L)
     }
 
     override fun onResume() {
@@ -543,7 +521,6 @@ class SettingsActivity : AutokolkActivity() {
     }
 
     private fun updateHungerDebugBox() {
-        if (!BuildConfig.DEVELOPER_OPTIONS_ENABLED) return
         val textView = findViewById<TextView>(R.id.hunger_debug_text) ?: return
         val hungerManager = HungerManager(this)
         val current = hungerManager.getCurrentHunger()
@@ -589,16 +566,7 @@ class SettingsActivity : AutokolkActivity() {
     }
 
     private fun showPasswordDialog(onSuccess: (Boolean) -> Unit) {
-        val expected = BuildConfig.DEVELOPER_OPTIONS_PASSWORD
-        if (expected.isEmpty()) {
-            android.widget.Toast.makeText(
-                this,
-                "Nastavte v local.properties klíč developerOptionsPassword a znovu sestavte projekt.",
-                android.widget.Toast.LENGTH_LONG
-            ).show()
-            onSuccess(false)
-            return
-        }
+        val expected = DEVELOPER_OPTIONS_PASSWORD
         val editText = createDarkDialogEditText().apply {
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
             hint = "Zadejte heslo"

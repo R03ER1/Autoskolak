@@ -255,6 +255,10 @@ class MainActivity : AutokolkActivity() {
         isTestMode = intent.getBooleanExtra(EXTRA_IS_TEST_MODE, false)
         lessonProgress = LessonProgress(this)
 
+        if (shouldPreloadLessonInterstitial()) {
+            LessonInterstitialAds.preload(this)
+        }
+
         initializeViews()
         if (loadQuestions()) {
             setupListeners()
@@ -1257,6 +1261,14 @@ class MainActivity : AutokolkActivity() {
         currentVideoFile?.delete()
         testCountDownTimer?.cancel()
         testCountDownTimer = null
+    }
+
+    /** Sessions that end with [ResultsActivity] interstitial — preload while user answers questions. */
+    private fun shouldPreloadLessonInterstitial(): Boolean {
+        if (isTestMode) return false
+        if (category.isNotBlank()) return false
+        if (intent.getIntExtra(EXTRA_RANDOM_COUNT, 0) > 0) return false
+        return true
     }
 
     private fun dpToPx(dp: Int): Int {

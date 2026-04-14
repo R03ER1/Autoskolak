@@ -1,0 +1,10 @@
+---
+description: Po větších změnách v kódu commitovat do gitu smysluplné commity se zprávou.
+alwaysApply: true
+---
+
+Po každé **větší** změně (nová funkce, refaktor přes více souborů, oprava chování napříč obrazovkami) **commitni** do lokálního gitu.
+
+- Jedna logická změna = jeden commit (nebo pár souvisejících), drobné úpravy lze sloučit do stejného commitu.
+- Zpráva: stručně co se změnilo (česky nebo anglicky podle zbytku historie repozitáře).
+- Nevkládej do commitu zbytečné build artefakty a generované složky, pokud to projekt nevyžaduje.

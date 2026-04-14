@@ -7,6 +7,21 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.11] - 2026-03-31
+- Changed: Lesson results interstitial — preload starts during reading intro and during the quiz (`LessonInterstitialAds`), so the ad is often ready when results open; loading overlay redesigned (Material card + circular indicator).
+- Note: If the user finishes before preload completes, the new loading UI still appears until the ad loads.
+
+## [2.0.10] - 2026-03-31
+- Fixed: Topic intro / reading lesson (`ReadingLessonActivity`) — image paths now use the `images/` asset prefix like question images, so intro slides show pictures again.
+
+## [2.0.9] - 2026-03-30
+- Changed: Vývojářské možnosti v Nastavení jsou dostupné i v release buildu; heslo je konstanta `DEVELOPER_OPTIONS_PASSWORD` v `SettingsActivity` (ne `local.properties` / BuildConfig).
+
+## [2.0.8] - 2026-03-30
+- Fixed: Alex death flow — death screen no longer opens twice (onCreate + onResume); after revive, Alex page loads main content if it was skipped while dead.
+- Changed: Death revival hold shortened to 3 seconds; dead Alex uses `images/alex/AlexDead.png` from the imageassets module (with legacy path fallback).
+- Added: `AlexDead.png` asset under `imageassets/src/main/assets/images/alex/`.
+
 ## [2.0.7] - 2026-03-30
 - Changed: Practice — „Tvoje chyby“ section title uses red accent for visibility.
 

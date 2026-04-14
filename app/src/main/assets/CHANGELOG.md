@@ -7,6 +7,21 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.11] - 2026-03-31
+- Změna: Reklama po lekci se začne načítat už během čtecího úvodu a během kvízu; výsledek je často bez dlouhého čekání. Obrazovka „načítání“ má nový vzhled (karta + kolečko).
+- Pozn.: Když lekci dokončíš velmi rychle, načítání se může stejně na chvíli ukázat.
+
+## [2.0.10] - 2026-03-31
+- Oprava: Úvod k tématu (čtecí lekce) — obrázky se znovu načítají ze složky `images/` v assets (stejně jako u otázek).
+
+## [2.0.9] - 2026-03-30
+- Změna: Vývojářské možnosti fungují i v ostré verzi aplikace; heslo je v kódu (`SettingsActivity`, konstanta `DEVELOPER_OPTIONS_PASSWORD`).
+
+## [2.0.8] - 2026-03-30
+- Oprava: Smrt Alexe — obrazovka už se neotevře dvakrát; po probuzení se načte hlavní obsah Alexovy stránky.
+- Změna: Podržení otisku 3 s; mrtvý Alex z `images/alex/AlexDead.png` (modul imageassets).
+- Novinka: Soubor `AlexDead.png` v imageassets.
+
 ## [2.0.7] - 2026-03-30
 - Změna: Procvičování — nadpis „Tvoje chyby“ je červený pro lepší viditelnost.
 

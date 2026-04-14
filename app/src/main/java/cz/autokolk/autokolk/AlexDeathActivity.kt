@@ -20,8 +20,9 @@ class AlexDeathActivity : AutokolkActivity() {
     private var holdHandler: Handler? = null
     private var holdRunnable: Runnable? = null
     private var rotationAnimator: ObjectAnimator? = null
-    
-    private val HOLD_DURATION_MS = 5000L // 5 seconds
+    private var fillAnimator: ObjectAnimator? = null
+
+    private val holdDurationMs = 3000L
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +46,10 @@ class AlexDeathActivity : AutokolkActivity() {
         val lionName = prefs.getString("lion_name", "Alex") ?: "Alex"
         deathTitle.text = "⚠️ ${lionName.uppercase()} VYHLADOVĚL... ⚠️"
         
-        // Load dead lion image rotated 90 degrees
-        try {
-            assets.open("alex/AlexDead.png").use { input ->
-                val bmp = android.graphics.BitmapFactory.decodeStream(input)
-                deadLionImage.setImageBitmap(bmp)
-            }
+        AlexDeadBitmapLoader.load(assets)?.let { bmp ->
+            deadLionImage.setImageBitmap(bmp)
             deadLionImage.rotation = 90f
-        } catch (_: Throwable) { }
+        }
         
         // Setup hold button
         holdButton.setOnTouchListener { _, event ->
@@ -81,18 +78,18 @@ class AlexDeathActivity : AutokolkActivity() {
             progressDrawable?.level = 0
         }
         
-        // Start rotation animation
-        rotationAnimator = ObjectAnimator.ofFloat(deadLionImage, "rotation", 90f, 0f)
-        rotationAnimator?.duration = HOLD_DURATION_MS
-        rotationAnimator?.start()
-        
-        // Start fill animation - animate drawable level from 0 to 10000
+        rotationAnimator = ObjectAnimator.ofFloat(deadLionImage, "rotation", 90f, 0f).apply {
+            duration = holdDurationMs
+            start()
+        }
+
         (holdButton.background as? android.graphics.drawable.LayerDrawable)?.let { layerDrawable ->
             val progressDrawable = layerDrawable.findDrawableByLayerId(android.R.id.progress)
             progressDrawable?.let {
-                val fillAnimator = ObjectAnimator.ofInt(it, "level", 0, 10000)
-                fillAnimator.duration = HOLD_DURATION_MS
-                fillAnimator.start()
+                fillAnimator = ObjectAnimator.ofInt(it, "level", 0, 10000).apply {
+                    duration = holdDurationMs
+                    start()
+                }
             }
         }
         
@@ -103,9 +100,9 @@ class AlexDeathActivity : AutokolkActivity() {
                 if (!isHolding) return
                 
                 val elapsed = System.currentTimeMillis() - holdStartTime
-                val secondsRemaining = ((HOLD_DURATION_MS - elapsed) / 1000f).coerceAtLeast(0f)
+                val secondsRemaining = ((holdDurationMs - elapsed) / 1000f).coerceAtLeast(0f)
                 
-                if (elapsed >= HOLD_DURATION_MS) {
+                if (elapsed >= holdDurationMs) {
                     // Completed!
                     onHoldComplete()
                 } else {
@@ -123,6 +120,8 @@ class AlexDeathActivity : AutokolkActivity() {
         
         rotationAnimator?.cancel()
         rotationAnimator = null
+        fillAnimator?.cancel()
+        fillAnimator = null
         holdHandler?.removeCallbacksAndMessages(null)
         holdRunnable = null
         holdProgressText.text = ""
@@ -141,6 +140,8 @@ class AlexDeathActivity : AutokolkActivity() {
         isHolding = false
         holdHandler?.removeCallbacksAndMessages(null)
         rotationAnimator?.cancel()
+        fillAnimator?.cancel()
+        fillAnimator = null
         
         // Change to happy lion
         try {

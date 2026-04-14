@@ -26,7 +26,6 @@ class ResultsActivity : AutokolkActivity() {
         const val EXTRA_FIRST_OF_DAY = "extra_first_of_day"
         const val EXTRA_IS_PRACTICE = "extra_is_practice"
         const val EXTRA_PRACTICE_CATEGORY = "extra_practice_category"
-        private const val LESSON_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-7904041740523292/1806063612"
 
         fun createIntent(
             context: Context, 
@@ -180,33 +179,24 @@ class ResultsActivity : AutokolkActivity() {
             return
         }
 
-        // While loading/showing ad, show fullscreen overlay and hide content
-        adLoadingOverlay.visibility = View.VISIBLE
         resultsContent.visibility = View.INVISIBLE
 
+        val ready = LessonInterstitialAds.takeReadyAd()
+        if (ready != null) {
+            adLoadingOverlay.visibility = View.GONE
+            bindAndShowInterstitial(ready, adLoadingOverlay, resultsContent)
+            return
+        }
+
+        adLoadingOverlay.visibility = View.VISIBLE
         InterstitialAd.load(
             this,
-            LESSON_INTERSTITIAL_AD_UNIT_ID,
+            LessonInterstitialAds.AD_UNIT_ID,
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                    lessonInterstitialAd = interstitialAd
-                    lessonInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                        override fun onAdDismissedFullScreenContent() {
-                            lessonInterstitialAd = null
-                            adLoadingOverlay.visibility = View.GONE
-                            resultsContent.visibility = View.VISIBLE
-                        }
-
-                        override fun onAdFailedToShowFullScreenContent(adError: com.google.android.gms.ads.AdError) {
-                            Log.w("ResultsActivity", "Interstitial failed to show: ${adError.message}")
-                            lessonInterstitialAd = null
-                            adLoadingOverlay.visibility = View.GONE
-                            resultsContent.visibility = View.VISIBLE
-                        }
-                    }
-                    adShownForThisResult = true
-                    lessonInterstitialAd?.show(this@ResultsActivity)
+                    adLoadingOverlay.visibility = View.GONE
+                    bindAndShowInterstitial(interstitialAd, adLoadingOverlay, resultsContent)
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
@@ -214,8 +204,35 @@ class ResultsActivity : AutokolkActivity() {
                     lessonInterstitialAd = null
                     adLoadingOverlay.visibility = View.GONE
                     resultsContent.visibility = View.VISIBLE
+                    LessonInterstitialAds.preload(this@ResultsActivity)
                 }
             }
         )
+    }
+
+    private fun bindAndShowInterstitial(
+        interstitialAd: InterstitialAd,
+        adLoadingOverlay: View,
+        resultsContent: View
+    ) {
+        lessonInterstitialAd = interstitialAd
+        lessonInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                lessonInterstitialAd = null
+                adLoadingOverlay.visibility = View.GONE
+                resultsContent.visibility = View.VISIBLE
+                LessonInterstitialAds.preload(this@ResultsActivity)
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: com.google.android.gms.ads.AdError) {
+                Log.w("ResultsActivity", "Interstitial failed to show: ${adError.message}")
+                lessonInterstitialAd = null
+                adLoadingOverlay.visibility = View.GONE
+                resultsContent.visibility = View.VISIBLE
+                LessonInterstitialAds.preload(this@ResultsActivity)
+            }
+        }
+        adShownForThisResult = true
+        lessonInterstitialAd?.show(this)
     }
 } 

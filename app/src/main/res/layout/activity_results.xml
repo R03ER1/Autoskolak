@@ -73,40 +73,65 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Fullscreen loading overlay shown while interstitial ad is loading/showing -->
-    <LinearLayout
+    <!-- Shown only while interstitial is loading (preloaded ads skip this) -->
+    <FrameLayout
         android:id="@+id/adLoadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:background="#CC000000"
-        android:visibility="gone">
+        android:background="#E6121212"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp"
-            android:background="@drawable/result_panel_correct_gradient"
-            android:elevation="8dp">
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/card_dark"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#33FFFFFF">
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="40dp"
+                android:paddingVertical="32dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Připravujeme krátkou reklamu…"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    app:indicatorColor="@color/primary_light"
+                    app:indicatorSize="44dp"
+                    app:trackThickness="3dp"
+                    app:trackCornerRadius="2dp"
+                    app:trackColor="#33FFFFFF" />
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:letterSpacing="0.02"
+                    android:text="Načítání"
+                    android:textColor="@color/text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
-    </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="Chvilku strpení, prosím"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
 </FrameLayout>

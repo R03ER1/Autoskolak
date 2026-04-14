@@ -1,0 +1,2 @@
+# Zkopíruj do souboru local.properties (ten není v gitu).
+# Volitelné klíče pro podpis / SDK; heslo k vývojářským možnostem je v SettingsActivity.kt (konstanta DEVELOPER_OPTIONS_PASSWORD).

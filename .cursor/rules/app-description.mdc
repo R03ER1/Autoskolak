@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+
+you see an app for android in Kotlin. it's called Autoškolák. the purpose of this app is to help czech people to prepare for driver's license exam. but unlike other apps, it's made to be fun. there are duolingo-like lessons, a little animal you have to take care of by doing lessons, a driver's license exam to try, achievements and categories to recall.
+
+there are 5 pages. each page has bottom menu (5 pages buttons), and top menu: streak, coins and lives. all buttons in top menu are clickable and they can open some menus. the pages are:
+- Home: a path of lessons, the main page
+- Alex page: little lion that is slowly getting hungry, so the user has to feed him for points that they get from finished lessons.
+- Test: an exam-like page. the page offers the exact time limits, points and thing like on the real exam.
+- Practice page: there can the user practice by categories.
+- Settings page: basic settings

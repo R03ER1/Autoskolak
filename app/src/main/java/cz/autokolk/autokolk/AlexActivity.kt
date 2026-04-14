@@ -108,24 +108,15 @@ class AlexActivity : AutokolkActivity() {
             }
         }
         
-        // Check if lion is dead before loading content
+        // Dead Alex: one death screen (onResume would duplicate if we also launched there with empty content)
         val manager = HungerManager(this)
         val prefs = getSharedPreferences("hunger_prefs", MODE_PRIVATE)
         val reviveTimestamp = prefs.getLong("revive_timestamp", 0L)
         val now = System.currentTimeMillis()
-        val timeSinceRevive = now - reviveTimestamp
-        
-        // If we just revived (within grace period), skip death screen check
-        val justRevived = reviveTimestamp > 0 && timeSinceRevive < 2000L
-        
-        if (!justRevived) {
-            val hunger = manager.getCurrentHunger()
-            if (hunger <= 0) {
-                val intent = android.content.Intent(this, AlexDeathActivity::class.java)
-                startActivity(intent)
-                // Don't load content if dead
-                return
-            }
+        val justRevived = reviveTimestamp > 0 && now - reviveTimestamp < 2000L
+        if (!justRevived && manager.getCurrentHunger() <= 0) {
+            startActivity(android.content.Intent(this, AlexDeathActivity::class.java))
+            return
         }
         
         // Load page 1 content
@@ -152,26 +143,27 @@ class AlexActivity : AutokolkActivity() {
         val prefs = getSharedPreferences("hunger_prefs", MODE_PRIVATE)
         val reviveTimestamp = prefs.getLong("revive_timestamp", 0L)
         val now = System.currentTimeMillis()
-        val timeSinceRevive = now - reviveTimestamp
-        
-        // If we just revived (within grace period), skip death screen check
-        val justRevived = reviveTimestamp > 0 && timeSinceRevive < 2000L
-        
-        if (!justRevived) {
-            val hunger = manager.getCurrentHunger()
-            // Check if lion is dead and show death screen
-            if (hunger <= 0) {
-                val intent = android.content.Intent(this, AlexDeathActivity::class.java)
-                startActivity(intent)
+        val justRevived = reviveTimestamp > 0 && now - reviveTimestamp < 2000L
+        val hunger = manager.getCurrentHunger()
+
+        if (!justRevived && hunger <= 0) {
+            if (page1Container.childCount > 0) {
+                startActivity(android.content.Intent(this, AlexDeathActivity::class.java))
                 return
             }
+            // First open while dead: AlexDeathActivity already started from onCreate
+            return
         }
-        
-        val hunger = manager.getCurrentHunger()
-        
-        // Update hunger message as title
-        page1Container.findViewById<TextView>(R.id.pageTitle)?.text = getHungerMessage(hunger, lionName)
-        page2ContentContainer.findViewById<TextView>(R.id.foodTitle)?.text = "Jídlo pro $lionName"
+
+        if (page1Container.childCount == 0 && hunger > 0) {
+            loadPage1Content()
+        }
+
+        if (page1Container.childCount > 0) {
+            page1Container.findViewById<TextView>(R.id.pageTitle)?.text =
+                getHungerMessage(manager.getCurrentHunger(), lionName)
+            page2ContentContainer.findViewById<TextView>(R.id.foodTitle)?.text = "Jídlo pro $lionName"
+        }
 
         // Tutorial overlay for Alex page
         TutorialManager.showIfNeeded(
@@ -915,24 +907,21 @@ class AlexActivity : AutokolkActivity() {
             // #endregion
 
             if (hunger <= 0) {
-                // Show dead Alex rotated 90 degrees to the right
-                assets.open("alex/$imageName").use { input ->
-                    val bmp = android.graphics.BitmapFactory.decodeStream(input)
-                    imageView.setImageBitmap(bmp)
-                    // #region agent log
-                    debugLog(
-                        hypothesisId = "H2",
-                        location = "AlexActivity.kt:updateAlexImage:dead",
-                        message = "load_success",
-                        data = mapOf(
-                            "imageName" to imageName,
-                            "width" to bmp?.width,
-                            "height" to bmp?.height,
-                            "moduleInstalled" to moduleInstalled
-                        )
+                val bmp = AlexDeadBitmapLoader.load(assets)
+                imageView.setImageBitmap(bmp)
+                // #region agent log
+                debugLog(
+                    hypothesisId = "H2",
+                    location = "AlexActivity.kt:updateAlexImage:dead",
+                    message = if (bmp != null) "load_success" else "load_failed",
+                    data = mapOf(
+                        "imageName" to imageName,
+                        "width" to bmp?.width,
+                        "height" to bmp?.height,
+                        "moduleInstalled" to moduleInstalled
                     )
-                    // #endregion
-                }
+                )
+                // #endregion
                 imageView.rotation = 90f
             } else {
                 assets.open("images/alex/$imageName").use { input ->
