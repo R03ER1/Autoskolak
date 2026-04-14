@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.49] - 2026-04-14
+- Novinka (krok 22): AnswerButton — stavy odpovědí, animace, konfety.
+- Novinka (krok 23–24): progress bar a kruhový RingProgress.
+- Novinka (krok 25–29): AnimatedCounter, FloatingReward, ConfettiOverlay, shimmer, AnimatedBackground.
+- Novinka (krok 30): Lottie placeholdery v assets/lottie.
+- Novinka (krok 31–35): navigace (Routes, NavGraph), spodní a horní panel (TopBar), AutokolkApp se Scaffoldem.
+
 ## [2.0.35] - 2026-04-14
 - Added: `PrimaryGradientButton` — CTA s gradientem, animovaným stínem (glow), pružinovým stiskem a volitelným shimmer přes gradient.
 

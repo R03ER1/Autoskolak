@@ -7,6 +7,22 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.49] - 2026-04-14
+- Added (krok 22): `AnswerButton` + `AnswerState` — stavy default/výběr/správně/špatně, shake, pulse, mini konfety.
+- Added (krok 23): `AnimatedProgressBar` + varianty `QuizProgressBar`, `XpProgressBar`, `HungerProgressBar`.
+- Added (krok 24): `RingProgress` (oblouk se sweep gradientem).
+- Added (krok 25): `AnimatedCounter` (animované číslice).
+- Added (krok 26): `FloatingReward` (AnimatedVisibility + auto-dismiss).
+- Added (krok 27): `ConfettiOverlay` (částice rect/circle).
+- Added (krok 28): `Modifier.shimmer()`.
+- Added (krok 29): `AnimatedBackground` (radial gradient v čase).
+- Added (krok 30): minimální Lottie JSON placeholdery v `assets/lottie/`.
+- Added (krok 31–32): `Route` sealed třída, `AutokolkNavGraph`, zástupné obrazovky.
+- Added (krok 33–34): `AutokolkBottomBar` (GlassCard, animace ikon a labelů).
+- Added (krok 35): `AutokolkTopBar` + `StatBadge` s `AnimatedCounter` a pulsem životů.
+- Changed: `AutokolkApp` — `Scaffold`, bottom bar na tab routách, `NavHost`.
+- Changed: závislost `material-icons-extended` (ikony pro budoucí použití).
+
 ## [2.0.35] - 2026-04-14
 - Added: `PrimaryGradientButton` — CTA s gradientem, animovaným stínem (glow), pružinovým stiskem a volitelným shimmer přes gradient.
 
