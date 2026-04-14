@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.17] - 2026-04-14
+- Added: Navigation Compose 2.9.7 závislost (příprava pro NavGraph a single-activity navigaci).
+
 ## [2.0.16] - 2026-04-14
 - Added: Jetpack Compose závislosti (BOM 2026.04.00, Material 3, UI Tooling); Compose a XML koexistují.
 

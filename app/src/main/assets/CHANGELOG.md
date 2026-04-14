@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.17] - 2026-04-14
+- Novinka: Přidána knihovna Navigation Compose 2.9.7 (příprava na novou navigaci v aplikaci).
+
 ## [2.0.16] - 2026-04-14
 - Novinka: Přidána podpora Jetpack Compose (BOM 2026.04.00, Material 3); příprava na moderní redesign UI.
 
