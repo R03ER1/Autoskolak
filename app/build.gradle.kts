@@ -9,14 +9,14 @@ plugins {
 
 android {
     namespace = "cz.autokolk"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
         versionCode = 21
-        versionName = "2.0.20"
+        versionName = "2.0.21"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -153,6 +153,8 @@ dependencies {
     implementation(libs.accompanist.drawablepainter)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.21] - 2026-04-14
+- Novinka: Přidána knihovna Haze 1.7.2 (glassmorphism blur efekty pro nový design).
+- Změna: compileSdk zvýšen na 36 (vyžadováno novými knihovnami).
+
 ## [2.0.20] - 2026-04-14
 - Novinka: Přidány knihovny Accompanist Permissions 0.37.3, Drawable Painter 0.37.3, Coil Compose 3.4.0, Compose Foundation a Animation (příprava pro Pager, async obrázky, animace).
 
