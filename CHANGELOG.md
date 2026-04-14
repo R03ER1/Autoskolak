@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.16] - 2026-04-14
+- Added: Jetpack Compose závislosti (BOM 2026.04.00, Material 3, UI Tooling); Compose a XML koexistují.
+
 ## [2.0.15] - 2026-04-14
 - Security / compliance: `usesCleartextTraffic` vypnuto; HTTP zůstává jen pro localhost/emulátor přes `network_security_config`.
 - Privacy: Google UMP (souhlas s reklamami) před startem stahování DFM na `LoadingActivity`; odkaz na soukromí v Nastavení.

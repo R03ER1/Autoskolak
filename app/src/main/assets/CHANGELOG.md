@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.16] - 2026-04-14
+- Novinka: Přidána podpora Jetpack Compose (BOM 2026.04.00, Material 3); příprava na moderní redesign UI.
+
 ## [2.0.15] - 2026-04-14
 - Bezpečnost: vypnutý volný HTTP provoz; výjimky jen pro vývoj (localhost) v nastavení sítě.
 - Soukromí: formulář souhlasu s reklamami (UMP) při startu; odkaz na zásady soukromí v Nastavení.

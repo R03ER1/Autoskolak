@@ -4,6 +4,7 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -14,8 +15,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 20
-        versionName = "2.0.15"
+        versionCode = 21
+        versionName = "2.0.16"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -102,6 +103,7 @@ android {
     }
     buildFeatures {
         buildConfig = true
+        compose = true
     }
     
     setDynamicFeatures(setOf(
@@ -135,4 +137,14 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads:23.5.0")
     // User Messaging Platform (GDPR consent form before personalized ads)
     implementation("com.google.android.ump:user-messaging-platform:3.1.0")
+
+    // Jetpack Compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.activity.compose)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
