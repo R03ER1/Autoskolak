@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.18] - 2026-04-14
+- Added: Lottie Compose 6.7.1 závislost (příprava pro animace: splash, správná/špatná odpověď, streak, konfety atd.).
+
 ## [2.0.17] - 2026-04-14
 - Added: Navigation Compose 2.9.7 závislost (příprava pro NavGraph a single-activity navigaci).
 

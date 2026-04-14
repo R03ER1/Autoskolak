@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.18] - 2026-04-14
+- Novinka: Přidána knihovna Lottie Compose 6.7.1 (příprava na animace v aplikaci — splash, odpovědi, streak, konfety aj.).
+
 ## [2.0.17] - 2026-04-14
 - Novinka: Přidána knihovna Navigation Compose 2.9.7 (příprava na novou navigaci v aplikaci).
 
