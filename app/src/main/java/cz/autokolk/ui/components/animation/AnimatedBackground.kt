@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.DarkBackground
@@ -20,6 +21,7 @@ import cz.autokolk.ui.theme.DarkBackground
 @Composable
 fun AnimatedBackground(
     modifier: Modifier = Modifier,
+    accentColor: Color? = null,
     content: @Composable () -> Unit,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "bg")
@@ -33,11 +35,13 @@ fun AnimatedBackground(
         label = "bgOffset",
     )
 
+    val accent = accentColor ?: AccentCyan
+    val accent2 = accentColor ?: AccentTeal
     val brush = Brush.radialGradient(
         colors = listOf(
-            AccentCyan.copy(alpha = 0.05f),
+            accent.copy(alpha = if (accentColor != null) 0.12f else 0.05f),
             DarkBackground,
-            AccentTeal.copy(alpha = 0.03f),
+            accent2.copy(alpha = if (accentColor != null) 0.08f else 0.03f),
         ),
         center = Offset(offset * 1000f, offset * 1500f),
         radius = 800f,

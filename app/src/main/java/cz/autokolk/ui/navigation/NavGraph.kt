@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cz.autokolk.ui.screens.AlexScreen
 import cz.autokolk.ui.screens.HomeScreen
-import cz.autokolk.ui.screens.OnboardingScreen
+import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.PracticeScreen
 import cz.autokolk.ui.screens.QuizScreen
 import cz.autokolk.ui.screens.ReadingLessonScreen

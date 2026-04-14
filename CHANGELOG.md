@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.51] - 2026-04-14
+- Added (krok 43–52): onboarding — `OnboardingData`, `OnboardingPreferences` (SharedPreferences `lesson_progress`), `OnboardingScreen` (8 stránek: úvod, licence, denní cíl, jméno lva, demo otázka z `LessonProgress`, dialog notifikací API 33+), placeholdery Lottie v `assets/lottie/onboarding_*.json`.
+- Changed: `AutokolkApp` — `startDestination` = Onboarding dokud není dokončeno; `AnimatedBackground` volitelný `accentColor`; nastavení (Compose stub) — „Znovu zobrazit onboarding“.
+
 ## [2.0.50] - 2026-04-14
 - Added (krok 36–38): Compose bottom sheety — `StreakSheet`, `HeartsSheet`, `CoinsSheet` (Lottie, AnimatedCounter, pravidla bodů).
 - Added (krok 39–40): `AutokolkApp` — AnimatedBackground, viditelnost spodní lišty, `AutokolkTopBar` na tab routách; `navigateToTab` v `NavigationExtensions.kt`.

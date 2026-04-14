@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.51] - 2026-04-14
+- Novinka: průvodce prvním spuštěním (onboarding) s výběrem skupiny, denního cíle, jména lva a ukázkovou otázkou.
+- Novinka: připomínky streaku (systémové oprávnění na Android 13+).
+- Úprava: start aplikace podle toho, zda už byl onboarding dokončen.
+
 ## [2.0.50] - 2026-04-14
 - Novinka (krok 36–38): bottom sheety streak, životy, mince (Compose).
 - Novinka (krok 39–40): vylepšený app shell a navigace mezi záložkami.
