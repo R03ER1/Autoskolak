@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.28] - 2026-04-14
+- Added: Light mode color palette (`Color.kt`) — light backgrounds, light glass-effect tokens, adjusted accent colors for light surfaces, and dark text variants. Enables future light/dark theme switching.
+
 ## [2.0.27] - 2026-04-14
 - Added: Dark mode color palette (`Color.kt`) — backgrounds, glass-effect tokens, accent colors (cyan/teal/blue gradient), semantic colors (success/error/warning/info) and text opacity variants for glassmorphism design system.
 

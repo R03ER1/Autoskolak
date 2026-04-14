@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.28] - 2026-04-14
+- Novinka: Barevná paleta pro light mode (`Color.kt`) — světlá pozadí, glass-effect tokeny pro světlý režim, upravené akcentové barvy pro kontrast na světlém povrchu a tmavé textové varianty. Připraveno pro přepínání dark/light tématu.
+
 ## [2.0.27] - 2026-04-14
 - Novinka: Barevná paleta pro dark mode (`Color.kt`) — pozadí, glass-effect tokeny, akcentové barvy (cyan/teal/blue gradient), sémantické barvy (success/error/warning/info) a textové varianty s průhledností pro glassmorphism design systém.
 

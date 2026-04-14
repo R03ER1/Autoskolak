@@ -34,3 +34,27 @@ val TextPrimary = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xB3FFFFFF)   // 70 % white
 val TextTertiary = Color(0x80FFFFFF)    // 50 % white
 // endregion
+
+// region Light — Backgrounds
+val LightBackground = Color(0xFFF0F4FF)      // Jemně modrý off-white
+val LightSurface = Color(0xFFFFFFFF)          // Čistá bílá pro karty
+val LightSurfaceVariant = Color(0xFFE8EEFF)   // Lehce tónovaná
+// endregion
+
+// region Light — Glass
+val LightGlassFill = Color(0x80FFFFFF)        // Poloprůhledná bílá
+val LightGlassBorder = Color(0x33000000)      // Jemný tmavý border
+val LightGlassHighlight = Color(0x4D000000)   // ~30 % black – hover / active
+// endregion
+
+// region Light — Accent
+val LightAccentCyan = Color(0xFF00B8D4)
+val LightAccentTeal = Color(0xFF00BFA5)
+val LightAccentBlue = Color(0xFF2962FF)
+// endregion
+
+// region Light — Text
+val LightTextPrimary = Color(0xFF1A1F36)
+val LightTextSecondary = Color(0xFF4A5568)
+val LightTextTertiary = Color(0xFF9CA3AF)
+// endregion

@@ -42,7 +42,7 @@
 | 11 | Vytvoření hlavní Compose Activity | 1 | ✅ |
 | 12 | Nastavení edge-to-edge zobrazení | 1 | ✅ |
 | 13 | Definice barevné palety (Dark mode) | 2 | ✅ |
-| 14 | Definice barevné palety (Light mode) | 2 | ⬜ |
+| 14 | Definice barevné palety (Light mode) | 2 | ✅ |
 | 15 | Compose ColorScheme a MaterialTheme | 2 | ⬜ |
 | 16 | Definice typografie | 2 | ⬜ |
 | 17 | Definice tvarů (Shapes) | 2 | ⬜ |
