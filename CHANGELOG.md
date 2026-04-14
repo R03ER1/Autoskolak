@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.19] - 2026-04-14
+- Added: Quicksand font family (5 weights: Light, Regular, Medium, SemiBold, Bold) pro Compose Typography.
+
 ## [2.0.18] - 2026-04-14
 - Added: Lottie Compose 6.7.1 závislost (příprava pro animace: splash, správná/špatná odpověď, streak, konfety atd.).
 

@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.19] - 2026-04-14
+- Novinka: Přidán font Quicksand (5 řezů: Light, Regular, Medium, SemiBold, Bold) pro nový design aplikace.
+
 ## [2.0.18] - 2026-04-14
 - Novinka: Přidána knihovna Lottie Compose 6.7.1 (příprava na animace v aplikaci — splash, odpovědi, streak, konfety aj.).
 
