@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.23] - 2026-04-14
+- Novinka: Zvukový engine (`SoundManager`) s nízkolatenčním přehráváním krátkých efektů (správná/špatná odpověď, streak, mince, tap, level up, odpočet). Zvukové soubory budou doplněny později.
+
 ## [2.0.22] - 2026-04-14
 - Novinka: Centralizovaný systém haptické odezvy (vibrace při tapnutí, správné/špatné odpovědi, streak aj.) — připraven pro nový Compose design.
 

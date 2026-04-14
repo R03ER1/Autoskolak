@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.23] - 2026-04-14
+- Added: Sound engine (`SoundManager` singleton + Compose `rememberSoundManager()` helper) using `SoundPool` for low-latency playback of short effects (correct, wrong, streak, coin, tap, levelup, countdown). Gracefully skips missing raw resources — actual sound files will be added in Phase 12.
+
 ## [2.0.22] - 2026-04-14
 - Added: Centralized haptic feedback utility (`HapticFeedback` object + Compose `rememberHaptic()` helper) with six feedback levels (light, medium, heavy, success, error, streak). Uses `HapticFeedbackConstants` on API 30+ with `Vibrator` fallback for older devices.
 
