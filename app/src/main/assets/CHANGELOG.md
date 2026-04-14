@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.34] - 2026-04-14
+- Added: Tlačítka glass/CTA — `GlassButton` (slot + pružinová animace), `PrimaryButton`, `SecondaryButton`, `DangerButton` (`ui/components/buttons/GlassButton.kt`).
+
 ## [2.0.33] - 2026-04-14
 - Added: `GlassCard` a `GlassCardBlur` — glassmorphism karty (`GlassCard` gradient + border; `GlassCardBlur` s Haze `hazeEffect` a `HazeMaterials.thin`).
 
