@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.31] - 2026-04-14
+- Added: Material 3 tvary — `Shape.kt` (`AutokolkShapes`, `PillShape`, `BottomSheetShape`, `LessonNodeShape`) a zapojení `shapes` do `AutokolkTheme`.
+
 ## [2.0.30] - 2026-04-14
 - Added: Compose typografie — `Type.kt` s rodinou fontů Quicksand a `AutokolkTypography` (Material 3 hierarchie), zapojeno do `AutokolkTheme` přes `MaterialTheme.typography`.
 

@@ -129,6 +129,7 @@ fun AutokolkTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = AutokolkTypography,
+            shapes = AutokolkShapes,
             content = content,
         )
     }
