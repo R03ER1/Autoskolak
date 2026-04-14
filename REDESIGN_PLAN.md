@@ -2,7 +2,7 @@
 
 > **Verze plánu:** 1.0  
 > **Datum:** 2026-04-14  
-> **Aktuální verze aplikace:** 2.0.15  
+> **Aktuální verze aplikace:** 2.0.53  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -108,50 +108,50 @@
 | 77 | Správná odpověď — particle burst | 6 | ✅ |
 | 78 | Špatná odpověď — screen shake | 6 | ✅ |
 | 79 | Quiz timer animace (test mode) | 6 | ✅ |
-| 80 | Quiz life-loss animace | 6 | ⬜ |
+| 80 | Quiz life-loss animace | 6 | ✅ |
 | 81 | Results screen (lesson mode) | 6 | ✅ |
 | 82 | Results statistika s animací count-up | 6 | ✅ |
-| 83 | Streak celebration screen | 6 | ⬜ |
+| 83 | Streak celebration screen | 6 | ✅ |
 | 84 | Quiz question number indicator | 6 | ✅ |
-| 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ⬜ |
-| 86 | Alex screen scaffold | 7 | ⬜ |
-| 87 | Alex character composable s animacemi | 7 | ⬜ |
-| 88 | Hunger bar s gradient a animací | 7 | ⬜ |
-| 89 | Food menu bottom sheet | 7 | ⬜ |
+| 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ✅ |
+| 86 | Alex screen scaffold | 7 | ✅ |
+| 87 | Alex character composable s animacemi | 7 | ✅ |
+| 88 | Hunger bar s gradient a animací | 7 | ✅ |
+| 89 | Food menu bottom sheet | 7 | ✅ |
 | 90 | Feed animace (Alex eating) | 7 | ⬜ |
-| 91 | Shop bottom sheet | 7 | ⬜ |
-| 92 | Alex rename dialog | 7 | ⬜ |
-| 93 | Alex death screen | 7 | ⬜ |
-| 94 | Alex ViewModel | 7 | ⬜ |
+| 91 | Shop bottom sheet | 7 | ✅ |
+| 92 | Alex rename dialog | 7 | ✅ |
+| 93 | Alex death screen | 7 | ✅ |
+| 94 | Alex ViewModel | 7 | ✅ |
 | 95 | Alex mood systém | 7 | ⬜ |
 | 96 | Alex interakční animace (tap/swipe) | 7 | ⬜ |
-| 97 | Hunger notifikace redesign | 7 | ⬜ |
-| 98 | Test hub screen | 8 | ⬜ |
-| 99 | Scores chart (Compose) | 8 | ⬜ |
-| 100 | Test results screen | 8 | ⬜ |
+| 97 | Hunger notifikace redesign | 7 | ✅ |
+| 98 | Test hub screen | 8 | ✅ |
+| 99 | Scores chart (Compose) | 8 | ✅ |
+| 100 | Test results screen | 8 | ✅ |
 | 101 | Test detail řádky | 8 | ⬜ |
-| 102 | Test mode specifika v QuizScreen | 8 | ⬜ |
-| 103 | Test countdown overlay | 8 | ⬜ |
-| 104 | Test stats | 8 | ⬜ |
+| 102 | Test mode specifika v QuizScreen | 8 | ✅ |
+| 103 | Test countdown overlay | 8 | ✅ |
+| 104 | Test stats | 8 | ✅ |
 | 105 | Test attempt ViewModel | 8 | ⬜ |
 | 106 | Test history | 8 | ⬜ |
-| 107 | Practice screen scaffold | 9 | ⬜ |
-| 108 | Category card | 9 | ⬜ |
+| 107 | Practice screen scaffold | 9 | ✅ |
+| 108 | Category card | 9 | ✅ |
 | 109 | Practice subcategories | 9 | ⬜ |
 | 110 | Practice filters | 9 | ⬜ |
-| 111 | Practice quiz mode | 9 | ⬜ |
+| 111 | Practice quiz mode | 9 | ✅ |
 | 112 | Practice ViewModel | 9 | ⬜ |
 | 113 | Practice stats | 9 | ⬜ |
 | 114 | Practice search | 9 | ⬜ |
-| 115 | Settings screen | 10 | ⬜ |
-| 116 | Settings komponenty (Switch, Clickable) | 10 | ⬜ |
-| 117 | Dark/light mode přepínač | 10 | ⬜ |
-| 118 | Achievements screen (Compose) | 10 | ⬜ |
+| 115 | Settings screen | 10 | ✅ |
+| 116 | Settings komponenty (Switch, Clickable) | 10 | ✅ |
+| 117 | Dark/light mode přepínač | 10 | ✅ |
+| 118 | Achievements screen (Compose) | 10 | ✅ |
 | 119 | Achievement unlock animace | 10 | ⬜ |
-| 120 | Changelog screen (Compose) | 10 | ⬜ |
-| 121 | Splash screen (Compose) | 10 | ⬜ |
+| 120 | Changelog screen (Compose) | 10 | ✅ |
+| 121 | Splash screen (Compose) | 10 | ✅ |
 | 122 | Loading states pro DFM | 10 | ⬜ |
-| 123 | XP / leveling systém | 11 | ⬜ |
+| 123 | XP / leveling systém | 11 | ✅ |
 | 124 | Level-up celebration | 11 | ⬜ |
 | 125 | Daily challenges | 11 | ⬜ |
 | 126 | Streak freeze mechanika | 11 | ⬜ |
@@ -167,7 +167,7 @@
 | 136 | Gamifikace — avatar customization | 11 | ⬜ |
 | 137 | Gamifikace — social sharing | 11 | ⬜ |
 | 138 | Zvukové soubory | 12 | ⬜ |
-| 139 | SoundManager implementace | 12 | ⬜ |
+| 139 | SoundManager implementace | 12 | ✅ |
 | 140 | Haptic patterns | 12 | ⬜ |
 | 141 | Integrace zvuků do quiz flow | 12 | ⬜ |
 | 142 | Integrace zvuků do Alex | 12 | ⬜ |
@@ -182,8 +182,8 @@
 | 151 | Performance audit — image loading | 13 | ⬜ |
 | 152 | Accessibility audit | 13 | ⬜ |
 | 153 | Reduced motion support | 13 | ⬜ |
-| 154 | Tablet / landscape support (základní) | 13 | ⬜ |
-| 155 | ProGuard / R8 pravidla pro nové knihovny | 13 | ⬜ |
+| 154 | Tablet / landscape support (základní) | 13 | ✅ |
+| 155 | ProGuard / R8 pravidla pro nové knihovny | 13 | ✅ |
 | 156 | App size audit | 13 | ⬜ |
 | 157 | Migrace ad logiky do Compose | 13 | ⬜ |
 | 158 | Finální QA a release checklist | 13 | ⬜ |

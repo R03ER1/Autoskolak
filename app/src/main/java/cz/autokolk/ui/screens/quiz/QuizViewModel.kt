@@ -22,6 +22,7 @@ data class QuizUiState(
     val lastWasCorrect: Boolean? = null,
     val comboStreak: Int = 0,
     val shakeToken: Int = 0,
+    val heartLossToken: Int = 0,
     val testRemainingMs: Long? = null,
     val showQuitDialog: Boolean = false,
 )
@@ -38,17 +39,29 @@ sealed class QuizFinish {
         val score: Int,
         val total: Int,
     ) : QuizFinish()
+
+    /** Procvičování celé kategorie — index v [LessonProgress.getCategoryGroups]. */
+    data class Practice(
+        val category: String,
+        val score: Int,
+        val total: Int,
+    ) : QuizFinish()
 }
 
 class QuizViewModel(
     application: Application,
     private val lessonId: Int,
     private val isTest: Boolean,
-    @Suppress("UNUSED_PARAMETER") private val categoryId: Int,
+    private val categoryId: Int,
     private val isReview: Boolean,
 ) : AndroidViewModel(application) {
 
     private val lessonProgress = LessonProgress(application)
+
+    private fun practiceCategoryName(): String? {
+        if (categoryId < 0) return null
+        return lessonProgress.getCategoryGroups().getOrNull(categoryId)?.category
+    }
 
     private val _state = MutableStateFlow(QuizUiState())
     val state: StateFlow<QuizUiState> = _state.asStateFlow()
@@ -82,7 +95,14 @@ class QuizViewModel(
                 if (pool.size >= 10) pool else lessonProgress.getRandomQuestions(25)
             }
             lessonId > 0 -> lessonProgress.getQuestionsForLesson(lessonId)
-            else -> emptyList()
+            else -> {
+                val cat = practiceCategoryName()
+                if (cat != null) {
+                    lessonProgress.getQuestionsForCategory(cat).shuffled().take(35)
+                } else {
+                    emptyList()
+                }
+            }
         }
         _state.value = QuizUiState(questions = qs)
     }
@@ -117,10 +137,15 @@ class QuizViewModel(
             } catch (_: Throwable) {
             }
         }
+        val practiceCat = practiceCategoryName()
+        if (!isTest && practiceCat != null && lessonId <= 0) {
+            lessonProgress.savePracticeAnswer(practiceCat, q.id, correct)
+        }
+        var lostHeart = false
         if (!isTest && !isReview && lessonId > 0) {
             if (!correct) {
-                val consumed = lessonProgress.consumeHeart()
-                if (consumed) {
+                lostHeart = lessonProgress.consumeHeart()
+                if (lostHeart) {
                     try {
                         HeartRefillJobService.scheduleNext(getApplication(), lessonProgress)
                     } catch (_: Throwable) {
@@ -144,6 +169,7 @@ class QuizViewModel(
                 awaitingAdvance = true,
                 lastWasCorrect = correct,
                 comboStreak = newCombo,
+                heartLossToken = if (lostHeart) it.heartLossToken + 1 else it.heartLossToken,
                 shakeToken = if (!correct) it.shakeToken + 1 else it.shakeToken,
             )
         }
@@ -230,6 +256,19 @@ class QuizViewModel(
 
     private fun completeLessonMode() {
         if (hasCompleted) return
+        val practiceCat = practiceCategoryName()
+        if (practiceCat != null && lessonId <= 0 && !isTest) {
+            val qs = _state.value.questions
+            val correctAnswers = qs.count { normalizeAnswerKey(it.userAnswer) == resolveCorrectKey(it) }
+            val totalQuestions = qs.size
+            hasCompleted = true
+            _finish.value = QuizFinish.Practice(
+                category = practiceCat,
+                score = correctAnswers,
+                total = totalQuestions,
+            )
+            return
+        }
         if (lessonId <= 0) {
             hasCompleted = true
             _finish.value = QuizFinish.Lesson(lessonId = -1, score = 0, total = 0, isReview = isReview)

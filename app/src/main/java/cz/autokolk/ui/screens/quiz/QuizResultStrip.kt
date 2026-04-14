@@ -5,6 +5,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,13 +27,14 @@ fun QuizResultStrip(
     combo: Int,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
+    funFact: String? = null,
 ) {
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically { it },
         exit = slideOutVertically { it },
     ) {
-        Row(
+        Column(
             modifier = modifier
                 .fillMaxWidth()
                 .background(
@@ -45,15 +47,26 @@ fun QuizResultStrip(
                     ),
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = if (correct) "Správně! 🔥×$combo" else "Špatně",
-                color = TextPrimary,
-            )
-            Button(onClick = onContinue) {
-                Text("Dál")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = if (correct) "Správně! 🔥×$combo" else "Špatně",
+                    color = TextPrimary,
+                )
+                Button(onClick = onContinue) {
+                    Text("Dál")
+                }
+            }
+            if (!correct && !funFact.isNullOrBlank()) {
+                Text(
+                    text = funFact,
+                    color = TextPrimary.copy(alpha = 0.9f),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
             }
         }
     }

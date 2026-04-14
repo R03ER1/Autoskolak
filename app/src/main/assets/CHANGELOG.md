@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.53] - 2026-04-14
+- Novinka: Alex, test hub, statistiky, procvičování (Compose), nastavení, úspěchy, changelog, splash, oslava streaku, horní lišta se staty.
+
 ## [2.0.52] - 2026-04-14
 - Novinka (krok 53–85): Compose cesta lekcí (Home), čtení před kvízem, kvíz s výsledky; navigace s parametrem opakování; obrázky z assetů bez Coil v nových obrazovkách.
 

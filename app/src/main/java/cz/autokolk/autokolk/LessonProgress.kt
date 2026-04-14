@@ -886,4 +886,13 @@ class LessonProgress(private val context: Context) {
         if (hearts < MAX_HEARTS) return 0L
         return prefs.getLong(KEY_HEARTS_FULL_SINCE, 0L)
     }
+
+    /** Sdílené s Compose — obnovení UI při změně `lesson_progress`. */
+    fun registerOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun unregisterOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        prefs.unregisterOnSharedPreferenceChangeListener(listener)
+    }
 } 

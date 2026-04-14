@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.53] - 2026-04-14
+- Added (krok 80–158): Alex Compose (`AlexScreen`, `AlexViewModel`, `AlexDeathScreen`), test hub + statistiky (`TestHubScreen`, `TestStatsScreen`, detail pokusu), procvičování přes `categoryId` v `QuizViewModel`, nastavení (téma, úspěchy, changelog), obrazovky úspěchů, changelog ze `assets/CHANGELOG.md`, splash, oslava streaku, horní lišta napojená na `LessonProgress` + sheety, `XpLevel`, `AppSound` (základ), úpravy ProGuardu, notifikace hladu → `ComposeMainActivity`.
+- Changed: `QuizScreen` — animace ztráty života, fun fact ve stripu; `HungerNotificationService` cílí Compose hlavní aktivitu.
+- Removed: `PlaceholderScreens.kt` (nahrazeno konkrétními obrazovkami).
+
 ## [2.0.52] - 2026-04-14
 - Added (krok 53–85): Compose Home cesta lekcí (`HomeScreen`, `HomeViewModel`, Canvas pozadí, uzly, bottom sheet), čtenácká obrazovka (`ReadingLessonComposeScreen`), kvíz (`QuizScreen`, `QuizViewModel`, výsledky), `AssetImageFromPath`, tutoriál / event overlay zástupce, navigace (`Route` rozšířeno o `isReview`).
 - Changed: `NavGraph` napojen na nové obrazovky; zástupce odstraněny z `PlaceholderScreens.kt`.

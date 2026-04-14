@@ -28,6 +28,11 @@ sealed class Route(val route: String) {
 
     data object Streak : Route("streak")
 
+    /** Po lekci — oslava milníku streaku (volitelná navigace z výsledků). */
+    data class StreakCelebration(val streak: Int = 0) : Route("streak_celebration/{streak}") {
+        fun buildPath(): String = "streak_celebration/$streak"
+    }
+
     data object AlexDeath : Route("alex/death")
 
     data class Quiz(

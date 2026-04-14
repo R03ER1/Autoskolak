@@ -7,18 +7,22 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import cz.autokolk.ui.screens.AlexScreen
+import cz.autokolk.ui.screens.achievements.AchievementsScreen
+import cz.autokolk.ui.screens.alex.AlexDeathScreen
+import cz.autokolk.ui.screens.alex.AlexScreen
+import cz.autokolk.ui.screens.changelog.ChangelogScreen
 import cz.autokolk.ui.screens.home.HomeScreen
 import cz.autokolk.ui.screens.onboarding.OnboardingScreen
-import cz.autokolk.ui.screens.PracticeScreen
+import cz.autokolk.ui.screens.practice.PracticeScreen
 import cz.autokolk.ui.screens.quiz.QuizScreen
 import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
 import cz.autokolk.ui.screens.results.ResultsComposeScreen
-import cz.autokolk.ui.screens.SettingsComposeScreen
-import cz.autokolk.ui.screens.SplashScreen
-import cz.autokolk.ui.screens.TestResultsScreen
-import cz.autokolk.ui.screens.TestScreen
-import cz.autokolk.ui.screens.TestStatsScreen
+import cz.autokolk.ui.screens.settings.SettingsComposeScreen
+import cz.autokolk.ui.screens.splash.SplashScreen
+import cz.autokolk.ui.screens.streak.StreakCelebrationScreen
+import cz.autokolk.ui.screens.test.TestHubScreen
+import cz.autokolk.ui.screens.test.TestResultsDetailScreen
+import cz.autokolk.ui.screens.test.TestStatsScreen
 
 @Composable
 fun AutokolkNavGraph(
@@ -35,16 +39,28 @@ fun AutokolkNavGraph(
         composable(Route.Onboarding.route) { OnboardingScreen(navController) }
         composable(Route.Home.route) { HomeScreen(navController) }
         composable(Route.Alex.route) { AlexScreen(navController) }
+        composable(Route.AlexDeath.route) { AlexDeathScreen(navController) }
         composable(Route.TestStats.route) { TestStatsScreen(navController) }
         composable(
             route = Route.TestResults(0).route,
             arguments = listOf(navArgument("testId") { type = NavType.IntType }),
         ) { entry ->
-            TestResultsScreen(navController, entry.arguments?.getInt("testId") ?: 0)
+            TestResultsDetailScreen(navController, entry.arguments?.getInt("testId") ?: 0)
         }
-        composable(Route.Test.route) { TestScreen(navController) }
+        composable(Route.Test.route) { TestHubScreen(navController) }
         composable(Route.Practice.route) { PracticeScreen(navController) }
         composable(Route.Settings.route) { SettingsComposeScreen(navController) }
+        composable(Route.Achievements.route) { AchievementsScreen(navController) }
+        composable(Route.Changelog.route) { ChangelogScreen(navController) }
+        composable(
+            route = Route.StreakCelebration(0).route,
+            arguments = listOf(navArgument("streak") { type = NavType.IntType }),
+        ) { entry ->
+            StreakCelebrationScreen(
+                navController,
+                entry.arguments?.getInt("streak") ?: 0,
+            )
+        }
         composable(
             route = Route.Quiz(-1, false, -1, false).route,
             arguments = listOf(

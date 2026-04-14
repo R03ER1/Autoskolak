@@ -55,8 +55,8 @@ class HungerNotificationService : JobService() {
     private fun showHungerNotification(context: Context, hunger: Int, lionName: String) {
         createChannel(context)
         
-        // Create intent to open Alex page
-        val intent = Intent(context, AlexActivity::class.java).apply {
+        // Otevři hlavní Compose aktivitu (Alex je v dolní navigaci).
+        val intent = Intent(context, ComposeMainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent = PendingIntent.getActivity(
