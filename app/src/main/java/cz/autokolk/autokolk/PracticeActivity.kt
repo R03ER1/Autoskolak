@@ -84,7 +84,7 @@ class PracticeActivity : AutokolkActivity() {
                 else -> false
             }
         }
-        findViewById<TextView>(R.id.pageTitle)?.text = "💪 Practice"
+        findViewById<TextView>(R.id.pageTitle)?.text = getString(R.string.practice_page_title)
 
         // Build practice category boxes
         buildPracticeBoxes()
@@ -215,7 +215,7 @@ class PracticeActivity : AutokolkActivity() {
 
         // Title already present as first child; ensure spacing
         val titleView = findViewById<TextView>(R.id.pageTitle)
-        titleView?.text = "💪 Practice"
+        titleView?.text = getString(R.string.practice_page_title)
 
         container.addView(createUserMistakesBox())
 

@@ -10,10 +10,32 @@
 
     <!-- Loading screen -->
     <string name="loading_status_title">Připravuji otázky…</string>
-    <string name="loading_detail_initial">Stahuji obrázky a další obsah. Může to trvat několik sekund.</string>
+    <string name="loading_detail_initial">Stahuji obrázky a další obsah. Může to trvat několik sekund.\n\nUjistěte se, že máte zapnuté Wi‑Fi nebo mobilní data.</string>
     <string name="loading_detail_with_percent">Stahuji obsah (%1$d%%)…</string>
     <string name="loading_status_error">Nepodařilo se připravit obsah</string>
     <string name="loading_detail_error">Instalace balíčku s obrázky selhala. Zkontrolujte připojení k internetu a zkuste to znovu.</string>
     <string name="loading_retry">Zkusit znovu</string>
     <string name="loading_icon_description">Ikona aplikace Autoškolák</string>
+    <string name="loading_play_store_confirmation_hint">Potvrďte prosím stahování v dialogu Obchodu Play (může se zobrazit nad aplikací).</string>
+    <string name="video_module_wait_install">Stahuje se balíček s videem… Po dokončení se video zobrazí samo.</string>
+    <string name="video_module_downloading_percent">Stahuje se video: %1$d%%</string>
+    <string name="video_module_install_failed">Balíček videa se nepodařilo nainstalovat. Zkontrolujte připojení a zkuste to znovu.</string>
+    <string name="error_storage_full">V úložišti není dost místa. Uvolněte místo a vraťte se k otázce.</string>
+    <string name="settings_title">Nastavení</string>
+    <string name="settings_footer_format">Robert Sadílek 2026 • Verze: %1$s</string>
+    <string name="settings_privacy_link">Zásady ochrany soukromí</string>
+    <string name="practice_page_title">💪 Procvičování</string>
+    <string name="hunger_notification_title">Hlad Alexe</string>
+    <string name="hunger_notification_text">%1$s má hlad. Sytost: %2$d %%.</string>
+    <string name="hunger_notification_channel_name">Hlad lva</string>
+    <string name="nav_home">Domů</string>
+    <string name="nav_alex">Alex</string>
+    <string name="nav_test">Test</string>
+    <string name="nav_practice">Procvičování</string>
+    <string name="nav_settings">Nastavení</string>
+    <string name="content_desc_nav_home">Domovská stránka</string>
+    <string name="content_desc_nav_alex">Stránka Alexe</string>
+    <string name="content_desc_nav_test">Zkouška</string>
+    <string name="content_desc_nav_practice">Procvičování</string>
+    <string name="content_desc_nav_settings">Nastavení</string>
 </resources>

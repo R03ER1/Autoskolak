@@ -67,8 +67,10 @@ class HungerNotificationService : JobService() {
         val hungerLevel = (hunger / 10) * 10 // Round down to nearest 10
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_alex)
-            .setContentTitle(context.getString(R.string.app_name))
-            .setContentText("$lionName is hungry! He's on ${hungerLevel}%!")
+            .setContentTitle(context.getString(R.string.hunger_notification_title))
+            .setContentText(
+                context.getString(R.string.hunger_notification_text, lionName, hungerLevel),
+            )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
@@ -84,7 +86,7 @@ class HungerNotificationService : JobService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Hunger Notifications",
+                context.getString(R.string.hunger_notification_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             channel.description = "Notifikace o hladu Alexe"

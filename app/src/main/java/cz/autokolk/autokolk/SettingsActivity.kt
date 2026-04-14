@@ -1,5 +1,6 @@
 package cz.autokolk
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
@@ -18,11 +19,12 @@ import android.view.Gravity
 import android.util.TypedValue
 import android.view.View
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 
 class SettingsActivity : AutokolkActivity() {
 
     companion object {
-        /** Změň v repu podle potřeby; stejné heslo platí pro debug i release. */
+        /** Pouze debug build; v release je vývojářská sekce skrytá. */
         private const val DEVELOPER_OPTIONS_PASSWORD = "autokolk_dev"
     }
 
@@ -50,6 +52,23 @@ class SettingsActivity : AutokolkActivity() {
         setContentView(R.layout.activity_settings)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.black)
+
+        findViewById<View>(R.id.debugging_section_card)?.visibility =
+            if (BuildConfig.DEBUG) View.VISIBLE else View.GONE
+
+        findViewById<TextView>(R.id.settings_footer)?.text =
+            getString(R.string.settings_footer_format, BuildConfig.VERSION_NAME)
+        findViewById<TextView>(R.id.settings_privacy_link)?.setOnClickListener {
+            try {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://sites.google.com/view/dos-pachos-studio/zásady-ochrany-soukromí"),
+                    ),
+                )
+            } catch (_: Throwable) {
+            }
+        }
 
         lessonProgress = LessonProgress(this)
         streakButton = findViewById(R.id.streakButton)
@@ -133,7 +152,7 @@ class SettingsActivity : AutokolkActivity() {
                 else -> false
             }
         }
-        findViewById<TextView>(R.id.pageTitle)?.text = "⚙️ Settings"
+        findViewById<TextView>(R.id.pageTitle)?.text = getString(R.string.settings_title)
 
         // Footer version click -> open changelog
         findViewById<TextView>(R.id.settings_footer)?.setOnClickListener {

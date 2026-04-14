@@ -23,6 +23,9 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import androidx.activity.OnBackPressedCallback
+import com.google.android.ump.ConsentRequestParameters
+import com.google.android.ump.FormError
+import com.google.android.ump.UserMessagingPlatform
 
 class LoadingActivity : AutokolkActivity() {
 
@@ -54,13 +57,15 @@ class LoadingActivity : AutokolkActivity() {
                 Log.d("LoadingActivity", "Image module '$imageModuleName' installed")
                 ensureTermsAcceptedThenNavigate()
             }
+            SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
+                updateProgress(null)
+                detailText.text = getString(R.string.loading_play_store_confirmation_hint)
+            }
             SplitInstallSessionStatus.INSTALLING,
             SplitInstallSessionStatus.PENDING,
-            SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION,
             SplitInstallSessionStatus.CANCELING,
             SplitInstallSessionStatus.CANCELED,
             SplitInstallSessionStatus.UNKNOWN -> {
-                // For these states we keep showing the loading UI
                 updateProgress(null)
             }
             SplitInstallSessionStatus.FAILED -> {
@@ -98,7 +103,24 @@ class LoadingActivity : AutokolkActivity() {
         splitInstallManager = SplitInstallManagerFactory.create(this)
         splitInstallManager.registerListener(stateListener)
 
-        startOrCheckInstall()
+        requestAdsConsentThenStartInstall()
+    }
+
+    private fun requestAdsConsentThenStartInstall() {
+        val params = ConsentRequestParameters.Builder().build()
+        val consentInformation = UserMessagingPlatform.getConsentInformation(this)
+        consentInformation.requestConsentInfoUpdate(
+            this,
+            params,
+            {
+                UserMessagingPlatform.loadAndShowConsentFormIfRequired(this) { _: FormError? ->
+                    startOrCheckInstall()
+                }
+            },
+            { _: FormError? ->
+                startOrCheckInstall()
+            },
+        )
     }
 
     override fun onDestroy() {

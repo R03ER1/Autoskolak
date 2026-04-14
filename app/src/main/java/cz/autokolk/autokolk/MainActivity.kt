@@ -18,7 +18,8 @@ import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.view.View
 import java.io.File
-import java.io.FileOutputStream
+import java.io.FileNotFoundException
+import java.io.IOException
 import android.media.MediaPlayer
 import android.content.Intent
 import android.widget.MediaController
@@ -33,11 +34,12 @@ import android.os.Looper
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
-import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
-import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
+/**
+ * Lesson / practice / test UI. Video + DFM helpers live in [VideoModuleRegistry], [VideoSplitInstallListenerFactory], [VideoAssetFileCache] (audit A1).
+ */
 class MainActivity : AutokolkActivity() {
     companion object {
         const val EXTRA_LESSON_NUMBER = "extra_lesson_number"
@@ -108,85 +110,60 @@ class MainActivity : AutokolkActivity() {
 
     // Dynamic Feature Modules for video assets
     private lateinit var splitInstallManager: SplitInstallManager
-    private val videoModules = listOf("videoassets1", "videoassets2", "videoassets3", "videoassets4", "videoassets5")
-    private val videoToModuleMap = createVideoToModuleMap()
+    private val videoModules = VideoModuleRegistry.MODULE_NAMES
+    private val videoToModuleMap = VideoModuleRegistry.filenameToModule()
     private var installedVideoModules = mutableSetOf<String>()
     private var pendingVideoPath: String? = null
 
-    private var isPlaying = true
-
-    /**
-     * Map video filenames to their module names
-     */
-    private fun createVideoToModuleMap(): Map<String, String> {
-        val map = mutableMapOf<String, String>()
-        // Module 1 videos
-        listOf("0494.mp4", "0679.mp4", "0032.mp4", "0561.mp4", "0648.mp4", "0563.mp4", "0657.mp4", "0054.mp4", "0669.mp4", "0118.mp4", "0021.mp4").forEach {
-            map[it] = "videoassets1"
-        }
-        // Module 2 videos
-        listOf("0380.mp4", "0063.mp4", "0553.mp4", "0658.mp4", "0465.mp4", "0663.mp4", "0661.mp4", "0055.mp4", "0551.mp4", "0665.mp4", "0548.mp4").forEach {
-            map[it] = "videoassets2"
-        }
-        // Module 3 videos
-        listOf("0957.mp4", "0564.mp4", "0562.mp4", "0350.mp4", "0672.mp4", "0057.mp4", "0033.mp4", "0655.mp4", "0117.mp4", "0660.mp4", "0348.mp4").forEach {
-            map[it] = "videoassets3"
-        }
-        // Module 4 videos
-        listOf("0673.mp4", "0674.mp4", "0464.mp4", "0463.mp4", "0128.mp4", "0999.mp4", "0347.mp4", "0662.mp4", "0664.mp4", "0666.mp4", "0048.mp4").forEach {
-            map[it] = "videoassets4"
-        }
-        // Module 5 videos
-        listOf("0554.mp4", "0056.mp4", "0115.mp4", "0493.mp4", "0659.mp4", "0656.mp4", "0915.mp4", "0670.mp4", "0667.mp4", "0668.mp4", "0983.mp4").forEach {
-            map[it] = "videoassets5"
-        }
-        return map
+    private val videoFileCache by lazy {
+        VideoAssetFileCache(File(cacheDir, "video_asset_cache"))
     }
 
-    /**
-     * SplitInstall state listener to track download progress
-     */
-    private val splitInstallStateListener = SplitInstallStateUpdatedListener { state ->
-        when (state.status()) {
-            SplitInstallSessionStatus.INSTALLED -> {
-                val moduleName = state.moduleNames().firstOrNull()
-                if (moduleName != null) {
-                    Log.d("MainActivity", "Video module '$moduleName' installed")
-                    installedVideoModules.add(moduleName)
-                // If there's a pending video, try to load it now
-                pendingVideoPath?.let { path ->
-                        val videoFileName = path.substringAfterLast("/")
-                        val requiredModule = videoToModuleMap[videoFileName]
-                        if (requiredModule == moduleName && installedVideoModules.contains(requiredModule)) {
-                    pendingVideoPath = null
+    private lateinit var videoModuleStatusText: TextView
+
+    private val splitInstallStateListener by lazy {
+        VideoSplitInstallListenerFactory.create(
+            "MainActivity",
+            videoToModuleMap,
+            installedVideoModules,
+            getPendingVideoPath = { pendingVideoPath },
+            setPendingVideoPath = { pendingVideoPath = it },
+            onReloadVideo = { path ->
+                runOnUiThread {
+                    if (::videoModuleStatusText.isInitialized) {
+                        videoModuleStatusText.visibility = View.GONE
+                    }
                     handleVideoDisplay(path)
                 }
-            }
+            },
+            onInstallFailed = { _, _ ->
+                runOnUiThread {
+                    pendingVideoPath = null
+                    if (::videoModuleStatusText.isInitialized) {
+                        videoModuleStatusText.visibility = View.GONE
+                    }
+                    Toast.makeText(
+                        this,
+                        getString(R.string.video_module_install_failed),
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
-            }
-            SplitInstallSessionStatus.FAILED -> {
-                val moduleName = state.moduleNames().firstOrNull()
-                Log.e("MainActivity", "Video module '$moduleName' installation failed: ${state.errorCode()}")
-            }
-            SplitInstallSessionStatus.DOWNLOADING -> {
-                val moduleName = state.moduleNames().firstOrNull()
-                val bytesDownloaded = state.bytesDownloaded()
-                val totalBytes = state.totalBytesToDownload()
-                if (totalBytes > 0) {
-                    val progress = (bytesDownloaded * 100 / totalBytes).toInt()
-                    Log.d("MainActivity", "Video module '$moduleName' downloading: $progress% ($bytesDownloaded/$totalBytes bytes)")
+            },
+            onDownloadProgress = { _, percent ->
+                runOnUiThread {
+                    if (::videoModuleStatusText.isInitialized) {
+                        videoModuleStatusText.visibility = View.VISIBLE
+                        videoModuleStatusText.text = getString(
+                            R.string.video_module_downloading_percent,
+                            percent,
+                        )
+                    }
                 }
-            }
-            SplitInstallSessionStatus.PENDING -> {
-                val moduleName = state.moduleNames().firstOrNull()
-                Log.d("MainActivity", "Video module '$moduleName' installation pending")
-            }
-            else -> {
-                val moduleName = state.moduleNames().firstOrNull()
-                Log.d("MainActivity", "Video module '$moduleName' status: ${state.status()}")
-            }
-        }
+            },
+        )
     }
+
+    private var isPlaying = true
 
     /**
      * Ensure that the dynamic feature modules containing video assets are installed.
@@ -239,10 +216,6 @@ class MainActivity : AutokolkActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize SplitInstall manager for video assets
-        splitInstallManager = SplitInstallManagerFactory.create(this)
-        requestVideoModulesIfNeeded()
-
         // Set the status bar color to black
         window.statusBarColor = ContextCompat.getColor(this, R.color.black)
 
@@ -260,6 +233,10 @@ class MainActivity : AutokolkActivity() {
         }
 
         initializeViews()
+
+        // After views exist (status text for DFM), register SplitInstall for video assets
+        splitInstallManager = SplitInstallManagerFactory.create(this)
+        requestVideoModulesIfNeeded()
         if (loadQuestions()) {
             setupListeners()
             showQuestion()
@@ -276,6 +253,7 @@ class MainActivity : AutokolkActivity() {
         questionImage = findViewById(R.id.questionImage)
         questionVideo = findViewById(R.id.questionVideo)
         videoContainer = findViewById(R.id.videoContainer)
+        videoModuleStatusText = findViewById(R.id.videoModuleStatusText)
         playPauseButton = findViewById(R.id.playPauseButton)
         optionA = findViewById(R.id.optionA)
         optionB = findViewById(R.id.optionB)
@@ -296,6 +274,7 @@ class MainActivity : AutokolkActivity() {
 
         // Hide video container initially
         videoContainer.visibility = View.GONE
+        videoModuleStatusText.visibility = View.GONE
 
         // Set up VideoView
         questionVideo.setOnPreparedListener { mp ->
@@ -1125,40 +1104,47 @@ class MainActivity : AutokolkActivity() {
         return groupedResult
     }
 
+    private fun deleteLegacyTempVideoOnly() {
+        currentVideoFile?.let { f ->
+            val marker = "${File.separator}video_asset_cache${File.separator}"
+            if (!f.absolutePath.contains(marker)) {
+                f.delete()
+            }
+        }
+        currentVideoFile = null
+    }
+
     private fun handleVideoDisplay(videoPath: String?) {
         try {
-            // Clean up previous video file
-            currentVideoFile?.delete()
-            currentVideoFile = null
+            deleteLegacyTempVideoOnly()
 
             if (videoPath == null) {
                 questionVideo.stopPlayback()
                 videoContainer.visibility = View.GONE
+                videoModuleStatusText.visibility = View.GONE
                 pendingVideoPath = null
                 return
             }
 
             Log.d("MainActivity", "Loading video: $videoPath")
-            
-            // Extract video filename from path (e.g., "videos/0494.mp4" -> "0494.mp4")
+
             val videoFileName = videoPath.substringAfterLast("/")
             val requiredModule = videoToModuleMap[videoFileName]
-            
+
             if (requiredModule == null) {
                 Log.e("MainActivity", "Video file '$videoFileName' not found in module map")
                 videoContainer.visibility = View.GONE
-                    pendingVideoPath = null
-                    return
+                videoModuleStatusText.visibility = View.GONE
+                pendingVideoPath = null
+                return
             }
-            
-            // Check if the required module is installed
+
             if (!installedVideoModules.contains(requiredModule)) {
                 Log.d("MainActivity", "Video module '$requiredModule' not installed yet, requesting installation")
-                // Request the specific module
                 val request = SplitInstallRequest.newBuilder()
                     .addModule(requiredModule)
                     .build()
-                
+
                 splitInstallManager.startInstall(request)
                     .addOnSuccessListener { sessionId ->
                         Log.d("MainActivity", "Installation of module '$requiredModule' started (sessionId=$sessionId)")
@@ -1166,58 +1152,57 @@ class MainActivity : AutokolkActivity() {
                     .addOnFailureListener { exception ->
                         Log.e("MainActivity", "Failed to request installation for module '$requiredModule'", exception)
                     }
-                
-                // Store video path to load once module is installed
-                    pendingVideoPath = videoPath
-                    videoContainer.visibility = View.GONE
-                    return
-                }
-            
-            // Module is installed, try to load video from assets
-            // Dynamic feature module assets are accessible via the app's AssetManager
+
+                pendingVideoPath = videoPath
+                videoContainer.visibility = View.GONE
+                videoModuleStatusText.visibility = View.VISIBLE
+                videoModuleStatusText.text = getString(R.string.video_module_wait_install)
+                return
+            }
+
             try {
                 Log.d("MainActivity", "Trying to load video from assets: $videoPath (module: $requiredModule)")
-                
-                val inputStream = assets.open(videoPath)
-                currentVideoFile = File.createTempFile("video_", ".mp4", cacheDir).apply {
-                    deleteOnExit()
-                }
-                
-                var bytesCopied = 0L
-                FileOutputStream(currentVideoFile).use { output ->
-                    bytesCopied = inputStream.copyTo(output)
-                }
-                inputStream.close()
-                
-                if (bytesCopied > 0) {
-                    Log.d("MainActivity", "Video file loaded from assets, size: ${currentVideoFile!!.length()} bytes")
+
+                val file = videoFileCache.getOrCopyFromAssets(assets, videoPath)
+                if (file != null && file.length() > 0L) {
+                    currentVideoFile = file
+                    Log.d("MainActivity", "Video file ready, size: ${file.length()} bytes")
                     questionVideo.stopPlayback()
                     videoContainer.visibility = View.VISIBLE
-                    questionVideo.setVideoPath(currentVideoFile!!.absolutePath)
+                    videoModuleStatusText.visibility = View.GONE
+                    questionVideo.setVideoPath(file.absolutePath)
                     questionVideo.requestFocus()
                     isPlaying = true
                     updatePlayPauseButton()
                     pendingVideoPath = null
                 } else {
-                    Log.e("MainActivity", "Video file is empty (0 bytes)")
+                    Log.e("MainActivity", "Video file is empty or missing after cache copy")
                     videoContainer.visibility = View.GONE
+                    videoModuleStatusText.visibility = View.GONE
                     pendingVideoPath = null
                 }
-            } catch (e: java.io.FileNotFoundException) {
+            } catch (e: VideoAssetFileCache.NoSpaceOnDeviceException) {
+                Log.e("MainActivity", "No space while caching video", e)
+                Toast.makeText(this, R.string.error_storage_full, Toast.LENGTH_LONG).show()
+                videoContainer.visibility = View.GONE
+                videoModuleStatusText.visibility = View.GONE
+                pendingVideoPath = null
+            } catch (e: FileNotFoundException) {
                 Log.e("MainActivity", "Video file not found in assets: $videoPath", e)
                 Log.e("MainActivity", "Module '$requiredModule' is installed but video not accessible")
                 videoContainer.visibility = View.GONE
+                videoModuleStatusText.visibility = View.GONE
                 pendingVideoPath = null
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Log.e("MainActivity", "Error loading video from assets", e)
-                Log.e("MainActivity", "Video path was: $videoPath")
                 videoContainer.visibility = View.GONE
+                videoModuleStatusText.visibility = View.GONE
                 pendingVideoPath = null
             }
-
         } catch (e: Exception) {
             Log.e("MainActivity", "Error loading video", e)
             videoContainer.visibility = View.GONE
+            videoModuleStatusText.visibility = View.GONE
             pendingVideoPath = null
         }
     }
@@ -1258,7 +1243,7 @@ class MainActivity : AutokolkActivity() {
         }
         super.onDestroy()
         questionVideo.stopPlayback()
-        currentVideoFile?.delete()
+        deleteLegacyTempVideoOnly()
         testCountDownTimer?.cancel()
         testCountDownTimer = null
     }

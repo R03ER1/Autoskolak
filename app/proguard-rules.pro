@@ -19,3 +19,23 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Gson (LessonProgress and similar)
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+
+# Play Feature Delivery / Split Install
+-keep class com.google.android.play.core.splitinstall.** { *; }
+-dontwarn com.google.android.play.core.**
+
+# AdMob / ads identifiers
+-keep public class com.google.android.gms.ads.** { *; }
+-keep public class com.google.ads.** { *; }
+
+# User Messaging Platform (consent)
+-keep class com.google.android.ump.** { *; }
+
+# Apache Commons CSV (used for questions)
+-keep class org.apache.commons.csv.** { *; }

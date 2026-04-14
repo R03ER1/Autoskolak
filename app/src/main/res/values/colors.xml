@@ -31,6 +31,7 @@
     <color name="progress_indicator">#FF81C784</color>
 
     <!-- Settings/dark surfaces -->
+    <color name="header_scrim">#CC000000</color>
     <color name="card_dark">#1E1E1E</color>
     <color name="switch_thumb_on">#FFFFFF</color>
     <color name="switch_thumb_off">#B3FFFFFF</color>

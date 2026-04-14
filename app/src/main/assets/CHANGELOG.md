@@ -7,6 +7,15 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.15] - 2026-04-14
+- Bezpečnost: vypnutý volný HTTP provoz; výjimky jen pro vývoj (localhost) v nastavení sítě.
+- Soukromí: formulář souhlasu s reklamami (UMP) při startu; odkaz na zásady soukromí v Nastavení.
+- Výkon: videa z balíčků se cachují na disk (méně opakovaného zápisu).
+- UX: u lekce vidíš, když se stahuje video balíček; při málo místě na disku upozornění; načítání — nápověda k síti a k dialogu Play.
+- Změna: obrázky z Play se stahují jen z načítací obrazovky (bez duplicity z aplikace).
+- Změna: sekce pro vývojáře jen v ladící verzi; zmenšení release APK (R8); notifikace hladu a procvičování česky.
+- Oprava: titulek stránky nastavení v layoutu (Lint).
+
 ## [2.0.14] - 2026-04-14
 - Oprava: Načítací obrazovka — tlačítko Zpět je pořád zablokované, ale přes novější API (`OnBackPressedDispatcher`), aby prošel Lint (`MissingSuperCall`).
 

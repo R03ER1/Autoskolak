@@ -35,6 +35,10 @@ data class GlobalLesson(
     val count: Int             // Slice length (<= 10)
 )
 
+/**
+ * Central user progress, economy, streak, and practice persistence.
+ * Refactor direction (audit A2): split by domain (persistence vs streak vs economy) instead of growing this file further.
+ */
 class LessonProgress(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("lesson_progress", Context.MODE_PRIVATE)
     private val gson = Gson()

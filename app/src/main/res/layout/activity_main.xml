@@ -89,6 +89,17 @@
             android:scaleType="fitCenter"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/videoModuleStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:accessibilityLiveRegion="polite" />
+
         <FrameLayout
             android:id="@+id/videoContainer"
             android:layout_width="match_parent"

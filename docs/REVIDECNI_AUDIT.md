@@ -17,7 +17,7 @@ Aplikace **Autoškolák** (`cz.autokolk`, minSdk 24, targetSdk 35) je monolitick
 | **Datum** | 2026-04-14 |
 | **Analyzovaná verze (kód)** | `versionName` 2.0.11 → po této změně dokumentace 2.0.12 (`app/build.gradle.kts`) |
 | **Způsob** | Statická analýza zdrojového kódu a manifestu, částečné čtení klíčových tříd, kontrola `.gitignore`; **bez** běhu aplikace na zařízení |
-| **Lint** | Příkaz `gradlew :app:lintDebug` skončil chybou `Couldn't delete ... R.jar` (typicky souběh s Android Studiem / zamčený soubor). **Doporučení:** zavřít IDE build, spustit Lint znovu a výsledky (`app/build/reports/lint-results-debug.html`) doplnit do přílohy auditu. |
+| **Lint** | **2026-04-14 (opakovaný běh):** `gradlew :app:lintDebug` dokončil generování reportu: `app/build/reports/lint-results-debug.html`. Souhrn: **48 errors**, 628 warnings, 2 hints (stav kódu před hromadnými opravami lintu). Typické chyby: `MissingInflatedId` (odkazy na neexistující `@+id` v kódu vs layout), další viz textový výstup v `app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt`. **Doporučení:** postupně opravit errors nebo zavést baseline; při souběhu se studiem znovu riziko zamčeného `R.jar`. |
 
 **Legenda typů:** bug · dluh · UX · použitelnost · výkon · compliance  
 **Legenda priorit:** P0 kritické · P1 vysoké · P2 střední · P3 nízké / nápad  
@@ -245,6 +245,18 @@ flowchart TD
 - [`CHANGELOG.md`](../CHANGELOG.md)
 
 **Otevřené otázky:** výsledek Lint po úspěšném buildu; chování `SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION` v produkci; měření času studeného startu po instalaci DFM.
+
+### Příloha — ruční checklist §5 (vyplnit při testu na zařízení)
+
+| Scénář | Výsledek / poznámka |
+|--------|---------------------|
+| První start | |
+| Odmítnutí podmínek | |
+| Instalace DFM na pomalé síti | |
+| Lekce s videem z každého `videoassets1`–`videoassets5` | |
+| Test časomíry | |
+| Smrt Alexe | |
+| Odměna za reklamu (životy) | |
 
 ---
 

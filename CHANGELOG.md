@@ -7,6 +7,16 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.15] - 2026-04-14
+- Security / compliance: `usesCleartextTraffic` vypnuto; HTTP zůstává jen pro localhost/emulátor přes `network_security_config`.
+- Privacy: Google UMP (souhlas s reklamami) před startem stahování DFM na `LoadingActivity`; odkaz na soukromí v Nastavení.
+- Performance: cache extrahovaných videí v `cacheDir/video_asset_cache` (LRU) místo kopírování do nového temp souboru při každé otázce.
+- UX: stav stahování video modulu v lekci; hláška při nedostatku místa; `LoadingActivity` — text k potvrzení ve Play; nápověda k síti v popisku načítání.
+- Changed: `imageassets` se žádá jen z `LoadingActivity` (ne duplicitně z `App`).
+- Changed: vývojářská karta v Nastavení jen v `debug`; release R8 (`isMinifyEnabled`); odstraněné nepoužívané Compose závislosti z `:app`.
+- i18n / a11y: české texty hladové notifikace, titulek procvičování, popisky spodní navigace; `pageTitle` v layoutu nastavení (oprava Lint `MissingInflatedId`).
+- Refactor: `VideoModuleRegistry`, `VideoSplitInstallListenerFactory`, `VideoAssetFileCache`; doplněny ProGuard pravidla a unit test `VideoModuleRegistryTest`.
+
 ## [2.0.14] - 2026-04-14
 - Fixed: `LoadingActivity` — blokace systémového zpět přes `OnBackPressedDispatcher` místo prázdného `onBackPressed()`, aby Lint nehlásil `MissingSuperCall` a chování zůstalo stejné.
 
