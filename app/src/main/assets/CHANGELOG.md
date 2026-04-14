@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.26] - 2026-04-14
+- Novinka: Edge-to-edge zobrazení — průhledný status bar a navigation bar se správnými ikonami (tmavé/světlé), obsah správně odsazen pomocí `systemBarsPadding()`. Odstraněn dočasný workaround pro Android 15.
+
 ## [2.0.25] - 2026-04-14
 - Novinka: Přidán vstupní bod pro nové Compose UI (`ComposeMainActivity`) — zatím neaktivní, připraven pro budoucí moderní rozhraní.
 

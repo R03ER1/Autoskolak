@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.26] - 2026-04-14
+- Added: Edge-to-edge display — transparent status/navigation bars with correct dark/light icon handling via `enableEdgeToEdge()` SideEffect in `AutokolkTheme`, `systemBarsPadding()` on root content, removed legacy `windowOptOutEdgeToEdgeEnforcement` workaround (values-v35).
+
 ## [2.0.25] - 2026-04-14
 - Added: Compose entry point — `ComposeMainActivity` (neaktivní, bez launcher filtru), stub `AutokolkTheme` a `AutokolkApp` composable. Připraveno pro budoucí Compose UI shell.
 
