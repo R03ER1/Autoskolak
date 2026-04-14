@@ -37,7 +37,7 @@
 | 6 | Přidání Haze knihovny pro glassmorphism | 1 | ✅ |
 | 7 | Přidání haptic feedback utility | 1 | ✅ |
 | 8 | Přidání sound engine | 1 | ✅ |
-| 9 | Vytvoření nové package struktury | 1 | ⬜ |
+| 9 | Vytvoření nové package struktury | 1 | ✅ |
 | 10 | Dead code cleanup | 1 | ⬜ |
 | 11 | Vytvoření hlavní Compose Activity | 1 | ⬜ |
 | 12 | Nastavení edge-to-edge zobrazení | 1 | ⬜ |

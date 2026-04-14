@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.24] - 2026-04-14
+- Added: New Compose package structure (`ui/theme`, `ui/components/*`, `ui/screens/*`, `ui/navigation`, `data`, `util`) — ready for upcoming Compose UI migration.
+
 ## [2.0.23] - 2026-04-14
 - Added: Sound engine (`SoundManager` singleton + Compose `rememberSoundManager()` helper) using `SoundPool` for low-latency playback of short effects (correct, wrong, streak, coin, tap, levelup, countdown). Gracefully skips missing raw resources — actual sound files will be added in Phase 12.
 
