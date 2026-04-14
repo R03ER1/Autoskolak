@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.12] - 2026-04-14
+- Novinka: Revizní audit aplikace v souboru `docs/REVIDECNI_AUDIT.md` (moduly, úložiště, stabilita, architektura, UX, použitelnost, design, výkon, notifikace, compliance, testy, release).
+- Změna: Úprava `.gitignore` — ignorovat složky `build` ve všech modulech (např. video balíčky), aby se do gitu nedostávaly meziprodukty Gradle.
+
 ## [2.0.11] - 2026-03-31
 - Změna: Reklama po lekci se začne načítat už během čtecího úvodu a během kvízu; výsledek je často bez dlouhého čekání. Obrazovka „načítání“ má nový vzhled (karta + kolečko).
 - Pozn.: Když lekci dokončíš velmi rychle, načítání se může stejně na chvíli ukázat.

@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.12] - 2026-04-14
+- Added: Dokument [`docs/REVIDECNI_AUDIT.md`](docs/REVIDECNI_AUDIT.md) — revizní audit aplikace (moduly DFM, úložiště a cache videí, stabilita, architektura, UX a použitelnost, design, výkon, notifikace, compliance, testy, release, backlog).
+- Changed: `.gitignore` — ignorovat `**/build/` ve všech modulech (např. `videoassets*`), aby se do gitu nedostávaly Gradle meziprodukty.
+
 ## [2.0.11] - 2026-03-31
 - Changed: Lesson results interstitial — preload starts during reading intro and during the quiz (`LessonInterstitialAds`), so the ad is often ready when results open; loading overlay redesigned (Material card + circular indicator).
 - Note: If the user finishes before preload completes, the new loading UI still appears until the ad loads.
