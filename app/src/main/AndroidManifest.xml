@@ -23,14 +23,9 @@
             android:value="ca-app-pub-7904041740523292~4238857086" />
         <activity
             android:name=".LoadingActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".HomeActivity"
             android:exported="true"
@@ -99,9 +94,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ComposeMainActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".HeartRefillJobService"

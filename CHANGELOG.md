@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.50] - 2026-04-14
+- Added (krok 36–38): Compose bottom sheety — `StreakSheet`, `HeartsSheet`, `CoinsSheet` (Lottie, AnimatedCounter, pravidla bodů).
+- Added (krok 39–40): `AutokolkApp` — AnimatedBackground, viditelnost spodní lišty, `AutokolkTopBar` na tab routách; `navigateToTab` v `NavigationExtensions.kt`.
+- Added (krok 41): KDoc poznámka k budoucím shared element přechodům v `Routes.kt`.
+- Added (krok 42): `AppBootstrap` (consent, DFM, podmínky); launcher `ComposeMainActivity`; `LoadingActivity` bez launcher intentu (fallback).
+- Fixed: kompilace — `Context.MODE_PRIVATE`, `animateFloat` + `getValue` u shimmeru, `fillMaxSize` místo `matchParentSize`, Lottie `compositionResult.value`.
+
 ## [2.0.49] - 2026-04-14
 - Added (krok 22): `AnswerButton` + `AnswerState` — stavy default/výběr/správně/špatně, shake, pulse, mini konfety.
 - Added (krok 23): `AnimatedProgressBar` + varianty `QuizProgressBar`, `XpProgressBar`, `HungerProgressBar`.

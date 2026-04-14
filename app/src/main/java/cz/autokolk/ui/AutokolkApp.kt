@@ -1,15 +1,25 @@
 package cz.autokolk.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.navigation.AutokolkBottomBar
+import cz.autokolk.ui.components.navigation.AutokolkTopBar
 import cz.autokolk.ui.navigation.AutokolkNavGraph
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.navigation.navigateToTab
 
 @Composable
 fun AutokolkApp() {
@@ -23,25 +33,46 @@ fun AutokolkApp() {
         Route.Practice.route,
         Route.Settings.route,
     )
-    val showBottomBar = currentRoute in tabRoutes
+    val showChrome = currentRoute in tabRoutes
 
     Scaffold(
+        containerColor = Color.Transparent,
         bottomBar = {
-            if (showBottomBar) {
+            AnimatedVisibility(
+                visible = showChrome,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it },
+            ) {
                 AutokolkBottomBar(
                     currentRoute = currentRoute,
-                    onNavigate = { route ->
-                        navController.navigate(route.route) {
-                            launchSingleTop = true
-                        }
-                    },
+                    onNavigate = { navController.navigateToTab(it) },
                 )
             }
         },
-    ) { padding ->
-        AutokolkNavGraph(
-            navController = navController,
-            modifier = Modifier.padding(padding),
-        )
+    ) { paddingValues ->
+        AnimatedBackground(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize()) {
+                if (showChrome) {
+                    AutokolkTopBar(
+                        streak = 0,
+                        coins = 0,
+                        lives = 0,
+                        onStreakClick = {},
+                        onCoinsClick = {},
+                        onLivesClick = {},
+                    )
+                }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .padding(paddingValues),
+                ) {
+                    AutokolkNavGraph(
+                        navController = navController,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+        }
     }
 }

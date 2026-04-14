@@ -54,3 +54,11 @@ sealed class Route(val route: String) {
         fun buildPath(): String = "test/results/$testId"
     }
 }
+
+/*
+ * Shared element transitions — příprava (Compose Navigation 2.8+, SharedTransitionLayout):
+ * - Uzel lekce na Home → hlavička / ikona stejné lekce v kvízu.
+ * - Alex (Alex stránka) → AlexDeath (stejný motiv postavy).
+ * - Karta achievementu → detail achievementu.
+ * Konkrétní sharedElement() modifikátory budou doplněny při migraci obrazovek.
+ */

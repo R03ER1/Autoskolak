@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.50] - 2026-04-14
+- Novinka (krok 36–38): bottom sheety streak, životy, mince (Compose).
+- Novinka (krok 39–40): vylepšený app shell a navigace mezi záložkami.
+- Novinka (krok 41–42): poznámka k shared transitions; start přes ComposeMainActivity a AppBootstrap.
+- Opravy drobných chyb kompilace (animace, Lottie, layout).
+
 ## [2.0.49] - 2026-04-14
 - Novinka (krok 22): AnswerButton — stavy odpovědí, animace, konfety.
 - Novinka (krok 23–24): progress bar a kruhový RingProgress.

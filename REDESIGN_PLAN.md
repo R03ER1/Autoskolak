@@ -64,13 +64,13 @@
 | 33 | Bottom navigation bar (animated) | 3 | ✅ |
 | 34 | Animace ikonky v bottom baru | 3 | ✅ |
 | 35 | Top app bar (streak, coins, lives) | 3 | ✅ |
-| 36 | Streak bottom sheet | 3 | ⬜ |
-| 37 | Hearts / Lives bottom sheet | 3 | ⬜ |
-| 38 | Coins / XP bottom sheet | 3 | ⬜ |
-| 39 | App shell (Scaffold) | 3 | ⬜ |
-| 40 | Tab navigation logika | 3 | ⬜ |
-| 41 | Shared element transitions (příprava) | 3 | ⬜ |
-| 42 | Přepojení launcher Activity na Compose | 3 | ⬜ |
+| 36 | Streak bottom sheet | 3 | ✅ |
+| 37 | Hearts / Lives bottom sheet | 3 | ✅ |
+| 38 | Coins / XP bottom sheet | 3 | ✅ |
+| 39 | App shell (Scaffold) | 3 | ✅ |
+| 40 | Tab navigation logika | 3 | ✅ |
+| 41 | Shared element transitions (příprava) | 3 | ✅ |
+| 42 | Přepojení launcher Activity na Compose | 3 | ✅ |
 | 43 | Onboarding data model | 4 | ⬜ |
 | 44 | Onboarding screen (HorizontalPager) | 4 | ⬜ |
 | 45 | Onboarding page content | 4 | ⬜ |
