@@ -17,9 +17,23 @@ object OnboardingPreferences {
     private const val KEY_LION_NAME = "lion_name"
     private const val KEY_NOTIFICATIONS_PROMPT = "onboarding_notifications_prompt_shown"
 
-    fun isCompleted(context: Context): Boolean =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getBoolean(KEY_ONBOARDING_COMPLETED, false)
+    /**
+     * Dokončený onboarding, nebo migrace: u existující instalace už může být `lesson_progress` vyplněný
+     * dřív než jsme přidali klíč — tehdy onboarding nepřeskakujeme znovu.
+     */
+    fun isCompleted(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        if (prefs.contains(KEY_ONBOARDING_COMPLETED)) {
+            return prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+        }
+        val hasLegacyData = prefs.all.isNotEmpty()
+        return if (hasLegacyData) {
+            prefs.edit { putBoolean(KEY_ONBOARDING_COMPLETED, true) }
+            true
+        } else {
+            false
+        }
+    }
 
     fun clearCompletedFlagForReplay(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
