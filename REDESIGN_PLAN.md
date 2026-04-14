@@ -49,7 +49,7 @@
 | 18 | Rozšířený design token systém | 2 | ✅ |
 | 19 | GlassCard composable | 2 | ✅ |
 | 20 | GlassButton composable | 2 | ✅ |
-| 21 | PrimaryGradientButton composable | 2 | ⬜ |
+| 21 | PrimaryGradientButton composable | 2 | ✅ |
 | 22 | AnswerButton composable | 2 | ⬜ |
 | 23 | AnimatedProgressBar composable | 2 | ⬜ |
 | 24 | CircularProgress / RingProgress composable | 2 | ⬜ |
