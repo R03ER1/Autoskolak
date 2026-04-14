@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.25] - 2026-04-14
+- Added: Compose entry point — `ComposeMainActivity` (neaktivní, bez launcher filtru), stub `AutokolkTheme` a `AutokolkApp` composable. Připraveno pro budoucí Compose UI shell.
+
 ## [2.0.24] - 2026-04-14
 - Added: New Compose package structure (`ui/theme`, `ui/components/*`, `ui/screens/*`, `ui/navigation`, `data`, `util`) — ready for upcoming Compose UI migration.
 

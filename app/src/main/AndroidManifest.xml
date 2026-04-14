@@ -97,6 +97,11 @@
             android:exported="false"
             android:theme="@style/Theme.Autokolk.NoActionBar"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ComposeMainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Autokolk.NoActionBar"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".HeartRefillJobService"

@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.25] - 2026-04-14
+- Novinka: Přidán vstupní bod pro nové Compose UI (`ComposeMainActivity`) — zatím neaktivní, připraven pro budoucí moderní rozhraní.
+
 ## [2.0.24] - 2026-04-14
 - Novinka: Nová package struktura pro Compose UI (`ui/theme`, `ui/components/*`, `ui/screens/*`, `ui/navigation`, `data`, `util`) — připraveno pro migraci na Compose.
 

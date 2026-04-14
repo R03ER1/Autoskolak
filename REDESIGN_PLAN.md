@@ -38,8 +38,8 @@
 | 7 | Přidání haptic feedback utility | 1 | ✅ |
 | 8 | Přidání sound engine | 1 | ✅ |
 | 9 | Vytvoření nové package struktury | 1 | ✅ |
-| 10 | Dead code cleanup | 1 | ⬜ |
-| 11 | Vytvoření hlavní Compose Activity | 1 | ⬜ |
+| 10 | Dead code cleanup | 1 | ❌ |
+| 11 | Vytvoření hlavní Compose Activity | 1 | ✅ |
 | 12 | Nastavení edge-to-edge zobrazení | 1 | ⬜ |
 | 13 | Definice barevné palety (Dark mode) | 2 | ⬜ |
 | 14 | Definice barevné palety (Light mode) | 2 | ⬜ |
@@ -393,7 +393,7 @@
 
 ---
 
-### Krok 10 — Dead code cleanup
+### Krok 10 — Dead code cleanup ⏭️ PŘESKOČENO
 
 **Soubory k odstranění:**
 - `CurvyPathView.kt` — nepoužívaný custom view
