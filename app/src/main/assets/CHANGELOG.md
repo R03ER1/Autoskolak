@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.27] - 2026-04-14
+- Novinka: Barevná paleta pro dark mode (`Color.kt`) — pozadí, glass-effect tokeny, akcentové barvy (cyan/teal/blue gradient), sémantické barvy (success/error/warning/info) a textové varianty s průhledností pro glassmorphism design systém.
+
 ## [2.0.26] - 2026-04-14
 - Novinka: Edge-to-edge zobrazení — průhledný status bar a navigation bar se správnými ikonami (tmavé/světlé), obsah správně odsazen pomocí `systemBarsPadding()`. Odstraněn dočasný workaround pro Android 15.
 

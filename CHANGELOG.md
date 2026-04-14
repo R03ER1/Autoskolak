@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.27] - 2026-04-14
+- Added: Dark mode color palette (`Color.kt`) — backgrounds, glass-effect tokens, accent colors (cyan/teal/blue gradient), semantic colors (success/error/warning/info) and text opacity variants for glassmorphism design system.
+
 ## [2.0.26] - 2026-04-14
 - Added: Edge-to-edge display — transparent status/navigation bars with correct dark/light icon handling via `enableEdgeToEdge()` SideEffect in `AutokolkTheme`, `systemBarsPadding()` on root content, removed legacy `windowOptOutEdgeToEdgeEnforcement` workaround (values-v35).
 
