@@ -8,12 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import cz.autokolk.ui.screens.AlexScreen
-import cz.autokolk.ui.screens.HomeScreen
+import cz.autokolk.ui.screens.home.HomeScreen
 import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.PracticeScreen
-import cz.autokolk.ui.screens.QuizScreen
-import cz.autokolk.ui.screens.ReadingLessonScreen
-import cz.autokolk.ui.screens.ResultsScreen
+import cz.autokolk.ui.screens.quiz.QuizScreen
+import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
+import cz.autokolk.ui.screens.results.ResultsComposeScreen
 import cz.autokolk.ui.screens.SettingsComposeScreen
 import cz.autokolk.ui.screens.SplashScreen
 import cz.autokolk.ui.screens.TestResultsScreen
@@ -46,11 +46,12 @@ fun AutokolkNavGraph(
         composable(Route.Practice.route) { PracticeScreen(navController) }
         composable(Route.Settings.route) { SettingsComposeScreen(navController) }
         composable(
-            route = Route.Quiz(-1, false, -1).route,
+            route = Route.Quiz(-1, false, -1, false).route,
             arguments = listOf(
                 navArgument("lessonId") { type = NavType.IntType; defaultValue = -1 },
                 navArgument("isTest") { type = NavType.BoolType; defaultValue = false },
                 navArgument("categoryId") { type = NavType.IntType; defaultValue = -1 },
+                navArgument("isReview") { type = NavType.BoolType; defaultValue = false },
             ),
         ) { entry ->
             QuizScreen(
@@ -58,13 +59,21 @@ fun AutokolkNavGraph(
                 lessonId = entry.arguments?.getInt("lessonId") ?: -1,
                 isTest = entry.arguments?.getBoolean("isTest") ?: false,
                 categoryId = entry.arguments?.getInt("categoryId") ?: -1,
+                isReview = entry.arguments?.getBoolean("isReview") ?: false,
             )
         }
         composable(
-            route = Route.ReadingLesson(0).route,
-            arguments = listOf(navArgument("lessonId") { type = NavType.IntType }),
+            route = Route.ReadingLesson(0, false).route,
+            arguments = listOf(
+                navArgument("lessonId") { type = NavType.IntType },
+                navArgument("isReview") { type = NavType.BoolType; defaultValue = false },
+            ),
         ) { entry ->
-            ReadingLessonScreen(navController, entry.arguments?.getInt("lessonId") ?: 0)
+            ReadingLessonComposeScreen(
+                navController = navController,
+                lessonId = entry.arguments?.getInt("lessonId") ?: 0,
+                isReview = entry.arguments?.getBoolean("isReview") ?: false,
+            )
         }
         composable(
             route = Route.Results(0, 0, 0).route,
@@ -74,7 +83,7 @@ fun AutokolkNavGraph(
                 navArgument("total") { type = NavType.IntType },
             ),
         ) { entry ->
-            ResultsScreen(
+            ResultsComposeScreen(
                 navController,
                 entry.arguments?.getInt("lessonId") ?: 0,
                 entry.arguments?.getInt("score") ?: 0,

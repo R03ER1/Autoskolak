@@ -1,0 +1,70 @@
+package cz.autokolk.ui.screens.home
+
+import android.app.Application
+import android.content.SharedPreferences
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import cz.autokolk.GlobalLesson
+import cz.autokolk.LessonProgress
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    val lessonProgress = LessonProgress(application)
+
+    private val _pathRows = MutableStateFlow<List<HomePathRow>>(emptyList())
+    val pathRows: StateFlow<List<HomePathRow>> = _pathRows.asStateFlow()
+
+    private val _reorderedPlan = MutableStateFlow<List<GlobalLesson>>(emptyList())
+    val reorderedPlan: StateFlow<List<GlobalLesson>> = _reorderedPlan.asStateFlow()
+
+    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+        refresh()
+    }
+
+    init {
+        lessonProgress.registerOnLessonProgressChanged(prefsListener)
+        refresh()
+    }
+
+    override fun onCleared() {
+        lessonProgress.unregisterOnLessonProgressChanged(prefsListener)
+        super.onCleared()
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            lessonProgress.normalizeStreakForToday()
+            val plan = lessonProgress.getGlobalLessonPlan()
+            val reordered = HomeLessonOrdering.reorderPlan(plan)
+            _reorderedPlan.value = reordered
+            _pathRows.value = HomePathListBuilder.buildRows(lessonProgress, reordered)
+        }
+    }
+
+    fun displayNumberForLesson(lessonNumber: Int): Int {
+        val reordered = _reorderedPlan.value
+        val idx = reordered.indexOfFirst { it.lessonNumber == lessonNumber }
+        return if (idx >= 0) idx + 1 else lessonNumber
+    }
+
+    fun canStartLesson(lessonNumber: Int): Boolean {
+        val tried = lessonProgress.getLessonState(lessonNumber).completed
+        val hasAnyProgress = lessonProgress.getAllLessonStates().isNotEmpty()
+        val nextAllowed = if (hasAnyProgress) {
+            lessonProgress.getNextAvailableLesson()
+        } else {
+            _reorderedPlan.value.firstOrNull()?.lessonNumber ?: 1
+        }
+        return tried || lessonNumber == nextAllowed
+    }
+
+    fun hasHeartsOrInfinite(): Boolean {
+        val prefs = getApplication<Application>().getSharedPreferences("lesson_progress", android.content.Context.MODE_PRIVATE)
+        val infinite = prefs.getBoolean("infinite_lives", false)
+        return infinite || lessonProgress.getCurrentHearts() > 0
+    }
+}

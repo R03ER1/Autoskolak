@@ -34,12 +34,16 @@ sealed class Route(val route: String) {
         val lessonId: Int = -1,
         val isTest: Boolean = false,
         val categoryId: Int = -1,
-    ) : Route("quiz/{lessonId}/{isTest}/{categoryId}") {
-        fun buildPath(): String = "quiz/$lessonId/$isTest/$categoryId"
+        val isReview: Boolean = false,
+    ) : Route("quiz/{lessonId}/{isTest}/{categoryId}/{isReview}") {
+        fun buildPath(): String = "quiz/$lessonId/$isTest/$categoryId/$isReview"
     }
 
-    data class ReadingLesson(val lessonId: Int) : Route("reading/{lessonId}") {
-        fun buildPath(): String = "reading/$lessonId"
+    data class ReadingLesson(
+        val lessonId: Int,
+        val isReview: Boolean = false,
+    ) : Route("reading/{lessonId}/{isReview}") {
+        fun buildPath(): String = "reading/$lessonId/$isReview"
     }
 
     data class Results(

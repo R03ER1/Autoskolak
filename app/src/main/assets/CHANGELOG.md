@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.52] - 2026-04-14
+- Novinka (krok 53–85): Compose cesta lekcí (Home), čtení před kvízem, kvíz s výsledky; navigace s parametrem opakování; obrázky z assetů bez Coil v nových obrazovkách.
+
 ## [2.0.51] - 2026-04-14
 - Novinka: průvodce prvním spuštěním (onboarding) s výběrem skupiny, denního cíle, jména lva a ukázkovou otázkou.
 - Novinka: připomínky streaku (systémové oprávnění na Android 13+).

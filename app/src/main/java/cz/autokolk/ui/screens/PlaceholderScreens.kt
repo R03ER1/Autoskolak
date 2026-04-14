@@ -21,11 +21,6 @@ fun SplashScreen(navController: NavHostController) {
 }
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
-    ScreenStub("Home")
-}
-
-@Composable
 fun AlexScreen(navController: NavHostController) {
     ScreenStub("Alex")
 }
@@ -65,31 +60,6 @@ fun SettingsComposeScreen(navController: NavHostController) {
             Text("Znovu zobrazit onboarding")
         }
     }
-}
-
-@Composable
-fun QuizScreen(
-    navController: NavHostController,
-    lessonId: Int,
-    isTest: Boolean,
-    categoryId: Int,
-) {
-    ScreenStub("Quiz $lessonId test=$isTest cat=$categoryId")
-}
-
-@Composable
-fun ReadingLessonScreen(navController: NavHostController, lessonId: Int) {
-    ScreenStub("Reading $lessonId")
-}
-
-@Composable
-fun ResultsScreen(
-    navController: NavHostController,
-    lessonId: Int,
-    score: Int,
-    total: Int,
-) {
-    ScreenStub("Results $lessonId $score/$total")
 }
 
 @Composable
