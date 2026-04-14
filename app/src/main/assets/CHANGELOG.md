@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.29] - 2026-04-14
+- Novinka: Compose ColorScheme & MaterialTheme — `darkColorScheme()` a `lightColorScheme()` napojeny na `AutokolkTheme`, preference tmavého/světlého režimu uložená v SharedPreferences přes `ThemeMode` enum, `LocalIsDarkTheme` dostupný ve všech composables.
+
 ## [2.0.28] - 2026-04-14
 - Novinka: Barevná paleta pro light mode (`Color.kt`) — světlá pozadí, glass-effect tokeny pro světlý režim, upravené akcentové barvy pro kontrast na světlém povrchu a tmavé textové varianty. Připraveno pro přepínání dark/light tématu.
 

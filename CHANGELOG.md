@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.29] - 2026-04-14
+- Added: Compose ColorScheme & MaterialTheme — `darkColorScheme()` and `lightColorScheme()` wired into `AutokolkTheme`, user dark/light mode preference persisted in SharedPreferences via `ThemeMode` enum, `CompositionLocalProvider` exposes `LocalIsDarkTheme` to all composables.
+
 ## [2.0.28] - 2026-04-14
 - Added: Light mode color palette (`Color.kt`) — light backgrounds, light glass-effect tokens, adjusted accent colors for light surfaces, and dark text variants. Enables future light/dark theme switching.
 
