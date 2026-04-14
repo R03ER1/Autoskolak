@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.14] - 2026-04-14
+- Oprava: Načítací obrazovka — tlačítko Zpět je pořád zablokované, ale přes novější API (`OnBackPressedDispatcher`), aby prošel Lint (`MissingSuperCall`).
+
 ## [2.0.13] - 2026-04-14
 - Oprava: Notifikace (životy plné / hlad Alexe) — na Androidu 13+ se před zobrazením ověří oprávnění k notifikacím; když ho uživatel nemá, neuloží se stav „už odesláno“, takže to zkusí znovu po povolení. Oprava Lint chyby a sestavení s kontrolou Lint.
 

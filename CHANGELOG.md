@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.14] - 2026-04-14
+- Fixed: `LoadingActivity` — blokace systémového zpět přes `OnBackPressedDispatcher` místo prázdného `onBackPressed()`, aby Lint nehlásil `MissingSuperCall` a chování zůstalo stejné.
+
 ## [2.0.13] - 2026-04-14
 - Fixed: Notifikace z `HeartRefillJobService` a `HungerNotificationService` — před voláním `notify` se na Android 13+ kontroluje `POST_NOTIFICATIONS`; bez oprávnění se preference „už odesláno“ neaktualizují, aby šlo upozornění zkusit znovu po udělení práva. Opravuje Lint `MissingPermission` a sestavení s `lintDebug`.
 

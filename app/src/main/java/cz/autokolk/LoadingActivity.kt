@@ -22,6 +22,7 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import androidx.activity.OnBackPressedCallback
 
 class LoadingActivity : AutokolkActivity() {
 
@@ -71,6 +72,14 @@ class LoadingActivity : AutokolkActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Block leaving while we are preparing required content
+                }
+            }
+        )
         setContentView(R.layout.activity_loading)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.black)
@@ -100,10 +109,6 @@ class LoadingActivity : AutokolkActivity() {
             }
         }
         super.onDestroy()
-    }
-
-    override fun onBackPressed() {
-        // Block leaving while we are preparing required content
     }
 
     private fun startOrCheckInstall() {
