@@ -47,7 +47,7 @@
 | 16 | Definice typografie | 2 | ✅ |
 | 17 | Definice tvarů (Shapes) | 2 | ✅ |
 | 18 | Rozšířený design token systém | 2 | ✅ |
-| 19 | GlassCard composable | 2 | ⬜ |
+| 19 | GlassCard composable | 2 | ✅ |
 | 20 | GlassButton composable | 2 | ⬜ |
 | 21 | PrimaryGradientButton composable | 2 | ⬜ |
 | 22 | AnswerButton composable | 2 | ⬜ |
