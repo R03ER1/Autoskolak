@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.22] - 2026-04-14
+- Added: Centralized haptic feedback utility (`HapticFeedback` object + Compose `rememberHaptic()` helper) with six feedback levels (light, medium, heavy, success, error, streak). Uses `HapticFeedbackConstants` on API 30+ with `Vibrator` fallback for older devices.
+
 ## [2.0.21] - 2026-04-14
 - Added: Haze 1.7.2 (glassmorphism blur efekty pro Compose — základní haze + materials).
 - Changed: compileSdk 35 → 36 (vyžadováno tranzitivními závislostmi Haze).

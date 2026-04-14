@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.22] - 2026-04-14
+- Novinka: Centralizovaný systém haptické odezvy (vibrace při tapnutí, správné/špatné odpovědi, streak aj.) — připraven pro nový Compose design.
+
 ## [2.0.21] - 2026-04-14
 - Novinka: Přidána knihovna Haze 1.7.2 (glassmorphism blur efekty pro nový design).
 - Změna: compileSdk zvýšen na 36 (vyžadováno novými knihovnami).
