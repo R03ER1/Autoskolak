@@ -12,7 +12,6 @@ import android.app.job.JobService
 import android.app.job.JobInfo
 import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 
 class HungerNotificationService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
@@ -75,11 +74,10 @@ class HungerNotificationService : JobService() {
             .setContentIntent(pendingIntent)
             .build()
 
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
-        
-        // Remember this notification level to avoid duplicates
-        val prefs = getSharedPreferences("hunger_notifications", MODE_PRIVATE)
-        prefs.edit().putInt("last_notified_hunger_level", hungerLevel).apply()
+        if (NotificationPermission.notifyIfAllowed(context, NOTIFICATION_ID, notification)) {
+            val prefs = getSharedPreferences("hunger_notifications", MODE_PRIVATE)
+            prefs.edit().putInt("last_notified_hunger_level", hungerLevel).apply()
+        }
     }
 
     private fun createChannel(context: Context) {

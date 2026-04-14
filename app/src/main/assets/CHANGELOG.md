@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.13] - 2026-04-14
+- Oprava: Notifikace (životy plné / hlad Alexe) — na Androidu 13+ se před zobrazením ověří oprávnění k notifikacím; když ho uživatel nemá, neuloží se stav „už odesláno“, takže to zkusí znovu po povolení. Oprava Lint chyby a sestavení s kontrolou Lint.
+
 ## [2.0.12] - 2026-04-14
 - Novinka: Revizní audit aplikace v souboru `docs/REVIDECNI_AUDIT.md` (moduly, úložiště, stabilita, architektura, UX, použitelnost, design, výkon, notifikace, compliance, testy, release).
 - Změna: Úprava `.gitignore` — ignorovat složky `build` ve všech modulech (např. video balíčky), aby se do gitu nedostávaly meziprodukty Gradle.

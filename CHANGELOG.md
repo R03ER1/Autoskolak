@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.13] - 2026-04-14
+- Fixed: Notifikace z `HeartRefillJobService` a `HungerNotificationService` — před voláním `notify` se na Android 13+ kontroluje `POST_NOTIFICATIONS`; bez oprávnění se preference „už odesláno“ neaktualizují, aby šlo upozornění zkusit znovu po udělení práva. Opravuje Lint `MissingPermission` a sestavení s `lintDebug`.
+
 ## [2.0.12] - 2026-04-14
 - Added: Dokument [`docs/REVIDECNI_AUDIT.md`](docs/REVIDECNI_AUDIT.md) — revizní audit aplikace (moduly DFM, úložiště a cache videí, stabilita, architektura, UX a použitelnost, design, výkon, notifikace, compliance, testy, release, backlog).
 - Changed: `.gitignore` — ignorovat `**/build/` ve všech modulech (např. `videoassets*`), aby se do gitu nedostávaly Gradle meziprodukty.

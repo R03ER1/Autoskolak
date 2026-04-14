@@ -12,7 +12,6 @@ import android.app.job.JobService
 import android.app.job.JobInfo
 import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 
 class HeartRefillJobService : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
@@ -76,11 +75,10 @@ class HeartRefillJobService : JobService() {
             .setContentIntent(pendingIntent)
             .build()
 
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
-        
-        // Remember this notification to avoid duplicates
-        val prefs = getSharedPreferences("heart_notifications", MODE_PRIVATE)
-        prefs.edit().putInt("last_notified_hearts", 15).apply()
+        if (NotificationPermission.notifyIfAllowed(context, NOTIFICATION_ID, notification)) {
+            val prefs = getSharedPreferences("heart_notifications", MODE_PRIVATE)
+            prefs.edit().putInt("last_notified_hearts", 15).apply()
+        }
     }
 
     private fun createChannel(context: Context) {
