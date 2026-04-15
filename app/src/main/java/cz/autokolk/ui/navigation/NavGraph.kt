@@ -31,6 +31,9 @@ import cz.autokolk.ui.screens.results.ResultsComposeScreen
 import cz.autokolk.ui.screens.streak.StreakScreen
 import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.splash.SplashScreen
+import cz.autokolk.ui.screens.achievements.AchievementsScreen
+import cz.autokolk.ui.screens.changelog.ChangelogScreen
+import cz.autokolk.ui.screens.settings.SettingsScreen
 import cz.autokolk.ui.screens.test.TestResultsScreen
 import cz.autokolk.ui.screens.test.TestScreen
 import cz.autokolk.ui.screens.test.TestStatsScreen
@@ -153,7 +156,7 @@ fun AutokolkNavGraph(
             popEnterTransition = { tabEnter() },
             popExitTransition = { tabExit() },
         ) {
-            PlaceholderScreen("Nastavení")
+            SettingsScreen(navController = navController)
         }
 
         // ── Detail screens ──────────────────────────────────────────────
@@ -263,11 +266,11 @@ fun AutokolkNavGraph(
         }
 
         composable(Route.Achievements.route) {
-            PlaceholderScreen("Úspěchy")
+            AchievementsScreen(navController = navController)
         }
 
         composable(Route.Changelog.route) {
-            PlaceholderScreen("Changelog")
+            ChangelogScreen(navController = navController)
         }
 
         // ── Modal screens — slide up from bottom ────────────────────────

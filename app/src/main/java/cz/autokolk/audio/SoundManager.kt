@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import cz.autokolk.ui.settings.AppSettingsStore
 
 /**
  * Low-latency sound effect engine backed by [SoundPool].
@@ -28,6 +29,7 @@ object SoundManager {
     private var soundPool: SoundPool? = null
     private val soundIds = mutableMapOf<Sound, Int>()
     private var enabled = true
+    private var appContext: Context? = null
 
     enum class Sound(val resName: String) {
         CORRECT("sound_correct"),
@@ -42,6 +44,7 @@ object SoundManager {
     }
 
     fun init(context: Context) {
+        appContext = context.applicationContext
         if (soundPool != null) return
 
         val attrs = AudioAttributes.Builder()
@@ -70,6 +73,8 @@ object SoundManager {
 
     fun play(sound: Sound) {
         if (!enabled) return
+        val ctx = appContext
+        if (ctx != null && !AppSettingsStore.isSoundEnabled(ctx)) return
         val id = soundIds[sound] ?: return
         soundPool?.play(id, 1f, 1f, 1, 0, 1f)
     }

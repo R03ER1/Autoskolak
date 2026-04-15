@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
 import cz.autokolk.data.test.TestAttemptRepository
+import cz.autokolk.ui.settings.AppSettingsStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -224,6 +225,7 @@ class TestViewModel(
 
     private fun vibrate(durationMs: Long, amplitude: Int) {
         val app = getApplication<Application>()
+        if (!AppSettingsStore.isHapticEnabled(app)) return
         if (ContextCompat.checkSelfPermission(app, Manifest.permission.VIBRATE)
             != PackageManager.PERMISSION_GRANTED
         ) {

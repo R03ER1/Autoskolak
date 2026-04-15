@@ -6,4 +6,7 @@ object ComposeNavIntent {
 
     /** Hodnota extra: otevřít Alex (krmení z notifikace). */
     const val OPEN_TAB_ALEX = "alex"
+
+    /** Otevřít záložku Nastavení (např. z legacy Home). */
+    const val OPEN_TAB_SETTINGS = "settings"
 }

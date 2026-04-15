@@ -1,5 +1,6 @@
 package cz.autokolk
 
+import cz.autokolk.ui.navigation.ComposeNavIntent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
@@ -75,8 +76,9 @@ class PracticeActivity : AutokolkActivity() {
                     true
                 }
                 R.id.nav_settings -> {
-                    val intent = android.content.Intent(this, SettingsActivity::class.java)
+                    val intent = android.content.Intent(this, ComposeMainActivity::class.java)
                         .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra(ComposeNavIntent.EXTRA_OPEN_TAB, ComposeNavIntent.OPEN_TAB_SETTINGS)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     finish()

@@ -27,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.feedback.HomeTutorialSpotlightOverlay
+import cz.autokolk.ui.components.security.BiometricLockHost
 import cz.autokolk.ui.components.navigation.AutokolkBottomBar
 import cz.autokolk.ui.components.navigation.AutokolkTopBar
 import cz.autokolk.ui.components.sheets.CoinsSheet
@@ -97,14 +98,26 @@ fun AutokolkApp(
     LaunchedEffect(initialOpenTab) {
         val tab = initialOpenTab ?: return@LaunchedEffect
         try {
-            if (tab == ComposeNavIntent.OPEN_TAB_ALEX) {
-                repeat(100) {
-                    val r = navController.currentDestination?.route
-                    if (r != null && r != Route.Splash.route) {
-                        navController.navigateToTab(Route.Alex)
-                        return@LaunchedEffect
+            when (tab) {
+                ComposeNavIntent.OPEN_TAB_ALEX -> {
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Alex)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
                     }
-                    delay(50)
+                }
+                ComposeNavIntent.OPEN_TAB_SETTINGS -> {
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Settings)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
+                    }
                 }
             }
         } finally {
@@ -206,5 +219,7 @@ fun AutokolkApp(
             totalCoins = coins,
             onDismiss = { coinsSheetVisible = false },
         )
+
+        BiometricLockHost()
     }
 }

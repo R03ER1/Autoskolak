@@ -4,9 +4,19 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.os.Looper
+import cz.autokolk.ui.components.feedback.AchievementUnlockOverlay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+data class AchievementRowUi(
+    val id: String,
+    val title: String,
+    val description: String,
+    val unlocked: Boolean,
+    /** 0f–1f pro neodemčené tier úspěchy */
+    val progress: Float,
+)
 
 class AchievementsManager(private val context: Context) {
     private val prefs = context.getSharedPreferences("achievements", Context.MODE_PRIVATE)
@@ -164,7 +174,7 @@ class AchievementsManager(private val context: Context) {
         val show = Runnable {
             if (act.isFinishing) return@Runnable
             if (Build.VERSION.SDK_INT >= 17 && act.isDestroyed) return@Runnable
-            EventStyleOverlay.show(act, "Úspěch!", achievementName, valueLine, null)
+            AchievementUnlockOverlay.show(act, achievementName, valueLine)
         }
         if (Looper.myLooper() == Looper.getMainLooper()) {
             show.run()
@@ -196,6 +206,63 @@ class AchievementsManager(private val context: Context) {
     // Expose simple getters for UI
     fun getValue(key: String, def: Int = 0): Int = prefs.getInt(key, def)
     fun isUnlocked(key: String): Boolean = prefs.getBoolean(key, false)
+
+    /** Seznam pro Compose obrazovku úspěchů (pořadí stabilní). */
+    fun getAchievementRows(): List<AchievementRowUi> = buildList {
+        fun addTiered(
+            prefix: String,
+            tiers: IntArray,
+            currentValue: () -> Int,
+            titleBase: String,
+            unit: String,
+        ) {
+            tiers.forEachIndexed { idx, threshold ->
+                val unlockedKey = "${prefix}_tier_${idx + 1}_unlocked"
+                val unlocked = prefs.getBoolean(unlockedKey, false)
+                val cur = currentValue()
+                val progress = if (unlocked) 1f else (cur.coerceAtMost(threshold).toFloat() / threshold.toFloat()).coerceIn(0f, 1f)
+                add(
+                    AchievementRowUi(
+                        id = unlockedKey,
+                        title = "$titleBase — úroveň ${idx + 1}",
+                        description = "Cíl: $threshold $unit",
+                        unlocked = unlocked,
+                        progress = progress,
+                    ),
+                )
+            }
+        }
+
+        val streakNow = try {
+            LessonProgress(context).getCurrentStreak()
+        } catch (_: Throwable) {
+            0
+        }
+        addTiered("streak", streakTiers, { streakNow }, "Streak", "dní v řadě")
+        addTiered("fixes", fixesTiers, { prefs.getInt("fixes_total", 0) }, "Opravy chyb", "oprav")
+        addTiered("answers_correct", correctTiers, { prefs.getInt("answers_correct_total", 0) }, "Správné odpovědi", "otázek")
+        addTiered("coins_earned", coinsEarnedTiers, { prefs.getInt("coins_earned_total", 0) }, "Penízky získané", "celkem")
+        addTiered("coins_spent", coinsSpentTiers, { prefs.getInt("coins_spent_total", 0) }, "Penízky utracené", "celkem")
+        addTiered("feed_streak", feedStreakTiers, { prefs.getInt("feed_streak", 0) }, "Krmení Alexe", "dní v řadě")
+
+        foodTargets.forEach { (foodKey, target) ->
+            val keyPrefix = "food_$foodKey"
+            val countKey = "${keyPrefix}_count"
+            val unlockedKey = "${keyPrefix}_unlocked"
+            val count = prefs.getInt(countKey, 0)
+            val unlocked = prefs.getBoolean(unlockedKey, false)
+            val progress = if (unlocked) 1f else (count.toFloat() / target.toFloat()).coerceIn(0f, 1f)
+            add(
+                AchievementRowUi(
+                    id = unlockedKey,
+                    title = achievementTitleForFoodPrefix(keyPrefix) ?: foodKey,
+                    description = "Nakrmit $target× ($foodKey)",
+                    unlocked = unlocked,
+                    progress = progress,
+                ),
+            )
+        }
+    }
 
     fun clearAll() {
         prefs.edit().clear().apply()

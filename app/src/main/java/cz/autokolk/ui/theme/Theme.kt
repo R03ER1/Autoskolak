@@ -13,9 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 
 // ---------------------------------------------------------------------------
@@ -88,6 +86,14 @@ fun writeThemeMode(context: Context, mode: ThemeMode) {
  */
 val LocalIsDarkTheme = compositionLocalOf { true }
 
+/** Poskytuje [ComposeMainActivity] — přepínání světlého/tmavého režimu z nastavení. */
+data class ThemeController(
+    val mode: ThemeMode,
+    val setMode: (ThemeMode) -> Unit,
+)
+
+val LocalThemeController = staticCompositionLocalOf<ThemeController?> { null }
+
 // ---------------------------------------------------------------------------
 // Root theme composable
 // ---------------------------------------------------------------------------
@@ -98,12 +104,10 @@ fun AutokolkTheme(
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
-    val resolvedMode by remember(themeMode) {
-        mutableStateOf(themeMode ?: readThemeMode(context))
-    }
+    val mode = themeMode ?: readThemeMode(context)
 
     val systemDark = isSystemInDarkTheme()
-    val isDark = when (resolvedMode) {
+    val isDark = when (mode) {
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
         ThemeMode.SYSTEM -> systemDark

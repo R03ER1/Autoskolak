@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.55] - 2026-04-15
+- Fáze 10: Nastavení v Compose (profil, téma Systém/Světlý/Tmavý, zvuky, vibrace, biometrický zámek, denní cíl, úspěchy, changelog, smazání postupu), obrazovky Úspěchy a Historie změn; splash s Lottie a lepší stav stahování DFM; nový celoobrazovkový efekt při odemčení úspěchu (Lottie + konfety). Odstraněny legacy Settings/Achievements/Changelog Activity.
+
 ## [2.0.54] - 2026-04-15
 - Jeden dynamický modul `mediaassets` místo `imageassets` a `videoassets1`–`5` (obrázky + videa; velikost pod limitem 200 MB na modul u Google Play).
 

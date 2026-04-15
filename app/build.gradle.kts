@@ -16,8 +16,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 43
-        versionName = "2.0.54"
+        versionCode = 44
+        versionName = "2.0.55"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -124,6 +124,8 @@ dependencies {
     implementation(libs.commons.csv)
     implementation(libs.play.services.ads)
     implementation(libs.user.messaging.platform)
+    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation("androidx.biometric:biometric:1.1.0")
 
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))

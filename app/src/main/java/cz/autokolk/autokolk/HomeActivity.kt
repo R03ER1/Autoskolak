@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.navigation.compose.rememberNavController
+import cz.autokolk.ui.navigation.ComposeNavIntent
 import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
 import cz.autokolk.ui.screens.reading.ReadingLessonExternalExit
 import cz.autokolk.ui.theme.AutokolkTheme
@@ -116,8 +117,9 @@ class HomeActivity : AutokolkActivity() {
                     true
                 }
                 R.id.nav_settings -> {
-                    val intent = Intent(this, SettingsActivity::class.java)
+                    val intent = Intent(this, ComposeMainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra(ComposeNavIntent.EXTRA_OPEN_TAB, ComposeNavIntent.OPEN_TAB_SETTINGS)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     true

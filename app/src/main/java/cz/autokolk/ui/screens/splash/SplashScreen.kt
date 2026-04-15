@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +39,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
@@ -48,6 +54,7 @@ import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
 import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.DarkBackground
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 
@@ -98,7 +105,7 @@ fun SplashScreen(navController: NavHostController) {
         }
 
         state = SplashState.DFM_DOWNLOADING
-        statusText = "Stahování obsahu…"
+        statusText = "Stahuji materiály…"
         downloadProgress = -1f
 
         try {
@@ -126,9 +133,15 @@ fun SplashScreen(navController: NavHostController) {
             when (installState.status()) {
                 SplitInstallSessionStatus.DOWNLOADING -> {
                     val total = installState.totalBytesToDownload()
-                    downloadProgress = if (total > 0) {
+                    val pct = if (total > 0) {
                         installState.bytesDownloaded().toFloat() / total
-                    } else -1f
+                    } else {
+                        -1f
+                    }
+                    downloadProgress = pct
+                    if (pct >= 0f) {
+                        statusText = "Stahuji materiály… ${(pct * 100).toInt()} %"
+                    }
                 }
                 SplitInstallSessionStatus.INSTALLED -> {
                     Log.d(TAG, "Image module installed")
@@ -167,18 +180,31 @@ fun SplashScreen(navController: NavHostController) {
         )
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    val splashLottie by rememberLottieComposition(LottieCompositionSpec.Asset("lottie/onboarding_welcome.json"))
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(DarkBackground),
+        contentAlignment = Alignment.Center,
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp),
         ) {
+            LottieAnimation(
+                composition = splashLottie,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier.size(200.dp),
+            )
+            Spacer(Modifier.height(16.dp))
             Text(
                 text = "Autoškolák",
                 style = MaterialTheme.typography.headlineLarge,
-                color = TextPrimary,
+                color = AccentCyan,
             )
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(24.dp))
 
             when (state) {
                 SplashState.CONSENT, SplashState.DFM_CHECK, SplashState.NAVIGATING -> {
@@ -197,17 +223,12 @@ fun SplashScreen(navController: NavHostController) {
                             progress = { animatedProgress },
                             modifier = Modifier.fillMaxWidth(),
                             color = AccentCyan,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            "${(downloadProgress * 100).toInt()} %",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            trackColor = AccentCyan.copy(alpha = 0.2f),
                         )
                     } else {
-                        CircularProgressIndicator(color = AccentCyan)
+                        CircularProgressIndicator(color = AccentCyan, strokeWidth = 2.dp)
                     }
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(12.dp))
                     Text(statusText, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
                 }
                 SplashState.ERROR -> {

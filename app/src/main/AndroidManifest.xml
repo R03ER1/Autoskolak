@@ -64,21 +64,6 @@
             android:theme="@style/Theme.Autokolk.NoActionBar"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".AchievementsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ChangelogActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ComposeMainActivity"
             android:exported="true"
             android:launchMode="singleTop"
