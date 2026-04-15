@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -170,6 +171,7 @@ private fun TestQuizSessionReadyContent(
                 .displayCutoutPadding()
                 .navigationBarsPadding(),
         ) {
+            val examSubtitle = examBlockSubtitle(state.examBlocks, state.index)
             QuizTopBar(
                 progress = progress,
                 current = state.index + 1,
@@ -179,6 +181,19 @@ private fun TestQuizSessionReadyContent(
                 comboStreak = 0,
                 showCombo = false,
                 onClose = { vm.requestQuit() },
+                belowProgress = if (examSubtitle.isNotBlank()) {
+                    {
+                        Text(
+                            text = examSubtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextSecondary,
+                            maxLines = 4,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                } else {
+                    null
+                },
             )
             Spacer(Modifier.height(8.dp))
             Box(Modifier.weight(1f)) {
@@ -196,13 +211,16 @@ private fun TestQuizSessionReadyContent(
                         ) {
                             QuizMedia(imagePath = question.imagePath, videoPath = question.videoPath)
                             Spacer(Modifier.height(12.dp))
-                            QuestionContent(
-                                question = question,
-                                awaitingAdvance = false,
-                                pendingAnswerKey = null,
-                                isTest = true,
-                                onPick = { vm.selectAnswer(it) },
-                            )
+                            key(question.id, state.answersByQuestionId[question.id]) {
+                                QuestionContent(
+                                    question = question,
+                                    awaitingAdvance = false,
+                                    pendingAnswerKey = null,
+                                    isTest = true,
+                                    onPick = { vm.selectAnswer(it) },
+                                    testSelectionKey = state.answersByQuestionId[question.id],
+                                )
+                            }
                         }
                     }
                 }
@@ -234,10 +252,9 @@ private fun TestQuizSessionReadyContent(
                     Text("Další")
                 }
             }
-            val canFinish = vm.allQuestionsAnswered()
             Button(
-                onClick = { vm.finishTestIfComplete() },
-                enabled = canFinish && state.runPhase == TestRunPhase.Running,
+                onClick = { vm.finishTest() },
+                enabled = state.runPhase == TestRunPhase.Running,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -273,6 +290,11 @@ private fun TestCountdownOverlay(value: Int) {
             )
         }
     }
+}
+
+private fun examBlockSubtitle(blocks: List<OfficialExamBlock>, questionIndex: Int): String {
+    val b = blocks.find { questionIndex >= it.startIndex && questionIndex < it.startIndex + it.questionCount }
+    return b?.descriptionLine.orEmpty()
 }
 
 private class TestViewModelFactory(

@@ -36,10 +36,15 @@ data class TestUiState(
     /** null = countdown hotov; 3..1 = číslice; 0 = „Start!“ */
     val countdownShow: Int? = 3,
     val questions: List<Question> = emptyList(),
+    /** Body za otázku v pořadí [questions] (součet = 50). */
+    val pointsPerQuestion: List<Int> = emptyList(),
+    val examBlocks: List<OfficialExamBlock> = emptyList(),
     val index: Int = 0,
     val testRemainingMs: Long? = null,
     val showQuitDialog: Boolean = false,
-    /** Inkrementace při změně odpovědi (mutovaný [Question.userAnswer]). */
+    /** Odpovědi podle id otázky (Compose nemusí spoléhat na mutaci [Question.userAnswer]). */
+    val answersByQuestionId: Map<String, String> = emptyMap(),
+    /** Inkrementace při změně odpovědi. */
     val answerToken: Int = 0,
 )
 
@@ -66,12 +71,12 @@ class TestViewModel(
     init {
         viewModelScope.launch {
             testRepo.migrateLegacyScoresIfNeeded()
-            val pool = lessonProgress.getRandomQuestions(TEST_QUESTION_COUNT)
-            if (pool.size < TEST_QUESTION_COUNT) {
+            val built = buildOfficialExamQuestionSet(lessonProgress)
+            if (built == null) {
                 _state.update {
                     it.copy(
                         loadState = TestLoadState.InsufficientPool,
-                        insufficientMessage = "V databázi není dostatek otázek pro zkoušku (potřeba ${TEST_QUESTION_COUNT}).",
+                        insufficientMessage = "V databázi není dostatek otázek pro oficiální složení zkoušky (${TEST_QUESTION_COUNT} otázek, 50 bodů).",
                     )
                 }
                 return@launch
@@ -79,7 +84,10 @@ class TestViewModel(
             _state.update {
                 it.copy(
                     loadState = TestLoadState.Ready,
-                    questions = pool,
+                    questions = built.questions,
+                    pointsPerQuestion = built.pointsPerQuestion,
+                    examBlocks = built.blocks,
+                    answersByQuestionId = emptyMap(),
                     index = 0,
                     runPhase = TestRunPhase.Countdown,
                     countdownShow = 3,
@@ -137,8 +145,12 @@ class TestViewModel(
         if (s.loadState != TestLoadState.Ready || s.runPhase != TestRunPhase.Running) return
         val q = s.questions.getOrNull(s.index) ?: return
         val norm = normalizeAnswerKey(key)
-        q.userAnswer = norm
-        _state.update { it.copy(answerToken = it.answerToken + 1) }
+        _state.update {
+            it.copy(
+                answersByQuestionId = it.answersByQuestionId + (q.id to norm),
+                answerToken = it.answerToken + 1,
+            )
+        }
     }
 
     fun goToQuestion(pageIndex: Int) {
@@ -159,12 +171,6 @@ class TestViewModel(
         _state.update { it.copy(index = s.index + 1) }
     }
 
-    fun allQuestionsAnswered(): Boolean {
-        val qs = _state.value.questions
-        if (qs.isEmpty()) return false
-        return qs.all { normalizeAnswerKey(it.userAnswer).isNotEmpty() }
-    }
-
     fun requestQuit() {
         _state.update { it.copy(showQuitDialog = true) }
     }
@@ -178,22 +184,32 @@ class TestViewModel(
         completeTestFinal()
     }
 
-    fun finishTestIfComplete() {
-        if (allQuestionsAnswered()) completeTestFinal()
+    fun finishTest() {
+        completeTestFinal()
     }
 
     private fun completeTestFinal() {
         if (hasCompleted) return
-        val qs = _state.value.questions
+        val st = _state.value
+        val qs = st.questions
+        val pts = st.pointsPerQuestion
+        val answered = st.answersByQuestionId
         timerJob?.cancel()
         timerJob = null
         hasCompleted = true
         viewModelScope.launch {
             if (qs.isEmpty()) return@launch
+            val qsForSave = qs.map { q -> q.copy(userAnswer = answered[q.id]) }
             val app = getApplication<Application>()
-            TestCompletionHelper.applyPostTestRewards(app, lessonProgress, qs)
+            TestCompletionHelper.applyPostTestRewards(
+                application = app,
+                lessonProgress = lessonProgress,
+                questions = qsForSave,
+                pointsPerQuestion = pts,
+            )
             val (attemptId, _) = testRepo.insertCompletedAttempt(
-                questions = qs,
+                questions = qsForSave,
+                pointsPerQuestion = pts,
                 resolveCorrect = ::resolveCorrectKey,
                 normalizeKey = ::normalizeAnswerKey,
                 answerLabel = { q, k -> answerKeyToDisplayLabel(q, k) },

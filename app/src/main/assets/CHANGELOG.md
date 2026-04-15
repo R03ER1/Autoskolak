@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.51] - 2026-04-15
+- Zkouška má stejné rozložení otázek a bodů jako u skutečné zkoušky; nahoře pod ukazatelem postupu je napsaná aktuální skupina.
+- V průběhu testu hned vidíš označenou odpověď; test můžeš kdykoli dokončit i bez vyplnění všeho.
+
 ## [2.0.50] - 2026-04-15
 - Oprava sestavení aplikace (Room / novější kompilátor): databázové dotazy na pokusy zkoušky jsou blokující uvnitř IO vlákna, aby projekt zase šel přeložit.
 

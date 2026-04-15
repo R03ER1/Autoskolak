@@ -24,6 +24,8 @@ fun QuestionContent(
     pendingAnswerKey: String?,
     isTest: Boolean,
     onPick: (String) -> Unit,
+    /** V testu: vybraná odpověď z mapy ve ViewModelu (spolehlivě invaliduje Compose). */
+    testSelectionKey: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val canChange = isTest || (!awaitingAdvance && pendingAnswerKey == null)
@@ -35,7 +37,7 @@ fun QuestionContent(
                 else -> AnswerState.DEFAULT
             }
         }
-        val sel = normalizeAnswerKey(question.userAnswer)
+        val sel = normalizeAnswerKey(testSelectionKey ?: question.userAnswer)
         if (isTest) {
             if (sel.isEmpty()) return AnswerState.DEFAULT
             return if (key == sel) AnswerState.SELECTED else AnswerState.DEFAULT

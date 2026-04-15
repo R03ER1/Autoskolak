@@ -52,6 +52,7 @@ fun QuizTopBar(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     showCombo: Boolean = true,
+    belowProgress: (@Composable () -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth()) {
@@ -164,5 +165,14 @@ fun QuizTopBar(
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp),
         )
+        if (belowProgress != null) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+            ) {
+                belowProgress()
+            }
+        }
     }
 }

@@ -46,16 +46,21 @@ class TestAttemptRepository(
     /** @return Pair(attemptId, weightedScore 0–50) */
     suspend fun insertCompletedAttempt(
         questions: List<Question>,
+        pointsPerQuestion: List<Int> = emptyList(),
         finishedAtMillis: Long = System.currentTimeMillis(),
         resolveCorrect: (Question) -> String,
         normalizeKey: (String?) -> String,
         answerLabel: (Question, String) -> String,
     ): Pair<Long, Int> = withContext(Dispatchers.IO) {
         var correct = 0
+        var weighted = 0
         val answers = questions.mapIndexed { index, q ->
             val userKey = normalizeKey(q.userAnswer)
             val ok = userKey.isNotEmpty() && userKey == resolveCorrect(q)
-            if (ok) correct++
+            if (ok) {
+                correct++
+                weighted += pointsPerQuestion.getOrElse(index) { 0 }
+            }
             val userLabel = if (userKey.isEmpty()) "—" else answerLabel(q, userKey)
             TestAnswerEntity(
                 attemptId = 0L,
@@ -67,7 +72,11 @@ class TestAttemptRepository(
                 orderIndex = index,
             )
         }
-        val weighted = (correct * 50 / questions.size.coerceAtLeast(1)).coerceIn(0, 50)
+        if (pointsPerQuestion.size != questions.size || pointsPerQuestion.sum() <= 0) {
+            weighted = (correct * 50 / questions.size.coerceAtLeast(1)).coerceIn(0, 50)
+        } else {
+            weighted = weighted.coerceIn(0, 50)
+        }
         val attempt = TestAttemptEntity(
             finishedAtMillis = finishedAtMillis,
             score = weighted,

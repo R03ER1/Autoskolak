@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.51] - 2026-04-15
+- Zkouška (Compose): oficiální složení 25 otázek / 50 bodů (Def+Prav, Znak, Bez, Res, Voz, Souv, Med) jako u klasické zkoušky; řádek s kategorií a bodováním pod progress barem.
+- Test: viditelná okamžitá volba odpovědi (mapa odpovědí ve stavu); „Dokončit test“ i s nevyplněnými otázkami; skóre a zápis pokusu podle vah otázek (ne průměr z počtu správně).
+
 ## [2.0.50] - 2026-04-15
 - Oprava buildu po aktualizaci nástrojů: `TestAttemptDao` používá blokující dotazy (`*Blocking`) místo `suspend`, aby Room KSP znovu generoval `TestAttemptDao_Impl` bez konfliktu `Continuation<? super T>` vs `Continuation<T>` u `compileDebugJavaWithJavac`.
 

@@ -15,14 +15,20 @@ internal object TestCompletionHelper {
         application: Application,
         lessonProgress: LessonProgress,
         questions: List<Question>,
+        pointsPerQuestion: List<Int>,
     ): Pair<Int, Boolean> {
         if (questions.isEmpty()) return 0 to false
         var correct = 0
-        for (q in questions) {
+        var weighted = 0
+        questions.forEachIndexed { i, q ->
             val ok = normalizeAnswerKey(q.userAnswer) == resolveCorrectKey(q)
             lessonProgress.recordMistakeStreak(q.id, ok)
-            if (ok) correct++
+            if (ok) {
+                correct++
+                weighted += pointsPerQuestion.getOrElse(i) { 0 }
+            }
         }
+        weighted = weighted.coerceIn(0, 50)
         try {
             AchievementsManager(application).onTestCorrectAdded(correct)
         } catch (_: Throwable) {
@@ -32,7 +38,6 @@ internal object TestCompletionHelper {
         } catch (_: Throwable) {
             false
         }
-        val weighted = (correct * 50 / questions.size.coerceAtLeast(1)).coerceIn(0, 50)
         try {
             if (weighted > 0) lessonProgress.addPoints(weighted)
         } catch (_: Throwable) {
