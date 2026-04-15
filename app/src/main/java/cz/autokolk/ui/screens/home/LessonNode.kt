@@ -31,6 +31,8 @@ enum class LessonNodeState {
     PERFECT,
 }
 
+// TODO: Shared element transition — use sharedElement() modifier to animate
+//  this LessonNode icon into the Quiz header when navigating to a quiz.
 @Composable
 fun LessonNode(
     iconFileName: String,

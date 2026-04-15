@@ -7,6 +7,20 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.38] - 2026-04-15
+- Added: Animovaný bottom navigation bar s glassmorphism stylem, spring animacemi ikon a glow efektem (`ui/components/navigation/BottomNavBar.kt`).
+- Added: Top bar se statistikami (streak, coins, lives) s pulsující animací při nízkém počtu životů (`ui/components/navigation/TopBar.kt`).
+- Added: `AnimatedCounter` composable s rolling digit animací (`ui/components/animation/AnimatedCounter.kt`).
+- Added: Tab navigation logika `navigateToTab` — prevence stack leaku, back vždy na Home (`ui/navigation/NavigationExtensions.kt`).
+- Added: Streak bottom sheet s Lottie animací, 7-denní heatmapou a ochranou streak přes rewarded ad (`ui/components/sheets/StreakSheet.kt`).
+- Added: Hearts bottom sheet s animovanými srdíčky, odpočtem do dalšího života a rewarded ad (`ui/components/sheets/HeartsSheet.kt`).
+- Added: Coins/XP informativní bottom sheet (`ui/components/sheets/CoinsSheet.kt`).
+- Added: Compose-friendly `RewardedAdHelper` wrapper pro rewarded reklamy (`ui/components/sheets/RewardedAdHelper.kt`).
+- Added: 7-denní streak history tracking v `LessonProgress` (`getStreakHistory()`, `recordCompletionDate()`).
+- Changed: `AutokolkApp` přepsán na Scaffold s animovaným top/bottom barem, sheet stavem a SharedPreferences listener.
+- Changed: `SplashScreen` nyní obsahuje kompletní DFM install, UMP ads consent a terms dialog (přesunuto z `LoadingActivity`).
+- Changed: Launcher Activity přepojen z `LoadingActivity` na `ComposeMainActivity` v manifestu.
+
 ## [2.0.37] - 2026-04-15
 - Added: Centrální `NavGraph` — `AutokolkNavGraph` s `NavHost`, přechody (fade pro taby, slide pro detail, slide-up pro modály), napojení všech existujících obrazovek a placeholdery pro zatím neimplementované (`ui/navigation/NavGraph.kt`).
 - Changed: `AutokolkApp` nyní vytváří `NavHostController` a spouští `AutokolkNavGraph` místo placeholder textu.

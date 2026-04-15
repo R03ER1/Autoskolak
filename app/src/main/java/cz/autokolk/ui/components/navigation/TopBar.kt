@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cz.autokolk.R
@@ -45,24 +44,23 @@ fun AutokolkTopBar(
             .statusBarsPadding()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         StatBadge(
             iconRes = R.drawable.ic_streak,
             value = streak,
-            color = WarningAmber,
+            iconColor = WarningAmber,
             onClick = onStreakClick,
         )
         StatBadge(
             iconRes = R.drawable.ic_coin,
             value = coins,
-            color = WarningAmber,
+            iconColor = WarningAmber,
             onClick = onCoinsClick,
         )
         StatBadge(
-            iconRes = R.drawable.ic_live,
+            iconRes = R.drawable.ic_heart,
             value = lives,
-            color = ErrorRed,
+            iconColor = ErrorRed,
             onClick = onLivesClick,
             pulse = lives <= 1,
         )
@@ -73,28 +71,34 @@ fun AutokolkTopBar(
 private fun StatBadge(
     iconRes: Int,
     value: Int,
-    color: Color,
+    iconColor: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit,
     pulse: Boolean = false,
 ) {
-    val pulseTransition = rememberInfiniteTransition(label = "statPulse")
-    val pulseScale by pulseTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "pulse",
-    )
+    val pulseScale = if (pulse) {
+        val transition = rememberInfiniteTransition(label = "pulse")
+        val scale by transition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(800),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "pulseScale",
+        )
+        scale
+    } else {
+        1f
+    }
+
     GlassButton(onClick = onClick) {
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
             modifier = Modifier
                 .size(20.dp)
-                .scale(if (pulse) pulseScale else 1f),
-            tint = color,
+                .scale(pulseScale),
+            tint = iconColor,
         )
         Spacer(Modifier.width(6.dp))
         AnimatedCounter(

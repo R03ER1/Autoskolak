@@ -3,8 +3,6 @@ package cz.autokolk.ui.components.navigation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -17,10 +15,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,33 +34,34 @@ import cz.autokolk.R
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.AutokolkTypography
 import cz.autokolk.ui.theme.PillShape
 import cz.autokolk.ui.theme.TextSecondary
 
-data class BottomNavItem(
+private data class BottomNavItem(
     val route: Route,
-    val iconVectorRes: Int,
+    val iconRes: Int,
     val label: String,
+)
+
+private val bottomNavItems = listOf(
+    BottomNavItem(Route.Home, R.drawable.ic_home, "Domů"),
+    BottomNavItem(Route.Alex, R.drawable.ic_alex, "Alex"),
+    BottomNavItem(Route.Test, R.drawable.ic_test, "Zkouška"),
+    BottomNavItem(Route.Practice, R.drawable.ic_practice, "Praxe"),
+    BottomNavItem(Route.Settings, R.drawable.ic_settings, "Více"),
 )
 
 @Composable
 fun AutokolkBottomBar(
-    currentRoute: String?,
+    currentRoute: String,
     onNavigate: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val items = listOf(
-        BottomNavItem(Route.Home, R.drawable.ic_home, "Domů"),
-        BottomNavItem(Route.Alex, R.drawable.ic_alex, "Alex"),
-        BottomNavItem(Route.Test, R.drawable.ic_test, "Zkouška"),
-        BottomNavItem(Route.Practice, R.drawable.ic_practice, "Praxe"),
-        BottomNavItem(Route.Settings, R.drawable.ic_settings, "Více"),
-    )
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .navigationBarsPadding()
+            .padding(horizontal = 16.dp, bottom = 8.dp),
         shape = PillShape,
     ) {
         Row(
@@ -70,7 +71,7 @@ fun AutokolkBottomBar(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            items.forEach { item ->
+            bottomNavItems.forEach { item ->
                 BottomNavItemView(
                     item = item,
                     isSelected = currentRoute == item.route.route,
@@ -88,22 +89,25 @@ private fun BottomNavItemView(
     onClick: () -> Unit,
 ) {
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.15f else 0.95f,
+        targetValue = if (isSelected) 1.15f else 1f,
         animationSpec = spring(dampingRatio = 0.5f, stiffness = 800f),
-        label = "bnScale",
+        label = "navScale",
     )
     val iconColor by animateColorAsState(
         targetValue = if (isSelected) AccentCyan else TextSecondary,
         animationSpec = tween(200),
-        label = "bnColor",
+        label = "navColor",
     )
+
     Column(
+        modifier = Modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClick,
+            )
+            .padding(horizontal = 4.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = onClick,
-        ),
     ) {
         Box(contentAlignment = Alignment.Center) {
             if (isSelected) {
@@ -114,16 +118,21 @@ private fun BottomNavItemView(
                 )
             }
             Icon(
-                painter = painterResource(item.iconVectorRes),
+                painter = painterResource(item.iconRes),
                 contentDescription = item.label,
-                modifier = Modifier.size(24.dp).scale(scale),
+                modifier = Modifier
+                    .size(24.dp)
+                    .scale(scale),
                 tint = iconColor,
             )
         }
-        AnimatedVisibility(visible = isSelected) {
+        AnimatedVisibility(
+            visible = isSelected,
+            enter = slideInVertically { it } + fadeIn(),
+        ) {
             Text(
                 text = item.label,
-                style = AutokolkTypography.labelSmall,
+                style = MaterialTheme.typography.labelSmall,
                 color = iconColor,
                 modifier = Modifier.padding(top = 2.dp),
             )

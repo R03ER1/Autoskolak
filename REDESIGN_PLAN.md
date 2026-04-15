@@ -1265,7 +1265,7 @@
 
 ---
 
-### Krok 33 — Bottom navigation bar (animated)
+### Krok 33 — Bottom navigation bar (animated) ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/components/navigation/BottomNavBar.kt`
 
@@ -1318,7 +1318,7 @@
 
 ---
 
-### Krok 34 — Animace ikonky v bottom baru
+### Krok 34 — Animace ikonky v bottom baru ✅
 
 **Soubory:** Součást `BottomNavBar.kt`
 
@@ -1362,7 +1362,7 @@
 
 ---
 
-### Krok 35 — Top app bar (streak, coins, lives)
+### Krok 35 — Top app bar (streak, coins, lives) ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/components/navigation/TopBar.kt`
 
@@ -1427,7 +1427,7 @@
 
 ---
 
-### Krok 36 — Streak bottom sheet
+### Krok 36 — Streak bottom sheet ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/components/sheets/StreakSheet.kt`
 
@@ -1472,7 +1472,7 @@
 
 ---
 
-### Krok 37 — Hearts / Lives bottom sheet
+### Krok 37 — Hearts / Lives bottom sheet ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/components/sheets/HeartsSheet.kt`
 
@@ -1516,7 +1516,7 @@
 
 ---
 
-### Krok 38 — Coins / XP bottom sheet
+### Krok 38 — Coins / XP bottom sheet ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/components/sheets/CoinsSheet.kt`
 
@@ -1535,7 +1535,7 @@
 
 ---
 
-### Krok 39 — App shell (Scaffold)
+### Krok 39 — App shell (Scaffold) ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/AutokolkApp.kt`
 
@@ -1581,7 +1581,7 @@
 
 ---
 
-### Krok 40 — Tab navigation logika
+### Krok 40 — Tab navigation logika ✅
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/ui/navigation/NavigationExtensions.kt`
 
@@ -1602,7 +1602,7 @@
 
 ---
 
-### Krok 41 — Shared element transitions (příprava)
+### Krok 41 — Shared element transitions (příprava) ✅
 
 **Soubory:** Žádné nové soubory — přípravný krok
 
@@ -1617,7 +1617,7 @@
 
 ---
 
-### Krok 42 — Přepojení launcher Activity na Compose
+### Krok 42 — Přepojení launcher Activity na Compose ✅
 
 **Soubory:** `AndroidManifest.xml`, `ComposeMainActivity.kt`, `LoadingActivity.kt`
 

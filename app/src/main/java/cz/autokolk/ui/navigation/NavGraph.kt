@@ -45,6 +45,11 @@ private fun modalEnter(): EnterTransition =
 private fun modalExit(): ExitTransition =
     fadeOut(tween(DURATION_MODAL)) + slideOutVertically(tween(DURATION_MODAL)) { it / 3 }
 
+// TODO: Shared element transitions (Compose Navigation 2.8+):
+//  - Wrap with SharedTransitionLayout
+//  - LessonNode (Home) → Quiz header icon
+//  - Alex image (Alex page) → Alex image (AlexDeath)
+//  - Achievement card → Achievement detail
 @Composable
 fun AutokolkNavGraph(
     navController: NavHostController,

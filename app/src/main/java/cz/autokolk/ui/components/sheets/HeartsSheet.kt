@@ -1,7 +1,9 @@
 package cz.autokolk.ui.components.sheets
 
+import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,40 +21,58 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.theme.BottomSheetShape
 import cz.autokolk.ui.theme.DarkSurfaceVariant
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.TextTertiary
-import androidx.compose.material.icons.filled.PlayCircle
+import kotlinx.coroutines.delay
+
+private const val MAX_HEARTS = 15
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeartsSheet(
     isVisible: Boolean,
     lives: Int,
-    maxLives: Int,
-    nextHeartIn: kotlin.time.Duration?,
+    lessonProgress: LessonProgress,
     onDismiss: () -> Unit,
-    onWatchAd: () -> Unit,
+    onLivesUpdated: () -> Unit,
 ) {
     if (!isVisible) return
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val activity = LocalContext.current as? Activity
+    var adLoading by remember { mutableStateOf(false) }
+
+    var nextHeartMs by remember { mutableLongStateOf(lessonProgress.millisUntilNextHeart()) }
+    LaunchedEffect(lives) {
+        while (true) {
+            nextHeartMs = lessonProgress.millisUntilNextHeart()
+            delay(1000)
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = DarkSurfaceVariant,
         shape = BottomSheetShape,
     ) {
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,50 +80,70 @@ fun HeartsSheet(
             Text(
                 text = "Životy",
                 style = MaterialTheme.typography.titleLarge,
+                color = ErrorRed,
             )
             Spacer(Modifier.height(16.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                repeat(maxLives) { index ->
-                    val isFull = index < lives
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                repeat(MAX_HEARTS.coerceAtMost(5)) { index ->
+                    val isFull = index < lives.coerceAtMost(5)
                     val scale by animateFloatAsState(
                         targetValue = if (isFull) 1f else 0.7f,
-                        animationSpec = spring(dampingRatio = 0.6f),
-                        label = "heartScale",
+                        animationSpec = spring(dampingRatio = 0.5f),
+                        label = "heartScale_$index",
                     )
                     Icon(
-                        imageVector = if (isFull) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        imageVector = if (isFull) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = null,
                         tint = if (isFull) ErrorRed else TextTertiary,
                         modifier = Modifier
                             .size(32.dp)
-                            .scale(scale),
+                            .scale(scale)
+                            .padding(horizontal = 2.dp),
                     )
                 }
             }
-            nextHeartIn?.let { d ->
-                Spacer(Modifier.height(12.dp))
+
+            if (lives > 5) {
+                Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Další ❤️ za ${formatDuration(d)}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "$lives / $MAX_HEARTS",
+                    style = MaterialTheme.typography.labelMedium,
                     color = TextSecondary,
                 )
             }
-            if (lives < maxLives) {
-                Spacer(Modifier.height(24.dp))
-                PrimaryGradientButton(
-                    text = "Získat život",
-                    onClick = onWatchAd,
-                    icon = Icons.Filled.PlayCircle,
-                )
-            }
+
             Spacer(Modifier.height(16.dp))
+
+            if (nextHeartMs > 0) {
+                val minutes = (nextHeartMs / 60_000).toInt()
+                val seconds = ((nextHeartMs % 60_000) / 1000).toInt()
+                Text(
+                    text = "Další ❤\uFE0F za ${minutes}:${"%02d".format(seconds)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+
+            if (lives < MAX_HEARTS && activity != null) {
+                PrimaryGradientButton(
+                    text = if (adLoading) "Načítání…" else "Získat život",
+                    onClick = {
+                        if (adLoading) return@PrimaryGradientButton
+                        adLoading = true
+                        RewardedAdHelper.showForHeart(activity, lessonProgress) {
+                            adLoading = false
+                            onLivesUpdated()
+                        }
+                    },
+                    enabled = !adLoading,
+                )
+                Spacer(Modifier.height(16.dp))
+            }
         }
     }
-}
-
-private fun formatDuration(d: kotlin.time.Duration): String {
-    val totalSeconds = d.inWholeSeconds
-    val m = totalSeconds / 60
-    val s = totalSeconds % 60
-    return "${m}m ${s.toString().padStart(2, '0')}s"
 }

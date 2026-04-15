@@ -732,8 +732,39 @@ class LessonProgress(private val context: Context) {
             .putInt("streak_count", streak)
             .putString("last_completion_date", today)
             .apply()
+        recordCompletionDate(today)
         try { AchievementsManager(context).onStreakUpdated(streak) } catch (_: Throwable) { }
         return isFirstOfDay
+    }
+
+    private fun recordCompletionDate(date: String) {
+        val raw = prefs.getStringSet("completion_dates", emptySet()) ?: emptySet()
+        val dates = raw.toMutableSet()
+        dates.add(date)
+        // Keep only the last 14 days to avoid unbounded growth
+        val cutoff = run {
+            val cal = java.util.Calendar.getInstance()
+            cal.add(java.util.Calendar.DATE, -14)
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            sdf.format(cal.time)
+        }
+        dates.removeAll { it < cutoff }
+        prefs.edit().putStringSet("completion_dates", dates).apply()
+    }
+
+    /**
+     * Returns a list of 7 booleans representing the last 7 days (index 0 = today, 6 = 6 days ago).
+     * `true` means a lesson was completed on that day.
+     */
+    fun getStreakHistory(): List<Boolean> {
+        val dates = prefs.getStringSet("completion_dates", emptySet()) ?: emptySet()
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val cal = java.util.Calendar.getInstance()
+        return (0..6).map { offset ->
+            val c = java.util.Calendar.getInstance()
+            c.add(java.util.Calendar.DATE, -offset)
+            dates.contains(sdf.format(c.time))
+        }
     }
 
     fun normalizeStreakForToday() {
@@ -885,14 +916,5 @@ class LessonProgress(private val context: Context) {
         val hearts = prefs.getInt("hearts_count", MAX_HEARTS)
         if (hearts < MAX_HEARTS) return 0L
         return prefs.getLong(KEY_HEARTS_FULL_SINCE, 0L)
-    }
-
-    /** Sdílené s Compose — obnovení UI při změně `lesson_progress`. */
-    fun registerOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-    }
-
-    fun unregisterOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
-        prefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 } 
