@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.31] - 2026-04-15
+- Novinka: Definice tvarů (`Shape.kt`) — Material3 `Shapes` s glassmorphism zaoblením (8/12/16/24/32 dp), plus vlastní `PillShape`, `BottomSheetShape` a `LessonNodeShape` pro specifické UI prvky.
+
 ## [2.0.30] - 2026-04-15
 - Novinka: Kompletní typografie s fontem Quicksand (`Type.kt`) — 5 váhových řezů (Light/Regular/Medium/SemiBold/Bold), všech 15 textových stylů Material3 s explicitním řádkováním a prokládáním písmen. Dostupné přes `MaterialTheme.typography`.
 

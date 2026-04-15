@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.31] - 2026-04-15
+- Added: Shape definitions (`Shape.kt`) — Material3 `Shapes` with glassmorphism-friendly corner radii (8/12/16/24/32 dp), plus custom `PillShape`, `BottomSheetShape` and `LessonNodeShape` for specific UI elements.
+
 ## [2.0.30] - 2026-04-15
 - Added: Complete Quicksand typography system (`Type.kt`) — `FontFamily` with 5 weights (Light/Regular/Medium/SemiBold/Bold), all 15 Material3 `Typography` slots defined with explicit `lineHeight` and `letterSpacing` values. Available via `MaterialTheme.typography`.
 
