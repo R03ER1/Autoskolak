@@ -63,36 +63,15 @@ class ResultsActivity : AutokolkActivity() {
         val isRandom = intent.getBooleanExtra("extra_is_random", false)
         val practiceCategory = intent.getStringExtra(EXTRA_PRACTICE_CATEGORY) ?: ""
 
-        var pointsAwarded = 0
-        if (!isPractice && !isRandom) {
-            // Calculate awarded points (body) based on rules
-            pointsAwarded = run {
-                if (!isReviewMode) {
-                    when {
-                        percentage == 100 -> 8
-                        percentage >= 65 -> 6
-                        percentage < 35 -> 1
-                        else -> 4
-                    }
-                } else {
-                    when {
-                        totalQuestions in 6..10 -> {
-                            when {
-                                percentage == 100 -> 6
-                                percentage >= 65 -> 4
-                                else -> 2
-                            }
-                        }
-                        totalQuestions in 1..5 -> {
-                            if (percentage >= 65) 2 else 1
-                        }
-                        else -> 0
-                    }
-                }
-            }
-            if (pointsAwarded > 0) {
-                LessonProgress(this).addPoints(pointsAwarded)
-            }
+        val pointsAwarded = LessonPoints.computeLessonPointsAwarded(
+            isPractice = isPractice,
+            isRandom = isRandom,
+            isReviewMode = isReviewMode,
+            correctAnswers = correctAnswers,
+            totalQuestions = totalQuestions,
+        )
+        if (pointsAwarded > 0) {
+            LessonProgress(this).addPoints(pointsAwarded)
         }
 
         // Update congratulation text based on performance

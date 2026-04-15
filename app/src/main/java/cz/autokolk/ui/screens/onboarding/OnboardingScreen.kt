@@ -438,6 +438,7 @@ private fun OnboardingDemoQuestionPage(
         QuestionContent(
             question = question,
             awaitingAdvance = awaiting,
+            pendingAnswerKey = null,
             isTest = false,
             onPick = { key ->
                 if (question.userAnswer == null) onAnswer(key)

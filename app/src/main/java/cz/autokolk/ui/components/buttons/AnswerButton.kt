@@ -31,7 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -46,6 +48,10 @@ import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.GlassWhite
 import cz.autokolk.ui.theme.SuccessGreen
 import cz.autokolk.ui.theme.TextPrimary
+import cz.autokolk.ui.theme.WarningAmber
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 enum class AnswerState {
     DEFAULT,
@@ -96,22 +102,52 @@ fun AnswerButton(
         else -> Brush.linearGradient(listOf(GlassFill, GlassFill.copy(alpha = 0.02f)))
     }
 
-    Box(
-        modifier = modifier
-            .graphicsLayer { translationX = shake.value }
-            .scale(scale)
-            .clip(AutokolkShapes.medium)
-            .background(bgBrush)
-            .border(AutokolkTokens.GlassBorderWidth, borderColor, AutokolkShapes.medium)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(),
-                enabled = enabled,
-                role = Role.Button,
-                onClick = onClick,
-            )
-            .padding(horizontal = 14.dp, vertical = 12.dp),
-    ) {
+    val burstTarget = if (state == AnswerState.CORRECT) 1f else 0f
+    val burstT by animateFloatAsState(
+        targetValue = burstTarget,
+        animationSpec = tween(800),
+        label = "answerBurst",
+    )
+
+    Box(modifier) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .graphicsLayer { translationX = shake.value }
+                .scale(scale)
+                .clip(AutokolkShapes.medium)
+                .background(bgBrush)
+                .border(AutokolkTokens.GlassBorderWidth, borderColor, AutokolkShapes.medium)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(),
+                    enabled = enabled,
+                    role = Role.Button,
+                    onClick = onClick,
+                )
+                .drawWithContent {
+                    drawContent()
+                    if (burstT > 0.02f) {
+                        val t = burstT
+                        val cx = size.width * 0.5f
+                        val cy = size.height * 0.5f
+                        val n = 14
+                        for (i in 0 until n) {
+                            val ang = (i / n.toFloat()) * 2f * PI.toFloat()
+                            val dist = 36f * t
+                            val x = cx + cos(ang) * dist
+                            val y = cy + sin(ang) * dist
+                            val alpha = (1f - t) * 0.85f
+                            drawCircle(
+                                color = if (i % 2 == 0) SuccessGreen.copy(alpha = alpha) else WarningAmber.copy(alpha = alpha),
+                                radius = 4f * (1f - t * 0.5f),
+                                center = Offset(x, y),
+                            )
+                        }
+                    }
+                }
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+        ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
@@ -145,6 +181,7 @@ fun AnswerButton(
                 color = TextPrimary,
                 modifier = Modifier.weight(1f),
             )
+        }
         }
     }
 }

@@ -1,12 +1,18 @@
 package cz.autokolk.ui.screens.quiz
 
 import android.app.Application
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.autokolk.AchievementsManager
+import cz.autokolk.HeartRefillJobService
+import cz.autokolk.LessonPoints
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
-import cz.autokolk.HeartRefillJobService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,9 +28,15 @@ data class QuizUiState(
     val lastWasCorrect: Boolean? = null,
     val comboStreak: Int = 0,
     val shakeToken: Int = 0,
-    val heartLossToken: Int = 0,
     val testRemainingMs: Long? = null,
     val showQuitDialog: Boolean = false,
+    /** Před odkrytím správně/špatně (lesson mód). */
+    val pendingAnswerKey: String? = null,
+    val hearts: Int = 0,
+    val showNoLivesOverlay: Boolean = false,
+    val showCoinPopup: Boolean = false,
+    /** Zobrazené „+N“ u odměny (parita: +1 za správně jako vizuální feedback). */
+    val coinPopupAmount: Int = 1,
 )
 
 sealed class QuizFinish {
@@ -33,18 +45,15 @@ sealed class QuizFinish {
         val score: Int,
         val total: Int,
         val isReview: Boolean,
+        val firstOfDay: Boolean,
+        val pointsAwarded: Int,
     ) : QuizFinish()
 
     data class Test(
         val score: Int,
         val total: Int,
-    ) : QuizFinish()
-
-    /** Procvičování celé kategorie — index v [LessonProgress.getCategoryGroups]. */
-    data class Practice(
-        val category: String,
-        val score: Int,
-        val total: Int,
+        val firstOfDay: Boolean,
+        val pointsAwarded: Int,
     ) : QuizFinish()
 }
 
@@ -52,16 +61,11 @@ class QuizViewModel(
     application: Application,
     private val lessonId: Int,
     private val isTest: Boolean,
-    private val categoryId: Int,
+    @Suppress("UNUSED_PARAMETER") private val categoryId: Int,
     private val isReview: Boolean,
 ) : AndroidViewModel(application) {
 
     private val lessonProgress = LessonProgress(application)
-
-    private fun practiceCategoryName(): String? {
-        if (categoryId < 0) return null
-        return lessonProgress.getCategoryGroups().getOrNull(categoryId)?.category
-    }
 
     private val _state = MutableStateFlow(QuizUiState())
     val state: StateFlow<QuizUiState> = _state.asStateFlow()
@@ -70,10 +74,12 @@ class QuizViewModel(
     val finish: StateFlow<QuizFinish?> = _finish.asStateFlow()
 
     private var timerJob: Job? = null
+    private var revealJob: Job? = null
     private var hasCompleted: Boolean = false
 
     init {
         loadQuestions()
+        refreshHearts()
         if (isTest) {
             startTestTimer(45L * 60L * 1000L)
         }
@@ -83,8 +89,35 @@ class QuizViewModel(
         _finish.value = null
     }
 
+    fun dismissCoinPopup() {
+        _state.update { it.copy(showCoinPopup = false) }
+    }
+
+    fun dismissNoLivesOverlay() {
+        _state.update { it.copy(showNoLivesOverlay = false) }
+    }
+
+    fun goHomeFromNoLives() {
+        _state.update { it.copy(showNoLivesOverlay = false) }
+        confirmQuit()
+    }
+
+    fun onHeartRefilledFromAd() {
+        _state.update {
+            it.copy(
+                showNoLivesOverlay = false,
+                hearts = lessonProgress.getCurrentHearts(),
+            )
+        }
+    }
+
+    private fun refreshHearts() {
+        _state.update { it.copy(hearts = lessonProgress.getCurrentHearts()) }
+    }
+
     override fun onCleared() {
         timerJob?.cancel()
+        revealJob?.cancel()
         super.onCleared()
     }
 
@@ -95,16 +128,9 @@ class QuizViewModel(
                 if (pool.size >= 10) pool else lessonProgress.getRandomQuestions(25)
             }
             lessonId > 0 -> lessonProgress.getQuestionsForLesson(lessonId)
-            else -> {
-                val cat = practiceCategoryName()
-                if (cat != null) {
-                    lessonProgress.getQuestionsForCategory(cat).shuffled().take(35)
-                } else {
-                    emptyList()
-                }
-            }
+            else -> emptyList()
         }
-        _state.value = QuizUiState(questions = qs)
+        _state.value = QuizUiState(questions = qs, hearts = lessonProgress.getCurrentHearts())
     }
 
     private fun startTestTimer(totalMs: Long) {
@@ -113,8 +139,8 @@ class QuizViewModel(
             var t = totalMs
             while (t > 0) {
                 _state.update { it.copy(testRemainingMs = t) }
-                delay(1000)
-                t -= 1000
+                delay(250)
+                t -= 250
             }
             _state.update { it.copy(testRemainingMs = 0L) }
             completeTestMode()
@@ -123,11 +149,31 @@ class QuizViewModel(
 
     fun selectAnswer(key: String) {
         val s = _state.value
+        if (s.showNoLivesOverlay) return
         if (!isTest && s.awaitingAdvance) return
+        if (!isTest && s.pendingAnswerKey != null) return
         val q = s.questions.getOrNull(s.index) ?: return
         if (q.userAnswer != null && !isTest) return
 
         val norm = normalizeAnswerKey(key)
+        if (isTest) {
+            applyAnswer(q, norm)
+            return
+        }
+
+        revealJob?.cancel()
+        _state.update { it.copy(pendingAnswerKey = norm) }
+        revealJob = viewModelScope.launch {
+            delay(200)
+            buzzLight()
+            delay(100)
+            applyAnswer(q, norm)
+            _state.update { it.copy(pendingAnswerKey = null) }
+        }
+    }
+
+    private fun applyAnswer(q: Question, norm: String) {
+        val s = _state.value
         q.userAnswer = norm
         val correct = norm == resolveCorrectKey(q)
         if (!isTest) {
@@ -137,15 +183,10 @@ class QuizViewModel(
             } catch (_: Throwable) {
             }
         }
-        val practiceCat = practiceCategoryName()
-        if (!isTest && practiceCat != null && lessonId <= 0) {
-            lessonProgress.savePracticeAnswer(practiceCat, q.id, correct)
-        }
-        var lostHeart = false
-        if (!isTest && !isReview && lessonId > 0) {
+        if (!isTest && !isReview && lessonId > 0 && !lessonProgress.hasInfiniteLives()) {
             if (!correct) {
-                lostHeart = lessonProgress.consumeHeart()
-                if (lostHeart) {
+                val consumed = lessonProgress.consumeHeart()
+                if (consumed) {
                     try {
                         HeartRefillJobService.scheduleNext(getApplication(), lessonProgress)
                     } catch (_: Throwable) {
@@ -154,29 +195,48 @@ class QuizViewModel(
             }
         }
         val newCombo = if (correct) s.comboStreak + 1 else 0
+        val heartsNow = lessonProgress.getCurrentHearts()
+        val outOfLives =
+            !isTest && !isReview && lessonId > 0 &&
+                !lessonProgress.hasInfiniteLives() &&
+                !correct &&
+                heartsNow <= 0
+
         if (isTest) {
             _state.update {
                 it.copy(
                     lastWasCorrect = correct,
                     comboStreak = newCombo,
                     shakeToken = if (!correct) it.shakeToken + 1 else it.shakeToken,
+                    hearts = heartsNow,
                 )
             }
             return
         }
+
+        if (!correct) {
+            buzzWrong()
+        } else {
+            buzzLight()
+        }
+
         _state.update {
             it.copy(
                 awaitingAdvance = true,
                 lastWasCorrect = correct,
                 comboStreak = newCombo,
-                heartLossToken = if (lostHeart) it.heartLossToken + 1 else it.heartLossToken,
                 shakeToken = if (!correct) it.shakeToken + 1 else it.shakeToken,
+                hearts = heartsNow,
+                showCoinPopup = correct,
+                coinPopupAmount = 1,
+                showNoLivesOverlay = outOfLives,
             )
         }
     }
 
     fun advance() {
         val s = _state.value
+        if (s.showNoLivesOverlay) return
         if (isTest) {
             val last = s.questions.lastIndex
             if (s.index >= last) {
@@ -202,6 +262,7 @@ class QuizViewModel(
                 index = it.index + 1,
                 awaitingAdvance = false,
                 lastWasCorrect = null,
+                showCoinPopup = false,
             )
         }
     }
@@ -224,7 +285,7 @@ class QuizViewModel(
         val qs = _state.value.questions
         if (qs.isEmpty()) {
             hasCompleted = true
-            _finish.value = QuizFinish.Test(score = 0, total = 50)
+            _finish.value = QuizFinish.Test(score = 0, total = 50, firstOfDay = false, pointsAwarded = 0)
             return
         }
         var correct = 0
@@ -237,9 +298,10 @@ class QuizViewModel(
             AchievementsManager(getApplication()).onTestCorrectAdded(correct)
         } catch (_: Throwable) {
         }
-        try {
+        val firstOfDay = try {
             lessonProgress.updateStreakOnLessonCompleted()
         } catch (_: Throwable) {
+            false
         }
         val weighted = (correct * 50 / qs.size.coerceAtLeast(1)).coerceIn(0, 50)
         try {
@@ -251,27 +313,26 @@ class QuizViewModel(
         } catch (_: Throwable) {
         }
         hasCompleted = true
-        _finish.value = QuizFinish.Test(score = weighted, total = 50)
+        _finish.value = QuizFinish.Test(
+            score = weighted,
+            total = 50,
+            firstOfDay = firstOfDay,
+            pointsAwarded = weighted,
+        )
     }
 
     private fun completeLessonMode() {
         if (hasCompleted) return
-        val practiceCat = practiceCategoryName()
-        if (practiceCat != null && lessonId <= 0 && !isTest) {
-            val qs = _state.value.questions
-            val correctAnswers = qs.count { normalizeAnswerKey(it.userAnswer) == resolveCorrectKey(it) }
-            val totalQuestions = qs.size
-            hasCompleted = true
-            _finish.value = QuizFinish.Practice(
-                category = practiceCat,
-                score = correctAnswers,
-                total = totalQuestions,
-            )
-            return
-        }
         if (lessonId <= 0) {
             hasCompleted = true
-            _finish.value = QuizFinish.Lesson(lessonId = -1, score = 0, total = 0, isReview = isReview)
+            _finish.value = QuizFinish.Lesson(
+                lessonId = -1,
+                score = 0,
+                total = 0,
+                isReview = isReview,
+                firstOfDay = false,
+                pointsAwarded = 0,
+            )
             return
         }
         val qs = _state.value.questions
@@ -292,9 +353,23 @@ class QuizViewModel(
             }
             lessonProgress.saveLessonProgress(lessonId, remaining)
         }
-        try {
+        val firstOfDay = try {
             lessonProgress.updateStreakOnLessonCompleted()
         } catch (_: Throwable) {
+            false
+        }
+        val pointsAwarded = LessonPoints.computeLessonPointsAwarded(
+            isPractice = false,
+            isRandom = false,
+            isReviewMode = isReview,
+            correctAnswers = correctAnswers,
+            totalQuestions = totalQuestions,
+        )
+        if (pointsAwarded > 0) {
+            try {
+                lessonProgress.addPoints(pointsAwarded)
+            } catch (_: Throwable) {
+            }
         }
         hasCompleted = true
         _finish.value = QuizFinish.Lesson(
@@ -302,6 +377,38 @@ class QuizViewModel(
             score = correctAnswers,
             total = totalQuestions,
             isReview = isReview,
+            firstOfDay = firstOfDay,
+            pointsAwarded = pointsAwarded,
         )
+    }
+
+    private fun buzzLight() {
+        vibrate(18, 32)
+    }
+
+    private fun buzzWrong() {
+        vibrate(50, 96)
+    }
+
+    private fun vibrate(durationMs: Long, amplitude: Int) {
+        val app = getApplication<Application>()
+        val v = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vm = app.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+            vm?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            app.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        } ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(
+                VibrationEffect.createOneShot(
+                    durationMs,
+                    amplitude.coerceIn(1, 255),
+                ),
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            v.vibrate(durationMs)
+        }
     }
 }

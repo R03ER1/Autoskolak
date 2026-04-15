@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.45] - 2026-04-15
+- Fáze 6 (Quiz Experience): kompletnější Compose kvíz (top bar, média včetně videa, výsledkový pás, životy + reklama, odměny, zvuk odpočtu testu), výsledková obrazovka a fullscreen série po první lekci dne.
+- Body za lekci stejně jako dříve v klasických výsledcích; nové assety: zajímavosti o provozu + Lottie.
+
 ## [2.0.44] - 2026-04-15
 - Fixed: při schovávání `QuizResultStrip` po správné odpovědi zůstává zelený tón (stav ve ViewModelu se mezitím vymaže dřív, než doběhla exit animace).
 - Fixed: `QuizScreen` a `ReadingLessonComposeScreen` — `statusBarsPadding` + `displayCutoutPadding`, aby obsah nekolidoval s výřezem kamery a status barem.

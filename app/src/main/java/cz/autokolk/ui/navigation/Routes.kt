@@ -61,14 +61,19 @@ sealed class Route(val route: String) {
         val lessonId: Int,
         val score: Int,
         val total: Int,
-    ) : Route("results/{$ARG_LESSON_ID}/{$ARG_SCORE}/{$ARG_TOTAL}") {
-        fun buildPath(): String = "results/$lessonId/$score/$total"
+        val firstOfDay: Boolean = false,
+        val pointsAwarded: Int = 0,
+    ) : Route("results/{$ARG_LESSON_ID}/{$ARG_SCORE}/{$ARG_TOTAL}/{$ARG_FIRST_OF_DAY}/{$ARG_POINTS_AWARDED}") {
+        fun buildPath(): String =
+            "results/$lessonId/$score/$total/${if (firstOfDay) 1 else 0}/$pointsAwarded"
 
         companion object {
             val arguments: List<NamedNavArgument> = listOf(
                 navArgument(ARG_LESSON_ID) { type = NavType.IntType },
                 navArgument(ARG_SCORE) { type = NavType.IntType },
                 navArgument(ARG_TOTAL) { type = NavType.IntType },
+                navArgument(ARG_FIRST_OF_DAY) { type = NavType.IntType; defaultValue = 0 },
+                navArgument(ARG_POINTS_AWARDED) { type = NavType.IntType; defaultValue = 0 },
             )
         }
     }
@@ -93,6 +98,8 @@ sealed class Route(val route: String) {
         const val ARG_IS_REVIEW = "isReview"
         const val ARG_SCORE = "score"
         const val ARG_TOTAL = "total"
+        const val ARG_FIRST_OF_DAY = "firstOfDay"
+        const val ARG_POINTS_AWARDED = "pointsAwarded"
         const val ARG_TEST_ID = "testId"
 
         /** The five main bottom-bar tabs in display order. */

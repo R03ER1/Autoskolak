@@ -270,7 +270,8 @@ class LessonProgress(private val context: Context) {
                         correctAnswer = record[8].lowercase(),
                         category = normalizeCategory(record[1], record[2]).first,
                         imagePath = if (hasImage) resolveImagePath(questionNumber) else null,
-                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null
+                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null,
+                        funFact = DrivingFunFacts.pickForQuestionId(context, record[0]),
                     )
                 }
 
@@ -326,8 +327,9 @@ class LessonProgress(private val context: Context) {
                         correctAnswer = record[8].lowercase(),
                         category = normalizeCategory(record[1], record[2]).first,
                         imagePath = if (hasImage) resolveImagePath(questionNumber) else null,
-                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null
-                    )
+                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null,
+                        funFact = DrivingFunFacts.pickForQuestionId(context, record[0]),
+                    ),
                 )
             }
             csvParser.close()
@@ -516,7 +518,8 @@ class LessonProgress(private val context: Context) {
                         correctAnswer = record[8].lowercase(),
                         category = normalizeCategory(record[1], record[2]).first,
                         imagePath = if (hasImage) resolveImagePath(questionNumber) else null,
-                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null
+                        videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null,
+                        funFact = DrivingFunFacts.pickForQuestionId(context, record[0]),
                     )
                 }
 
@@ -860,6 +863,8 @@ class LessonProgress(private val context: Context) {
     }
 
     // --- Hearts (Lives) tracking ---
+    fun hasInfiniteLives(): Boolean = prefs.getBoolean("infinite_lives", false)
+
     /**
      * Returns current hearts after applying time-based recharge. Also persists any regeneration.
      */

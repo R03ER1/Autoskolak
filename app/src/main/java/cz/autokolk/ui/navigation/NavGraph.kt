@@ -24,6 +24,7 @@ import cz.autokolk.ui.screens.home.HomeScreen
 import cz.autokolk.ui.screens.quiz.QuizScreen
 import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
 import cz.autokolk.ui.screens.results.ResultsComposeScreen
+import cz.autokolk.ui.screens.streak.StreakScreen
 import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.splash.SplashScreen
 
@@ -177,7 +178,7 @@ fun AutokolkNavGraph(
         }
 
         composable(
-            route = Route.Results(lessonId = 0, score = 0, total = 0).route,
+            route = Route.Results(lessonId = 0, score = 0, total = 0, firstOfDay = false, pointsAwarded = 0).route,
             arguments = Route.Results.arguments,
             enterTransition = { modalEnter() },
             exitTransition = { modalExit() },
@@ -190,6 +191,8 @@ fun AutokolkNavGraph(
                 lessonId = args.getInt(Route.ARG_LESSON_ID),
                 score = args.getInt(Route.ARG_SCORE),
                 total = args.getInt(Route.ARG_TOTAL),
+                firstOfDay = args.getInt(Route.ARG_FIRST_OF_DAY) != 0,
+                pointsAwarded = args.getInt(Route.ARG_POINTS_AWARDED),
             )
         }
 
@@ -224,7 +227,7 @@ fun AutokolkNavGraph(
             popEnterTransition = { modalEnter() },
             popExitTransition = { modalExit() },
         ) {
-            PlaceholderScreen("Série")
+            StreakScreen(navController = navController)
         }
 
         composable(
