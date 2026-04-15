@@ -9,7 +9,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
 /**
  * Holds one preloaded lesson interstitial so Results can show it without a long wait.
- * Preload from [ReadingLessonActivity] / [MainActivity] while the user is in a session
+ * Preload from čtecí lekce (Compose overlay) / [MainActivity] while the user is in a session
  * that ends with this ad.
  */
 object LessonInterstitialAds {

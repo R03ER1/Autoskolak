@@ -11,9 +11,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -21,11 +23,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cz.autokolk.LessonProgress
-import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.reading.ReadingLessonsCatalog
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
+import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.home.categoryCodeForReadingLesson
+import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
@@ -36,6 +40,8 @@ fun ReadingLessonComposeScreen(
     navController: NavHostController,
     lessonId: Int,
     isReview: Boolean,
+    externalExit: ReadingLessonExternalExit? = null,
+    displayLessonNumberForMain: Int? = null,
 ) {
     val context = LocalContext.current
     val lessonProgress = remember(context) { LessonProgress(context) }
@@ -44,11 +50,22 @@ fun ReadingLessonComposeScreen(
     val pagerState = rememberPagerState(pageCount = { maxOf(1, pages.size) })
     val scope = rememberCoroutineScope()
 
-    androidx.compose.runtime.LaunchedEffect(pages.size) {
-        if (pages.isEmpty()) {
-            navController.navigate(Route.Quiz(lessonId, false, -1, isReview).buildPath()) {
-                popUpTo(Route.Home.route) { inclusive = false }
+    fun goToQuizOrExit() {
+        val ext = externalExit
+        when {
+            ext?.onOpenMainActivity != null -> ext.onOpenMainActivity.invoke(lessonId, isReview, displayLessonNumberForMain)
+            ext?.onDismissEmbedded != null -> ext.onDismissEmbedded.invoke()
+            else -> {
+                navController.navigate(Route.Quiz(lessonId, false, -1, isReview).buildPath()) {
+                    popUpTo(Route.Home.route) { inclusive = false }
+                }
             }
+        }
+    }
+
+    LaunchedEffect(pages.size) {
+        if (pages.isEmpty()) {
+            goToQuizOrExit()
         }
     }
 
@@ -56,7 +73,15 @@ fun ReadingLessonComposeScreen(
         return
     }
 
+    val progress = (pagerState.currentPage + 1f) / pages.size.toFloat()
+
     Column(Modifier.fillMaxSize()) {
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier.fillMaxWidth(),
+            color = AccentCyan,
+            trackColor = AccentTeal.copy(alpha = 0.25f),
+        )
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
@@ -94,16 +119,18 @@ fun ReadingLessonComposeScreen(
             }
         }
         PrimaryGradientButton(
-            text = if (pagerState.currentPage >= pages.lastIndex) "Přejít na kvíz" else "Další",
+            text = if (pagerState.currentPage >= pages.lastIndex) {
+                if (externalExit?.onDismissEmbedded != null) "Hotovo" else "Přejít na kvíz"
+            } else {
+                "Další"
+            },
             onClick = {
                 if (pagerState.currentPage < pages.lastIndex) {
                     scope.launch {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
                 } else {
-                    navController.navigate(Route.Quiz(lessonId, false, -1, isReview).buildPath()) {
-                        popUpTo(Route.Home.route) { inclusive = false }
-                    }
+                    goToQuizOrExit()
                 }
             },
             modifier = Modifier

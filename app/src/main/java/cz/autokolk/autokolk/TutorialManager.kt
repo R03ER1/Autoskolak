@@ -1,5 +1,6 @@
 package cz.autokolk
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,13 +21,20 @@ object TutorialManager {
     private const val TYPING_DELAY_MS = 25L // Fast typing animation - 25ms per character
 
     fun hasShown(activity: android.app.Activity, key: String): Boolean {
-        val prefs = activity.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-        return prefs.getBoolean(key, false)
+        return hasShown(activity.applicationContext, key)
+    }
+
+    fun hasShown(context: Context, key: String): Boolean {
+        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(key, false)
     }
 
     private fun markShown(activity: android.app.Activity, key: String) {
-        val prefs = activity.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(key, true).apply()
+        markShown(activity.applicationContext, key)
+    }
+
+    /** Zápis stejných klíčů jako u View overlaye — pro Compose tutoriál a náhodné události. */
+    fun markShown(context: Context, key: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(key, true).apply()
     }
 
     private fun animateTypingText(textView: TextView, finalText: CharSequence, handler: Handler) {

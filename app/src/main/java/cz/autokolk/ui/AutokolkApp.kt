@@ -11,17 +11,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.autokolk.LessonProgress
+import cz.autokolk.ui.components.feedback.HomeTutorialSpotlightOverlay
 import cz.autokolk.ui.components.navigation.AutokolkBottomBar
 import cz.autokolk.ui.components.navigation.AutokolkTopBar
 import cz.autokolk.ui.components.sheets.CoinsSheet
@@ -40,6 +45,7 @@ fun AutokolkApp() {
     val currentRoute = currentEntry?.destination?.route
 
     val showBars = currentRoute in tabRoutes
+    val onHomeTab = currentRoute == Route.Home.route
 
     val context = LocalContext.current
     val lessonProgress = remember { LessonProgress(context) }
@@ -68,65 +74,105 @@ fun AutokolkApp() {
     var heartsSheetVisible by remember { mutableStateOf(false) }
     var coinsSheetVisible by remember { mutableStateOf(false) }
 
-    Scaffold(
-        bottomBar = {
-            AnimatedVisibility(
-                visible = showBars,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it },
-            ) {
-                AutokolkBottomBar(
-                    currentRoute = currentRoute ?: "",
-                    onNavigate = { route -> navController.navigateToTab(route) },
-                )
-            }
-        },
-        containerColor = Color.Transparent,
-    ) { paddingValues ->
-        Column(Modifier.fillMaxSize()) {
-            AnimatedVisibility(
-                visible = showBars,
-                enter = slideInVertically { -it },
-                exit = slideOutVertically { -it },
-            ) {
-                AutokolkTopBar(
-                    streak = streak,
-                    coins = coins,
-                    lives = lives,
-                    onStreakClick = { streakSheetVisible = true },
-                    onCoinsClick = { coinsSheetVisible = true },
-                    onLivesClick = { heartsSheetVisible = true },
-                )
-            }
-            Box(Modifier.weight(1f).padding(bottom = paddingValues.calculateBottomPadding())) {
-                AutokolkNavGraph(navController = navController)
-            }
+    val tutorialTopRectState = remember { mutableStateOf<Rect?>(null) }
+    val tutorialBottomRectState = remember { mutableStateOf<Rect?>(null) }
+    val tutorialLessonRectState = remember { mutableStateOf<Rect?>(null) }
+    val tutorialTopRect by tutorialTopRectState
+    val tutorialBottomRect by tutorialBottomRectState
+    val tutorialLessonRect by tutorialLessonRectState
+
+    LaunchedEffect(currentRoute) {
+        if (!onHomeTab) {
+            tutorialLessonRectState.value = null
         }
     }
 
-    StreakSheet(
-        isVisible = streakSheetVisible,
-        streak = streak,
-        streakHistory = streakHistory,
-        lessonProgress = lessonProgress,
-        onDismiss = { streakSheetVisible = false },
-        onStreakUpdated = {
-            refreshStats()
-            streakSheetVisible = false
-        },
-    )
+    Box(Modifier.fillMaxSize()) {
+        Scaffold(
+            bottomBar = {
+                AnimatedVisibility(
+                    visible = showBars,
+                    enter = slideInVertically { it },
+                    exit = slideOutVertically { it },
+                ) {
+                    Box(
+                        Modifier.onGloballyPositioned { coords ->
+                            tutorialBottomRectState.value = coords.boundsInRoot()
+                        },
+                    ) {
+                        AutokolkBottomBar(
+                            currentRoute = currentRoute ?: "",
+                            onNavigate = { route -> navController.navigateToTab(route) },
+                        )
+                    }
+                }
+            },
+            containerColor = Color.Transparent,
+        ) { paddingValues ->
+            Column(Modifier.fillMaxSize()) {
+                AnimatedVisibility(
+                    visible = showBars,
+                    enter = slideInVertically { -it },
+                    exit = slideOutVertically { -it },
+                ) {
+                    Box(
+                        Modifier.onGloballyPositioned { coords ->
+                            tutorialTopRectState.value = coords.boundsInRoot()
+                        },
+                    ) {
+                        AutokolkTopBar(
+                            streak = streak,
+                            coins = coins,
+                            lives = lives,
+                            onStreakClick = { streakSheetVisible = true },
+                            onCoinsClick = { coinsSheetVisible = true },
+                            onLivesClick = { heartsSheetVisible = true },
+                        )
+                    }
+                }
+                Box(Modifier.weight(1f).padding(bottom = paddingValues.calculateBottomPadding())) {
+                    AutokolkNavGraph(
+                        navController = navController,
+                        onHomeLessonBoundsChanged = { r -> tutorialLessonRectState.value = r },
+                    )
+                }
+            }
+        }
 
-    HeartsSheet(
-        isVisible = heartsSheetVisible,
-        lives = lives,
-        lessonProgress = lessonProgress,
-        onDismiss = { heartsSheetVisible = false },
-        onLivesUpdated = { refreshStats() },
-    )
+        if (onHomeTab) {
+            HomeTutorialSpotlightOverlay(
+                active = true,
+                topBarRect = tutorialTopRect,
+                lessonRect = tutorialLessonRect,
+                bottomBarRect = tutorialBottomRect,
+                onDismissed = { refreshStats() },
+            )
+        }
 
-    CoinsSheet(
-        isVisible = coinsSheetVisible,
-        totalCoins = coins,
-        onDismiss = { coinsSheetVisible = false },
-    )
+        StreakSheet(
+            isVisible = streakSheetVisible,
+            streak = streak,
+            streakHistory = streakHistory,
+            lessonProgress = lessonProgress,
+            onDismiss = { streakSheetVisible = false },
+            onStreakUpdated = {
+                refreshStats()
+                streakSheetVisible = false
+            },
+        )
+
+        HeartsSheet(
+            isVisible = heartsSheetVisible,
+            lives = lives,
+            lessonProgress = lessonProgress,
+            onDismiss = { heartsSheetVisible = false },
+            onLivesUpdated = { refreshStats() },
+        )
+
+        CoinsSheet(
+            isVisible = coinsSheetVisible,
+            totalCoins = coins,
+            onDismiss = { coinsSheetVisible = false },
+        )
+    }
 }

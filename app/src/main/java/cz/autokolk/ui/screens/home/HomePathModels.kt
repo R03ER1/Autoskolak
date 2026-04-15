@@ -4,7 +4,13 @@ import androidx.compose.ui.graphics.Color
 import cz.autokolk.GlobalLesson
 
 sealed interface HomePathRow {
-    data class Header(val title: String) : HomePathRow
+    data class Header(
+        val title: String,
+        val doneCount: Int,
+        val totalCount: Int,
+        val sectionColor: Color,
+    ) : HomePathRow
+
     data class LessonItem(
         val lesson: GlobalLesson,
         val displayNumber: Int,
@@ -14,5 +20,6 @@ sealed interface HomePathRow {
         val ringProgress: Float,
         val subtitle: String,
     ) : HomePathRow
+
     data object Footer : HomePathRow
 }

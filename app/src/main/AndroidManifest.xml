@@ -43,11 +43,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ReadingLessonActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".AlexActivity"
             android:exported="false"
             android:theme="@style/Theme.Autokolk.NoActionBar"

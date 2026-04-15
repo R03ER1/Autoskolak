@@ -20,6 +20,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.graphics.Color
 import androidx.core.view.ViewCompat
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.navigation.compose.rememberNavController
+import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
+import cz.autokolk.ui.screens.reading.ReadingLessonExternalExit
+import cz.autokolk.ui.theme.AutokolkTheme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -41,6 +48,7 @@ class HomeActivity : AutokolkActivity() {
     private val lessonCircleColorByNumber: MutableMap<Int, Int> = mutableMapOf()
     private val displayNumberByLesson: MutableMap<Int, Int> = mutableMapOf()
     private val lessonIconCache: MutableMap<String, android.graphics.drawable.Drawable> = mutableMapOf()
+    private var readingTopicOverlay: FrameLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1044,14 +1052,7 @@ class HomeActivity : AutokolkActivity() {
         if (shouldShowIntro && categoryCode != null) {
             // Mark as shown immediately on first open
             prefs.edit().putBoolean(hasShownKey, true).apply()
-            val intent = Intent(this, ReadingLessonActivity::class.java).apply {
-                putExtra(ReadingLessonActivity.EXTRA_CATEGORY, categoryCode)
-                putExtra(ReadingLessonActivity.EXTRA_LESSON_NUMBER, lessonNumber)
-                putExtra(ReadingLessonActivity.EXTRA_IS_REVIEW, isReview)
-                // Also pass display lesson number so MainActivity shows correct numbering after intro
-                displayNumberByLesson[lessonNumber]?.let { putExtra(MainActivity.EXTRA_DISPLAY_LESSON_NUMBER, it) }
-            }
-            startActivity(intent)
+            showTopicReadingIntroOverlay(lessonNumber, isReview)
             return
         }
 
@@ -1064,6 +1065,59 @@ class HomeActivity : AutokolkActivity() {
             displayNumberByLesson[lessonNumber]?.let { putExtra(MainActivity.EXTRA_DISPLAY_LESSON_NUMBER, it) }
         }
         startActivity(intent)
+    }
+
+    private fun showTopicReadingIntroOverlay(lessonNumber: Int, isReview: Boolean) {
+        if (readingTopicOverlay != null) return
+        try {
+            LessonInterstitialAds.preload(this)
+            val root = findViewById<ViewGroup>(android.R.id.content)
+            val displayNum = displayNumberByLesson[lessonNumber]
+            val host = FrameLayout(this).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
+                setBackgroundColor(0xD9000000.toInt())
+                isClickable = true
+            }
+            val composeView = ComposeView(this).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    AutokolkTheme {
+                        val nav = rememberNavController()
+                        ReadingLessonComposeScreen(
+                            navController = nav,
+                            lessonId = lessonNumber,
+                            isReview = isReview,
+                            externalExit = ReadingLessonExternalExit(
+                                onOpenMainActivity = { ln, rev, dispArg ->
+                                    root.removeView(host)
+                                    readingTopicOverlay = null
+                                    val disp = dispArg ?: displayNum
+                                    startActivity(Intent(this@HomeActivity, MainActivity::class.java).apply {
+                                        putExtra(MainActivity.EXTRA_LESSON_NUMBER, ln)
+                                        putExtra(MainActivity.EXTRA_IS_REVIEW, rev)
+                                        putExtra(MainActivity.EXTRA_CATEGORY, "")
+                                        if (disp != null && disp > 0) {
+                                            putExtra(MainActivity.EXTRA_DISPLAY_LESSON_NUMBER, disp)
+                                        }
+                                    })
+                                },
+                            ),
+                            displayLessonNumberForMain = displayNum,
+                        )
+                    }
+                }
+            }
+            composeView.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            )
+            host.addView(composeView)
+            root.addView(host)
+            readingTopicOverlay = host
+        } catch (_: Throwable) { }
     }
 
     private fun getCategoryForLesson(lessonNumber: Int): String? {

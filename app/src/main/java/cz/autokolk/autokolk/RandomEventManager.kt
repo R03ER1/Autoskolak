@@ -10,7 +10,12 @@ class RandomEventManager(private val context: Context) {
     data class Event(
         val body: String,
         val valueLine: String,
-        val apply: (LessonProgress) -> Unit
+        val apply: (LessonProgress) -> Unit,
+    )
+
+    data class RandomEventPresentation(
+        val message: String,
+        val valueLine: String,
     )
 
     companion object {
@@ -29,53 +34,49 @@ class RandomEventManager(private val context: Context) {
 
     private fun buildEvents(): List<Event> {
         return listOf(
-            // Lives: only positive life events
             Event(
                 "Lov — mazlíček získá životy",
-                "+10 životů"
+                "+10 životů",
             ) { lp ->
                 val current = lp.getCurrentHearts()
                 lp.setHearts((current + 10).coerceAtMost(15))
             },
-            // Coins: add/remove
             Event(
                 "Pracant — lvíček vydělal prací",
-                "+5 mincí"
+                "+5 mincí",
             ) { lp ->
                 lp.addPoints(5)
             },
             Event(
                 "Dlužník — zviřátko půjčilo kamarádovi",
-                "−5 mincí"
+                "−5 mincí",
             ) { lp ->
                 lp.spendPoints(5)
             },
             Event(
                 "Narozeniny — Alex dostal dárky!",
-                "+15 mincí"
+                "+15 mincí",
             ) { lp ->
                 lp.addPoints(15)
             },
             Event(
                 "Štěstí — našel jsi bonusový život!",
-                "+1 život"
+                "+1 život",
             ) { lp ->
                 val current = lp.getCurrentHearts()
                 lp.setHearts((current + 1).coerceAtMost(15))
             },
             Event(
                 "Ztracená peněženka",
-                "−10 mincí"
+                "−10 mincí",
             ) { lp ->
-                // Try to spend up to 10, but don't go below 0
                 val current = lp.getTotalPoints()
                 val toSpend = if (current >= 10) 10 else current
                 if (toSpend > 0) lp.spendPoints(toSpend)
             },
-            // Hunger: add/remove
             Event(
                 "Hostina — Alex je sytý",
-                "+20 hlad"
+                "+20 hlad",
             ) { _ ->
                 val hm = HungerManager(context)
                 val cur = hm.getCurrentHunger()
@@ -83,7 +84,7 @@ class RandomEventManager(private val context: Context) {
             },
             Event(
                 "Dieta — Alex má menší hlad",
-                "−10 hlad"
+                "−10 hlad",
             ) { _ ->
                 val hm = HungerManager(context)
                 val cur = hm.getCurrentHunger()
@@ -91,41 +92,45 @@ class RandomEventManager(private val context: Context) {
             },
             Event(
                 "Piknik — společně jste se najedli",
-                "+10 hlad"
+                "+10 hlad",
             ) { _ ->
                 val hm = HungerManager(context)
                 val cur = hm.getCurrentHunger()
                 hm.setCurrentHunger((cur + 10).coerceAtMost(HungerManager.MAX_HUNGER))
-            }
+            },
         )
     }
 
-    fun maybeShowEvent(activity: Activity, afterHandled: (() -> Unit)? = null) {
-        // Never show until tutorials are done at least once
-        val tutorialsDone = TutorialManager.hasShown(activity, "tutorial_home") &&
-                TutorialManager.hasShown(activity, "tutorial_welcome")
-        if (!tutorialsDone) {
-            if (!prefs.getBoolean(KEY_DISABLED_UNTIL_TUTORIALS, false)) {
-                prefs.edit().putBoolean(KEY_DISABLED_UNTIL_TUTORIALS, true).apply()
-                scheduleNextRandom(prefs)
-            }
-            afterHandled?.invoke()
-            return
-        }
+    /** Vrátí null, pokud není čas / tutoriály; jinak aplikuje efekt a vrátí text pro Compose overlay. */
+    fun consumeDueRandomEventForCompose(lessonProgress: LessonProgress): RandomEventPresentation? {
+        if (blockWhenTutorialsIncomplete()) return null
+        if (blockWhenNotYetDue()) return null
 
-        val now = System.currentTimeMillis()
-        val nextAt = prefs.getLong(KEY_NEXT_AT, 0L)
-        if (nextAt == 0L) {
+        val events = buildEvents()
+        if (events.isEmpty()) {
             scheduleNextRandom(prefs)
+            return null
+        }
+        val event = events[Random.nextInt(events.size)]
+        event.apply(lessonProgress)
+        return RandomEventPresentation(message = event.body, valueLine = event.valueLine)
+    }
+
+    /** Po zavření Compose overlaye — naplánuje další náhodný čas. */
+    fun markComposeEventDismissed() {
+        scheduleNextRandom(prefs)
+    }
+
+    fun maybeShowEvent(activity: Activity, afterHandled: (() -> Unit)? = null) {
+        if (blockWhenTutorialsIncomplete()) {
             afterHandled?.invoke()
             return
         }
-        if (now < nextAt) {
+        if (blockWhenNotYetDue()) {
             afterHandled?.invoke()
             return
         }
 
-        // Pick and apply an event
         val events = buildEvents()
         if (events.isEmpty()) {
             scheduleNextRandom(prefs)
@@ -134,10 +139,32 @@ class RandomEventManager(private val context: Context) {
         }
         val event = events[Random.nextInt(events.size)]
         applyAndShowOverlay(activity, event) {
-            // Reschedule next event after user dismisses
             scheduleNextRandom(prefs)
             afterHandled?.invoke()
         }
+    }
+
+    private fun blockWhenTutorialsIncomplete(): Boolean {
+        val tutorialsDone = TutorialManager.hasShown(context, "tutorial_home") &&
+            TutorialManager.hasShown(context, "tutorial_welcome")
+        if (!tutorialsDone) {
+            if (!prefs.getBoolean(KEY_DISABLED_UNTIL_TUTORIALS, false)) {
+                prefs.edit().putBoolean(KEY_DISABLED_UNTIL_TUTORIALS, true).apply()
+                scheduleNextRandom(prefs)
+            }
+            return true
+        }
+        return false
+    }
+
+    private fun blockWhenNotYetDue(): Boolean {
+        val now = System.currentTimeMillis()
+        val nextAt = prefs.getLong(KEY_NEXT_AT, 0L)
+        if (nextAt == 0L) {
+            scheduleNextRandom(prefs)
+            return true
+        }
+        return now < nextAt
     }
 
     private fun applyAndShowOverlay(activity: Activity, event: Event, onDismiss: () -> Unit) {
@@ -149,7 +176,7 @@ class RandomEventManager(private val context: Context) {
             title = "Událost!",
             message = event.body,
             valueLine = event.valueLine,
-            onDismiss = onDismiss
+            onDismiss = onDismiss,
         )
     }
 
@@ -162,11 +189,8 @@ class RandomEventManager(private val context: Context) {
         }
         val event = events[Random.nextInt(events.size)]
         applyAndShowOverlay(activity, event) {
-            // Also schedule the next random so normal flow continues
             scheduleNextRandom(prefs)
             afterHandled?.invoke()
         }
     }
 }
-
-

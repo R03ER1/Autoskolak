@@ -17,33 +17,62 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cz.autokolk.GlobalLesson
-import cz.autokolk.ui.components.feedback.EventOverlay
-import cz.autokolk.ui.components.feedback.TutorialOverlay
+import cz.autokolk.ui.components.feedback.RandomEventOverlay
+import cz.autokolk.ui.components.glass.GlassCard
+import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.theme.GlassWhite
 import cz.autokolk.ui.theme.TextPrimary
+import cz.autokolk.ui.theme.TextSecondary
+import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(
+    navController: NavHostController,
+    onCurrentLessonNodeBoundsChanged: ((Rect) -> Unit)? = null,
+) {
     val vm: HomeViewModel = viewModel()
     val rows by vm.pathRows.collectAsStateWithLifecycle()
     val reordered by vm.reorderedPlan.collectAsStateWithLifecycle()
+    val randomEvent by vm.randomEvent.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    val density = LocalDensity.current
 
     var sheetLesson by remember { mutableStateOf<GlobalLesson?>(null) }
     var sheetDisplay by remember { mutableStateOf(1) }
+
+    val lessonOrder = remember(reordered) { reordered.map { it.lessonNumber } }
+    val measuredCenters = remember { mutableStateMapOf<Int, Offset>() }
+
+    LaunchedEffect(lessonOrder) {
+        measuredCenters.clear()
+    }
+
+    LaunchedEffect(Unit) {
+        vm.tryShowRandomEventIfDue()
+    }
+
+    var pathRootCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     val progressFraction = remember(rows, reordered) {
         if (reordered.isEmpty()) 0f
@@ -56,18 +85,31 @@ fun HomeScreen(navController: NavHostController) {
         }
     }
 
-    LaunchedEffect(rows) {
-        val idx = rows.indexOfFirst {
+    val currentLessonIndex = remember(rows) {
+        rows.indexOfFirst {
             it is HomePathRow.LessonItem && it.nodeState == LessonNodeState.CURRENT
-        }
-        if (idx >= 0) {
-            listState.scrollToItem(idx.coerceAtLeast(0))
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    val scrollOffsetPx = remember(density) { with(density) { (-200).dp.roundToPx() } }
+
+    LaunchedEffect(currentLessonIndex, rows.size) {
+        if (currentLessonIndex < 0) return@LaunchedEffect
+        delay(48)
+        listState.animateScrollToItem(
+            index = currentLessonIndex,
+            scrollOffset = scrollOffsetPx,
+        )
+    }
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .onGloballyPositioned { pathRootCoords = it },
+    ) {
         LessonPathBackground(
-            nodeCount = reordered.size.coerceAtLeast(2),
+            lessonOrder = lessonOrder,
+            measuredCenters = measuredCenters,
             progressFraction = progressFraction,
             modifier = Modifier.fillMaxSize(),
         )
@@ -79,23 +121,55 @@ fun HomeScreen(navController: NavHostController) {
         ) {
             items(rows, key = { row ->
                 when (row) {
-                    is HomePathRow.Header -> "h:${row.title}"
+                    is HomePathRow.Header -> "h:${row.title}:${row.doneCount}:${row.totalCount}"
                     is HomePathRow.LessonItem -> "l:${row.lesson.lessonNumber}"
                     HomePathRow.Footer -> "footer"
                 }
             }) { row ->
                 when (row) {
                     is HomePathRow.Header -> {
-                        Column(Modifier.fillMaxWidth()) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = row.title,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = TextPrimary,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                            Spacer(Modifier.height(4.dp))
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            GlassCard(
+                                modifier = Modifier.fillMaxWidth(0.92f),
+                                borderGradient = listOf(row.sectionColor.copy(alpha = 0.55f), GlassWhite.copy(alpha = 0.12f)),
+                            ) {
+                                Column(
+                                    Modifier.padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Text(
+                                        text = row.title,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = TextPrimary,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    Spacer(Modifier.height(6.dp))
+                                    Text(
+                                        text = "${row.doneCount}/${row.totalCount} dokončeno",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = TextSecondary,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    Spacer(Modifier.height(10.dp))
+                                    val frac = if (row.totalCount > 0) {
+                                        row.doneCount.toFloat() / row.totalCount.toFloat()
+                                    } else {
+                                        0f
+                                    }
+                                    AnimatedProgressBar(
+                                        progress = frac,
+                                        accent = row.sectionColor,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
                         }
                     }
                     is HomePathRow.LessonItem -> {
@@ -106,16 +180,35 @@ fun HomeScreen(navController: NavHostController) {
                                 .padding(start = offsetDp.coerceIn(0, 280).dp, top = 6.dp, bottom = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            LessonNode(
-                                iconFileName = mapSubcategoryToIconAsset(row.lesson.subcategory.trim().lowercase()),
-                                sectionColor = row.sectionColor,
-                                state = row.nodeState,
-                                ringProgress = row.ringProgress,
-                                onClick = {
-                                    sheetLesson = row.lesson
-                                    sheetDisplay = row.displayNumber
-                                },
-                            )
+                            val root = pathRootCoords
+                            Box(
+                                Modifier
+                                    .onGloballyPositioned { coords ->
+                                        if (root == null || !root.isAttached || !coords.isAttached) return@onGloballyPositioned
+                                        val centerLocal = Offset(
+                                            coords.size.width / 2f,
+                                            coords.size.height / 2f,
+                                        )
+                                        val inPath = root.localPositionOf(coords, centerLocal)
+                                        measuredCenters[row.lesson.lessonNumber] = inPath
+                                        if (row.nodeState == LessonNodeState.CURRENT) {
+                                            val b = coords.boundsInRoot()
+                                            onCurrentLessonNodeBoundsChanged?.invoke(b)
+                                        }
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                LessonNode(
+                                    iconFileName = mapSubcategoryToIconAsset(row.lesson.subcategory.trim().lowercase()),
+                                    sectionColor = row.sectionColor,
+                                    state = row.nodeState,
+                                    ringProgress = row.ringProgress,
+                                    onClick = {
+                                        sheetLesson = row.lesson
+                                        sheetDisplay = row.displayNumber
+                                    },
+                                )
+                            }
                             Spacer(Modifier.width(12.dp))
                             Text(
                                 text = row.subtitle,
@@ -139,10 +232,10 @@ fun HomeScreen(navController: NavHostController) {
             }
         }
 
-        TutorialOverlay(
-            onDismiss = { /* persisted inside */ },
+        RandomEventOverlay(
+            event = randomEvent,
+            onDismiss = { vm.dismissRandomEvent() },
         )
-        EventOverlay()
     }
 
     val sl = sheetLesson

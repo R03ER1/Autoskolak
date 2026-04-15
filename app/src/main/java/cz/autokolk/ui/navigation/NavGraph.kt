@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -55,6 +56,7 @@ private fun modalExit(): ExitTransition =
 fun AutokolkNavGraph(
     navController: NavHostController,
     startDestination: String = Route.Splash.route,
+    onHomeLessonBoundsChanged: (Rect) -> Unit = {},
 ) {
     NavHost(
         navController = navController,
@@ -86,7 +88,10 @@ fun AutokolkNavGraph(
             popEnterTransition = { tabEnter() },
             popExitTransition = { tabExit() },
         ) {
-            HomeScreen(navController)
+            HomeScreen(
+                navController = navController,
+                onCurrentLessonNodeBoundsChanged = onHomeLessonBoundsChanged,
+            )
         }
 
         composable(

@@ -17,6 +17,7 @@ import android.widget.Toast
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.view.View
+import android.view.ViewGroup
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -27,6 +28,12 @@ import android.widget.ScrollView
 import android.os.CountDownTimer
 import android.util.Log
 import android.widget.FrameLayout
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.navigation.compose.rememberNavController
+import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
+import cz.autokolk.ui.screens.reading.ReadingLessonExternalExit
+import cz.autokolk.ui.theme.AutokolkTheme
 import android.widget.SeekBar
 import android.widget.ImageButton
 import android.os.Handler
@@ -74,6 +81,7 @@ class MainActivity : AutokolkActivity() {
     private lateinit var scrollView: ScrollView
     private lateinit var closeButton: ImageButton
     private lateinit var infoButton: ImageButton
+    private var readingComposeOverlay: FrameLayout? = null
     private lateinit var floatingNavContainer: View
     private lateinit var floatingPrevButton: MaterialButton
     private lateinit var floatingNextButton: MaterialButton
@@ -357,20 +365,45 @@ class MainActivity : AutokolkActivity() {
         }
     }
 
-    private fun openLessonInfo(categoryCode: String) {
+    private fun openLessonInfo(@Suppress("UNUSED_PARAMETER") categoryCode: String) {
         try {
-            val intent = Intent(this, ReadingLessonActivity::class.java).apply {
-                putExtra(ReadingLessonActivity.EXTRA_CATEGORY, categoryCode)
-                putExtra(ReadingLessonActivity.EXTRA_LESSON_NUMBER, lessonNumber)
-                putExtra(ReadingLessonActivity.EXTRA_IS_REVIEW, false)
-                putExtra(ReadingLessonActivity.EXTRA_RETURN_TO_CALLER, true)
-                // Forward display lesson number if present so numbering stays consistent after closing info
-                val displayNum = intent?.getIntExtra(EXTRA_DISPLAY_LESSON_NUMBER, -1) ?: -1
-                if (displayNum > 0) {
-                    putExtra(ReadingLessonActivity.EXTRA_DISPLAY_LESSON_NUMBER, displayNum)
+            if (readingComposeOverlay != null) return
+            LessonInterstitialAds.preload(this)
+            val root = findViewById<ViewGroup>(android.R.id.content)
+            val host = FrameLayout(this).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
+                setBackgroundColor(0xD9000000.toInt())
+                isClickable = true
+            }
+            val composeView = ComposeView(this).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    AutokolkTheme {
+                        val nav = rememberNavController()
+                        ReadingLessonComposeScreen(
+                            navController = nav,
+                            lessonId = lessonNumber,
+                            isReview = false,
+                            externalExit = ReadingLessonExternalExit(
+                                onDismissEmbedded = {
+                                    root.removeView(host)
+                                    readingComposeOverlay = null
+                                },
+                            ),
+                        )
+                    }
                 }
             }
-            startActivity(intent)
+            composeView.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            )
+            host.addView(composeView)
+            root.addView(host)
+            readingComposeOverlay = host
         } catch (_: Throwable) { }
     }
 

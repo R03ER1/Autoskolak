@@ -36,21 +36,54 @@ object HomePathListBuilder {
         var nextBoundary = defCount
         var startedSkoroHotovo = false
 
+        fun skillBlockStart(groupIndex: Int): Int =
+            defCount + nonDefGroups.take(groupIndex).sumOf { it.second }
+
         fun maybeStartNextGroup(currentIdx: Int, out: MutableList<HomePathRow>) {
             if (currentIdx < defCount) return
             if (currentGroupIndex == -1 && currentIdx == defCount) {
                 currentGroupIndex = 0
                 nextBoundary = defCount + nonDefGroups[0].second
-                out.add(HomePathRow.Header(nonDefGroups[0].first))
+                val start = skillBlockStart(0)
+                val total = nonDefGroups[0].second
+                val (done, _) = countCompleted(reordered, lessonProgress, start, start + total)
+                out.add(
+                    HomePathRow.Header(
+                        title = nonDefGroups[0].first,
+                        doneCount = done,
+                        totalCount = total,
+                        sectionColor = headerColorSkill(0),
+                    ),
+                )
                 return
             }
             while (currentGroupIndex in 0..nonDefGroups.lastIndex && currentIdx == nextBoundary) {
                 currentGroupIndex++
                 if (currentGroupIndex <= nonDefGroups.lastIndex) {
-                    out.add(HomePathRow.Header(nonDefGroups[currentGroupIndex].first))
-                    nextBoundary += nonDefGroups[currentGroupIndex].second
+                    val g = currentGroupIndex
+                    val start = skillBlockStart(g)
+                    val total = nonDefGroups[g].second
+                    val (done, _) = countCompleted(reordered, lessonProgress, start, start + total)
+                    out.add(
+                        HomePathRow.Header(
+                            title = nonDefGroups[g].first,
+                            doneCount = done,
+                            totalCount = total,
+                            sectionColor = headerColorSkill(g),
+                        ),
+                    )
+                    nextBoundary += nonDefGroups[g].second
                 } else if (!startedSkoroHotovo) {
-                    out.add(HomePathRow.Header("Skoro hotovo!"))
+                    val start = skillBlockStart(nonDefGroups.size)
+                    val (done, total) = countCompleted(reordered, lessonProgress, start, reordered.size)
+                    out.add(
+                        HomePathRow.Header(
+                            title = "Skoro hotovo!",
+                            doneCount = done,
+                            totalCount = total,
+                            sectionColor = headerColorSkoro(),
+                        ),
+                    )
                     startedSkoroHotovo = true
                     nextBoundary = Int.MAX_VALUE
                 }
@@ -64,7 +97,15 @@ object HomePathListBuilder {
 
         val out = mutableListOf<HomePathRow>()
         if (defCount > 0) {
-            out.add(HomePathRow.Header("Základní pojmy"))
+            val (done, total) = countCompleted(reordered, lessonProgress, 0, defCount)
+            out.add(
+                HomePathRow.Header(
+                    title = "Základní pojmy",
+                    doneCount = done,
+                    totalCount = total,
+                    sectionColor = headerColorBasic(),
+                ),
+            )
         }
 
         var globalWaveIndex = 0
@@ -105,6 +146,33 @@ object HomePathListBuilder {
         out.add(HomePathRow.Footer)
         return out
     }
+
+    private fun countCompleted(
+        reordered: List<GlobalLesson>,
+        lp: LessonProgress,
+        fromInclusive: Int,
+        untilExclusive: Int,
+    ): Pair<Int, Int> {
+        val a = fromInclusive.coerceIn(0, reordered.size)
+        val b = untilExclusive.coerceIn(0, reordered.size)
+        if (a >= b) return 0 to (b - a).coerceAtLeast(0)
+        var done = 0
+        for (i in a until b) {
+            if (lp.getLessonState(reordered[i].lessonNumber).completed) done++
+        }
+        return done to (b - a)
+    }
+
+    private fun headerColorBasic(): Color =
+        Color(android.graphics.Color.HSVToColor(floatArrayOf(33f, 0.68f, 0.94f)))
+
+    private fun headerColorSkill(index: Int): Color {
+        val hue = (48f + index * 38f) % 360f
+        return Color(android.graphics.Color.HSVToColor(floatArrayOf(hue, 0.7f, 0.93f)))
+    }
+
+    private fun headerColorSkoro(): Color =
+        Color(android.graphics.Color.HSVToColor(floatArrayOf(285f, 0.55f, 0.92f)))
 
     private fun firstLessonNumber(reordered: List<GlobalLesson>): Int {
         return reordered.firstOrNull()?.lessonNumber ?: 1

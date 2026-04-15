@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.autokolk.GlobalLesson
 import cz.autokolk.LessonProgress
+import cz.autokolk.RandomEventManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,12 +15,16 @@ import kotlinx.coroutines.launch
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val lessonProgress = LessonProgress(application)
+    private val randomEventManager = RandomEventManager(application.applicationContext)
 
     private val _pathRows = MutableStateFlow<List<HomePathRow>>(emptyList())
     val pathRows: StateFlow<List<HomePathRow>> = _pathRows.asStateFlow()
 
     private val _reorderedPlan = MutableStateFlow<List<GlobalLesson>>(emptyList())
     val reorderedPlan: StateFlow<List<GlobalLesson>> = _reorderedPlan.asStateFlow()
+
+    private val _randomEvent = MutableStateFlow<RandomEventManager.RandomEventPresentation?>(null)
+    val randomEvent: StateFlow<RandomEventManager.RandomEventPresentation?> = _randomEvent.asStateFlow()
 
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
         refresh()
@@ -66,5 +71,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val prefs = getApplication<Application>().getSharedPreferences("lesson_progress", android.content.Context.MODE_PRIVATE)
         val infinite = prefs.getBoolean("infinite_lives", false)
         return infinite || lessonProgress.getCurrentHearts() > 0
+    }
+
+    fun tryShowRandomEventIfDue() {
+        if (_randomEvent.value != null) return
+        val presentation = randomEventManager.consumeDueRandomEventForCompose(lessonProgress) ?: return
+        _randomEvent.value = presentation
+    }
+
+    fun dismissRandomEvent() {
+        if (_randomEvent.value == null) return
+        randomEventManager.markComposeEventDismissed()
+        _randomEvent.value = null
     }
 }

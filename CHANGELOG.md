@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.42] - 2026-04-15
+- Fáze 5 (Home / lesson path): měřené pozice uzlů pro křivku pozadí (`LessonPathBackground` + `PathMeasure`), animovaný scroll na aktuální lekci, sekční hlavičky v `GlassCard` s `AnimatedProgressBar`.
+- Multi-step spotlight tutoriál na Home (`HomeTutorialSpotlightOverlay`), zápis do `TutorialManager` pro náhodné události.
+- Náhodné události v Compose (`RandomEventManager.consumeDueRandomEventForCompose`, `RandomEventOverlay` + `ConfettiView`).
+- Čtecí lekce: odstraněna `ReadingLessonActivity` a layout `activity_reading_lesson`, overlay z `MainActivity` / `HomeActivity` s `ReadingLessonComposeScreen` a `ReadingLessonExternalExit`.
+- `LessonProgress.prefsRevision` (`StateFlow`) pro reaktivní UI.
+
 ## [2.0.41] - 2026-04-15
 - Fixed: `PrimaryGradientButton` — shimmer přes `drawWithContent` místo sibling `Box(fillMaxSize)`, aby se při puštění prstu tlačítko znovu neroztáhlo na celou šířku rodiče (onboarding Přeskočit/Další).
 

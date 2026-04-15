@@ -2,6 +2,9 @@ package cz.autokolk
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.BufferedReader
@@ -43,6 +46,18 @@ data class GlobalLesson(
 class LessonProgress(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("lesson_progress", Context.MODE_PRIVATE)
     private val gson = Gson()
+
+    private val _prefsRevision = MutableStateFlow(0L)
+    /** Inkrementuje se při jakékoli změně [prefs] — pro Compose [androidx.compose.runtime.collectAsState]. */
+    val prefsRevision: StateFlow<Long> = _prefsRevision.asStateFlow()
+
+    private val prefsRevisionListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+        _prefsRevision.value = _prefsRevision.value + 1L
+    }
+
+    init {
+        prefs.registerOnSharedPreferenceChangeListener(prefsRevisionListener)
+    }
 
     companion object {
         /** Virtual practice category: mistakes from anywhere in the app (not in Questions.csv). */
