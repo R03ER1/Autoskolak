@@ -2,7 +2,7 @@
 
 > **Verze plánu:** 1.0  
 > **Datum:** 2026-04-14  
-> **Aktuální verze aplikace:** 2.0.53  
+> **Aktuální verze aplikace:** 2.0.15  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -44,114 +44,114 @@
 | 13 | Definice barevné palety (Dark mode) | 2 | ✅ |
 | 14 | Definice barevné palety (Light mode) | 2 | ✅ |
 | 15 | Compose ColorScheme a MaterialTheme | 2 | ✅ |
-| 16 | Definice typografie | 2 | ✅ |
-| 17 | Definice tvarů (Shapes) | 2 | ✅ |
-| 18 | Rozšířený design token systém | 2 | ✅ |
-| 19 | GlassCard composable | 2 | ✅ |
-| 20 | GlassButton composable | 2 | ✅ |
-| 21 | PrimaryGradientButton composable | 2 | ✅ |
-| 22 | AnswerButton composable | 2 | ✅ |
-| 23 | AnimatedProgressBar composable | 2 | ✅ |
-| 24 | CircularProgress / RingProgress composable | 2 | ✅ |
-| 25 | AnimatedCounter composable | 2 | ✅ |
-| 26 | CoinPopup / FloatingReward composable | 2 | ✅ |
-| 27 | ConfettiOverlay composable | 2 | ✅ |
-| 28 | Shimmer / skeleton loading efekt | 2 | ✅ |
-| 29 | Animated background (subtle particle / gradient animation) | 2 | ✅ |
-| 30 | Lottie asset příprava | 2 | ✅ |
-| 31 | Definice navigation routes | 3 | ✅ |
-| 32 | NavGraph setup | 3 | ✅ |
-| 33 | Bottom navigation bar (animated) | 3 | ✅ |
-| 34 | Animace ikonky v bottom baru | 3 | ✅ |
-| 35 | Top app bar (streak, coins, lives) | 3 | ✅ |
-| 36 | Streak bottom sheet | 3 | ✅ |
-| 37 | Hearts / Lives bottom sheet | 3 | ✅ |
-| 38 | Coins / XP bottom sheet | 3 | ✅ |
-| 39 | App shell (Scaffold) | 3 | ✅ |
-| 40 | Tab navigation logika | 3 | ✅ |
-| 41 | Shared element transitions (příprava) | 3 | ✅ |
-| 42 | Přepojení launcher Activity na Compose | 3 | ✅ |
-| 43 | Onboarding data model | 4 | ✅ |
-| 44 | Onboarding screen (HorizontalPager) | 4 | ✅ |
-| 45 | Onboarding page content | 4 | ✅ |
-| 46 | Onboarding controls (indikátory, tlačítka) | 4 | ✅ |
-| 47 | Onboarding "Vyber si cíl" | 4 | ✅ |
-| 48 | Onboarding "Nastav denní cíl" | 4 | ✅ |
-| 49 | Onboarding "Pojmenuj lva" | 4 | ✅ |
-| 50 | Onboarding "Demo otázka" | 4 | ✅ |
-| 51 | Onboarding notifikace permission | 4 | ✅ |
-| 52 | Persistentní onboarding stav | 4 | ✅ |
-| 53 | Home screen scaffold | 5 | ✅ |
-| 54 | Lesson path Canvas křivka (pozadí) | 5 | ✅ |
-| 55 | Lesson node composable | 5 | ✅ |
-| 56 | PulsingGlow efekt | 5 | ✅ |
-| 57 | Lesson path sinusový layout | 5 | ✅ |
-| 58 | Section headers na path | 5 | ✅ |
-| 59 | Lesson info popup (BottomSheet) | 5 | ✅ |
-| 60 | Scroll to current lesson | 5 | ✅ |
-| 61 | Tutorial overlay na Home (first time) | 5 | ✅ |
-| 62 | Random event overlay (Compose) | 5 | ✅ |
-| 63 | Home ViewModel | 5 | ✅ |
-| 64 | Reading lesson screen (Compose) | 5 | ✅ |
-| 65 | Integrace se stávajícím LessonProgress | 5 | ✅ |
-| 66 | Quiz screen scaffold | 6 | ✅ |
-| 67 | Quiz top bar (progress + close + timer) | 6 | ✅ |
-| 68 | Question content layout | 6 | ✅ |
-| 69 | Quiz media (obrázky a video) | 6 | ✅ |
-| 70 | Answer selection animace | 6 | ✅ |
-| 71 | Result strip (correct/wrong panel) | 6 | ✅ |
-| 72 | Quiz ViewModel | 6 | ✅ |
-| 73 | Přechod mezi otázkami (slide animace) | 6 | ✅ |
-| 74 | Quiz close confirmation dialog | 6 | ✅ |
-| 75 | Quiz "streak" micro-interaction | 6 | ✅ |
-| 76 | Quiz "power-up" hints (budoucí rozšíření) | 6 | ✅ |
-| 77 | Správná odpověď — particle burst | 6 | ✅ |
-| 78 | Špatná odpověď — screen shake | 6 | ✅ |
-| 79 | Quiz timer animace (test mode) | 6 | ✅ |
-| 80 | Quiz life-loss animace | 6 | ✅ |
-| 81 | Results screen (lesson mode) | 6 | ✅ |
-| 82 | Results statistika s animací count-up | 6 | ✅ |
-| 83 | Streak celebration screen | 6 | ✅ |
-| 84 | Quiz question number indicator | 6 | ✅ |
-| 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ✅ |
-| 86 | Alex screen scaffold | 7 | ✅ |
-| 87 | Alex character composable s animacemi | 7 | ✅ |
-| 88 | Hunger bar s gradient a animací | 7 | ✅ |
-| 89 | Food menu bottom sheet | 7 | ✅ |
+| 16 | Definice typografie | 2 | ⬜ |
+| 17 | Definice tvarů (Shapes) | 2 | ⬜ |
+| 18 | Rozšířený design token systém | 2 | ⬜ |
+| 19 | GlassCard composable | 2 | ⬜ |
+| 20 | GlassButton composable | 2 | ⬜ |
+| 21 | PrimaryGradientButton composable | 2 | ⬜ |
+| 22 | AnswerButton composable | 2 | ⬜ |
+| 23 | AnimatedProgressBar composable | 2 | ⬜ |
+| 24 | CircularProgress / RingProgress composable | 2 | ⬜ |
+| 25 | AnimatedCounter composable | 2 | ⬜ |
+| 26 | CoinPopup / FloatingReward composable | 2 | ⬜ |
+| 27 | ConfettiOverlay composable | 2 | ⬜ |
+| 28 | Shimmer / skeleton loading efekt | 2 | ⬜ |
+| 29 | Animated background (subtle particle / gradient animation) | 2 | ⬜ |
+| 30 | Lottie asset příprava | 2 | ⬜ |
+| 31 | Definice navigation routes | 3 | ⬜ |
+| 32 | NavGraph setup | 3 | ⬜ |
+| 33 | Bottom navigation bar (animated) | 3 | ⬜ |
+| 34 | Animace ikonky v bottom baru | 3 | ⬜ |
+| 35 | Top app bar (streak, coins, lives) | 3 | ⬜ |
+| 36 | Streak bottom sheet | 3 | ⬜ |
+| 37 | Hearts / Lives bottom sheet | 3 | ⬜ |
+| 38 | Coins / XP bottom sheet | 3 | ⬜ |
+| 39 | App shell (Scaffold) | 3 | ⬜ |
+| 40 | Tab navigation logika | 3 | ⬜ |
+| 41 | Shared element transitions (příprava) | 3 | ⬜ |
+| 42 | Přepojení launcher Activity na Compose | 3 | ⬜ |
+| 43 | Onboarding data model | 4 | ⬜ |
+| 44 | Onboarding screen (HorizontalPager) | 4 | ⬜ |
+| 45 | Onboarding page content | 4 | ⬜ |
+| 46 | Onboarding controls (indikátory, tlačítka) | 4 | ⬜ |
+| 47 | Onboarding "Vyber si cíl" | 4 | ⬜ |
+| 48 | Onboarding "Nastav denní cíl" | 4 | ⬜ |
+| 49 | Onboarding "Pojmenuj lva" | 4 | ⬜ |
+| 50 | Onboarding "Demo otázka" | 4 | ⬜ |
+| 51 | Onboarding notifikace permission | 4 | ⬜ |
+| 52 | Persistentní onboarding stav | 4 | ⬜ |
+| 53 | Home screen scaffold | 5 | ⬜ |
+| 54 | Lesson path Canvas křivka (pozadí) | 5 | ⬜ |
+| 55 | Lesson node composable | 5 | ⬜ |
+| 56 | PulsingGlow efekt | 5 | ⬜ |
+| 57 | Lesson path sinusový layout | 5 | ⬜ |
+| 58 | Section headers na path | 5 | ⬜ |
+| 59 | Lesson info popup (BottomSheet) | 5 | ⬜ |
+| 60 | Scroll to current lesson | 5 | ⬜ |
+| 61 | Tutorial overlay na Home (first time) | 5 | ⬜ |
+| 62 | Random event overlay (Compose) | 5 | ⬜ |
+| 63 | Home ViewModel | 5 | ⬜ |
+| 64 | Reading lesson screen (Compose) | 5 | ⬜ |
+| 65 | Integrace se stávajícím LessonProgress | 5 | ⬜ |
+| 66 | Quiz screen scaffold | 6 | ⬜ |
+| 67 | Quiz top bar (progress + close + timer) | 6 | ⬜ |
+| 68 | Question content layout | 6 | ⬜ |
+| 69 | Quiz media (obrázky a video) | 6 | ⬜ |
+| 70 | Answer selection animace | 6 | ⬜ |
+| 71 | Result strip (correct/wrong panel) | 6 | ⬜ |
+| 72 | Quiz ViewModel | 6 | ⬜ |
+| 73 | Přechod mezi otázkami (slide animace) | 6 | ⬜ |
+| 74 | Quiz close confirmation dialog | 6 | ⬜ |
+| 75 | Quiz "streak" micro-interaction | 6 | ⬜ |
+| 76 | Quiz "power-up" hints (budoucí rozšíření) | 6 | ⬜ |
+| 77 | Správná odpověď — particle burst | 6 | ⬜ |
+| 78 | Špatná odpověď — screen shake | 6 | ⬜ |
+| 79 | Quiz timer animace (test mode) | 6 | ⬜ |
+| 80 | Quiz life-loss animace | 6 | ⬜ |
+| 81 | Results screen (lesson mode) | 6 | ⬜ |
+| 82 | Results statistika s animací count-up | 6 | ⬜ |
+| 83 | Streak celebration screen | 6 | ⬜ |
+| 84 | Quiz question number indicator | 6 | ⬜ |
+| 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ⬜ |
+| 86 | Alex screen scaffold | 7 | ⬜ |
+| 87 | Alex character composable s animacemi | 7 | ⬜ |
+| 88 | Hunger bar s gradient a animací | 7 | ⬜ |
+| 89 | Food menu bottom sheet | 7 | ⬜ |
 | 90 | Feed animace (Alex eating) | 7 | ⬜ |
-| 91 | Shop bottom sheet | 7 | ✅ |
-| 92 | Alex rename dialog | 7 | ✅ |
-| 93 | Alex death screen | 7 | ✅ |
-| 94 | Alex ViewModel | 7 | ✅ |
+| 91 | Shop bottom sheet | 7 | ⬜ |
+| 92 | Alex rename dialog | 7 | ⬜ |
+| 93 | Alex death screen | 7 | ⬜ |
+| 94 | Alex ViewModel | 7 | ⬜ |
 | 95 | Alex mood systém | 7 | ⬜ |
 | 96 | Alex interakční animace (tap/swipe) | 7 | ⬜ |
-| 97 | Hunger notifikace redesign | 7 | ✅ |
-| 98 | Test hub screen | 8 | ✅ |
-| 99 | Scores chart (Compose) | 8 | ✅ |
-| 100 | Test results screen | 8 | ✅ |
+| 97 | Hunger notifikace redesign | 7 | ⬜ |
+| 98 | Test hub screen | 8 | ⬜ |
+| 99 | Scores chart (Compose) | 8 | ⬜ |
+| 100 | Test results screen | 8 | ⬜ |
 | 101 | Test detail řádky | 8 | ⬜ |
-| 102 | Test mode specifika v QuizScreen | 8 | ✅ |
-| 103 | Test countdown overlay | 8 | ✅ |
-| 104 | Test stats | 8 | ✅ |
+| 102 | Test mode specifika v QuizScreen | 8 | ⬜ |
+| 103 | Test countdown overlay | 8 | ⬜ |
+| 104 | Test stats | 8 | ⬜ |
 | 105 | Test attempt ViewModel | 8 | ⬜ |
 | 106 | Test history | 8 | ⬜ |
-| 107 | Practice screen scaffold | 9 | ✅ |
-| 108 | Category card | 9 | ✅ |
+| 107 | Practice screen scaffold | 9 | ⬜ |
+| 108 | Category card | 9 | ⬜ |
 | 109 | Practice subcategories | 9 | ⬜ |
 | 110 | Practice filters | 9 | ⬜ |
-| 111 | Practice quiz mode | 9 | ✅ |
+| 111 | Practice quiz mode | 9 | ⬜ |
 | 112 | Practice ViewModel | 9 | ⬜ |
 | 113 | Practice stats | 9 | ⬜ |
 | 114 | Practice search | 9 | ⬜ |
-| 115 | Settings screen | 10 | ✅ |
-| 116 | Settings komponenty (Switch, Clickable) | 10 | ✅ |
-| 117 | Dark/light mode přepínač | 10 | ✅ |
-| 118 | Achievements screen (Compose) | 10 | ✅ |
+| 115 | Settings screen | 10 | ⬜ |
+| 116 | Settings komponenty (Switch, Clickable) | 10 | ⬜ |
+| 117 | Dark/light mode přepínač | 10 | ⬜ |
+| 118 | Achievements screen (Compose) | 10 | ⬜ |
 | 119 | Achievement unlock animace | 10 | ⬜ |
-| 120 | Changelog screen (Compose) | 10 | ✅ |
-| 121 | Splash screen (Compose) | 10 | ✅ |
+| 120 | Changelog screen (Compose) | 10 | ⬜ |
+| 121 | Splash screen (Compose) | 10 | ⬜ |
 | 122 | Loading states pro DFM | 10 | ⬜ |
-| 123 | XP / leveling systém | 11 | ✅ |
+| 123 | XP / leveling systém | 11 | ⬜ |
 | 124 | Level-up celebration | 11 | ⬜ |
 | 125 | Daily challenges | 11 | ⬜ |
 | 126 | Streak freeze mechanika | 11 | ⬜ |
@@ -167,7 +167,7 @@
 | 136 | Gamifikace — avatar customization | 11 | ⬜ |
 | 137 | Gamifikace — social sharing | 11 | ⬜ |
 | 138 | Zvukové soubory | 12 | ⬜ |
-| 139 | SoundManager implementace | 12 | ✅ |
+| 139 | SoundManager implementace | 12 | ⬜ |
 | 140 | Haptic patterns | 12 | ⬜ |
 | 141 | Integrace zvuků do quiz flow | 12 | ⬜ |
 | 142 | Integrace zvuků do Alex | 12 | ⬜ |
@@ -182,8 +182,8 @@
 | 151 | Performance audit — image loading | 13 | ⬜ |
 | 152 | Accessibility audit | 13 | ⬜ |
 | 153 | Reduced motion support | 13 | ⬜ |
-| 154 | Tablet / landscape support (základní) | 13 | ✅ |
-| 155 | ProGuard / R8 pravidla pro nové knihovny | 13 | ✅ |
+| 154 | Tablet / landscape support (základní) | 13 | ⬜ |
+| 155 | ProGuard / R8 pravidla pro nové knihovny | 13 | ⬜ |
 | 156 | App size audit | 13 | ⬜ |
 | 157 | Migrace ad logiky do Compose | 13 | ⬜ |
 | 158 | Finální QA a release checklist | 13 | ⬜ |

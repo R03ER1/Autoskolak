@@ -7,63 +7,8 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
-## [2.0.53] - 2026-04-14
-- Added (krok 80–158): Alex Compose (`AlexScreen`, `AlexViewModel`, `AlexDeathScreen`), test hub + statistiky (`TestHubScreen`, `TestStatsScreen`, detail pokusu), procvičování přes `categoryId` v `QuizViewModel`, nastavení (téma, úspěchy, changelog), obrazovky úspěchů, changelog ze `assets/CHANGELOG.md`, splash, oslava streaku, horní lišta napojená na `LessonProgress` + sheety, `XpLevel`, `AppSound` (základ), úpravy ProGuardu, notifikace hladu → `ComposeMainActivity`.
-- Changed: `QuizScreen` — animace ztráty života, fun fact ve stripu; `HungerNotificationService` cílí Compose hlavní aktivitu.
-- Removed: `PlaceholderScreens.kt` (nahrazeno konkrétními obrazovkami).
-
-## [2.0.52] - 2026-04-14
-- Added (krok 53–85): Compose Home cesta lekcí (`HomeScreen`, `HomeViewModel`, Canvas pozadí, uzly, bottom sheet), čtenácká obrazovka (`ReadingLessonComposeScreen`), kvíz (`QuizScreen`, `QuizViewModel`, výsledky), `AssetImageFromPath`, tutoriál / event overlay zástupce, navigace (`Route` rozšířeno o `isReview`).
-- Changed: `NavGraph` napojen na nové obrazovky; zástupce odstraněny z `PlaceholderScreens.kt`.
-
-## [2.0.51] - 2026-04-14
-- Added (krok 43–52): onboarding — `OnboardingData`, `OnboardingPreferences` (SharedPreferences `lesson_progress`), `OnboardingScreen` (8 stránek: úvod, licence, denní cíl, jméno lva, demo otázka z `LessonProgress`, dialog notifikací API 33+), placeholdery Lottie v `assets/lottie/onboarding_*.json`.
-- Changed: `AutokolkApp` — `startDestination` = Onboarding dokud není dokončeno; `AnimatedBackground` volitelný `accentColor`; nastavení (Compose stub) — „Znovu zobrazit onboarding“.
-- Fixed: upgrade ze starší verze — pokud `lesson_progress` už obsahuje data a klíč `onboarding_completed` chybí, onboarding se automaticky označí za dokončený (ne nutit staré uživatele projít znovu).
-
-## [2.0.50] - 2026-04-14
-- Added (krok 36–38): Compose bottom sheety — `StreakSheet`, `HeartsSheet`, `CoinsSheet` (Lottie, AnimatedCounter, pravidla bodů).
-- Added (krok 39–40): `AutokolkApp` — AnimatedBackground, viditelnost spodní lišty, `AutokolkTopBar` na tab routách; `navigateToTab` v `NavigationExtensions.kt`.
-- Added (krok 41): KDoc poznámka k budoucím shared element přechodům v `Routes.kt`.
-- Added (krok 42): `AppBootstrap` (consent, DFM, podmínky); launcher `ComposeMainActivity`; `LoadingActivity` bez launcher intentu (fallback).
-- Fixed: kompilace — `Context.MODE_PRIVATE`, `animateFloat` + `getValue` u shimmeru, `fillMaxSize` místo `matchParentSize`, Lottie `compositionResult.value`.
-
-## [2.0.49] - 2026-04-14
-- Added (krok 22): `AnswerButton` + `AnswerState` — stavy default/výběr/správně/špatně, shake, pulse, mini konfety.
-- Added (krok 23): `AnimatedProgressBar` + varianty `QuizProgressBar`, `XpProgressBar`, `HungerProgressBar`.
-- Added (krok 24): `RingProgress` (oblouk se sweep gradientem).
-- Added (krok 25): `AnimatedCounter` (animované číslice).
-- Added (krok 26): `FloatingReward` (AnimatedVisibility + auto-dismiss).
-- Added (krok 27): `ConfettiOverlay` (částice rect/circle).
-- Added (krok 28): `Modifier.shimmer()`.
-- Added (krok 29): `AnimatedBackground` (radial gradient v čase).
-- Added (krok 30): minimální Lottie JSON placeholdery v `assets/lottie/`.
-- Added (krok 31–32): `Route` sealed třída, `AutokolkNavGraph`, zástupné obrazovky.
-- Added (krok 33–34): `AutokolkBottomBar` (GlassCard, animace ikon a labelů).
-- Added (krok 35): `AutokolkTopBar` + `StatBadge` s `AnimatedCounter` a pulsem životů.
-- Changed: `AutokolkApp` — `Scaffold`, bottom bar na tab routách, `NavHost`.
-- Changed: závislost `material-icons-extended` (ikony pro budoucí použití).
-
-## [2.0.35] - 2026-04-14
-- Added: `PrimaryGradientButton` — CTA s gradientem, animovaným stínem (glow), pružinovým stiskem a volitelným shimmer přes gradient.
-
-## [2.0.34] - 2026-04-14
-- Added: Tlačítka glass/CTA — `GlassButton` (slot + pružinová animace), `PrimaryButton`, `SecondaryButton`, `DangerButton` (`ui/components/buttons/GlassButton.kt`).
-
-## [2.0.33] - 2026-04-14
-- Added: `GlassCard` a `GlassCardBlur` — glassmorphism karty (`GlassCard` gradient + border; `GlassCardBlur` s Haze `hazeEffect` a `HazeMaterials.thin`).
-
-## [2.0.32] - 2026-04-14
-- Added: Design tokeny — `Tokens.kt` s `AutokolkTokens` (elevation, spacing, glass, délky animací, ikony a layout výšky).
-
-## [2.0.31] - 2026-04-14
-- Added: Material 3 tvary — `Shape.kt` (`AutokolkShapes`, `PillShape`, `BottomSheetShape`, `LessonNodeShape`) a zapojení `shapes` do `AutokolkTheme`.
-
-## [2.0.30] - 2026-04-14
-- Added: Compose typografie — `Type.kt` s rodinou fontů Quicksand a `AutokolkTypography` (Material 3 hierarchie), zapojeno do `AutokolkTheme` přes `MaterialTheme.typography`.
-
-## [2.0.29] - 2026-04-14
-- Added: Compose ColorScheme & MaterialTheme — `darkColorScheme()` and `lightColorScheme()` wired into `AutokolkTheme`, user dark/light mode preference persisted in SharedPreferences via `ThemeMode` enum, `CompositionLocalProvider` exposes `LocalIsDarkTheme` to all composables.
+## [2.0.29] - 2026-04-15
+- Added: Compose MaterialTheme integration — `darkColorScheme` / `lightColorScheme` mapped from Color.kt tokens, `ThemeMode` enum (Light/Dark/System) with `SharedPreferences`-backed `ThemePreferences`, `CompositionLocalProvider` for theme mode propagation. Placeholder `Type.kt` and `Shape.kt` for steps 16–17.
 
 ## [2.0.28] - 2026-04-14
 - Added: Light mode color palette (`Color.kt`) — light backgrounds, light glass-effect tokens, adjusted accent colors for light surfaces, and dark text variants. Enables future light/dark theme switching.

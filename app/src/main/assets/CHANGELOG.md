@@ -7,51 +7,8 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
-## [2.0.53] - 2026-04-14
-- Novinka: Alex, test hub, statistiky, procvičování (Compose), nastavení, úspěchy, changelog, splash, oslava streaku, horní lišta se staty.
-
-## [2.0.52] - 2026-04-14
-- Novinka (krok 53–85): Compose cesta lekcí (Home), čtení před kvízem, kvíz s výsledky; navigace s parametrem opakování; obrázky z assetů bez Coil v nových obrazovkách.
-
-## [2.0.51] - 2026-04-14
-- Novinka: průvodce prvním spuštěním (onboarding) s výběrem skupiny, denního cíle, jména lva a ukázkovou otázkou.
-- Novinka: připomínky streaku (systémové oprávnění na Android 13+).
-- Úprava: start aplikace podle toho, zda už byl onboarding dokončen.
-- Oprava: po aktualizaci aplikace se existujícím uživatelům onboarding znovu nevnucuje.
-
-## [2.0.50] - 2026-04-14
-- Novinka (krok 36–38): bottom sheety streak, životy, mince (Compose).
-- Novinka (krok 39–40): vylepšený app shell a navigace mezi záložkami.
-- Novinka (krok 41–42): poznámka k shared transitions; start přes ComposeMainActivity a AppBootstrap.
-- Opravy drobných chyb kompilace (animace, Lottie, layout).
-
-## [2.0.49] - 2026-04-14
-- Novinka (krok 22): AnswerButton — stavy odpovědí, animace, konfety.
-- Novinka (krok 23–24): progress bar a kruhový RingProgress.
-- Novinka (krok 25–29): AnimatedCounter, FloatingReward, ConfettiOverlay, shimmer, AnimatedBackground.
-- Novinka (krok 30): Lottie placeholdery v assets/lottie.
-- Novinka (krok 31–35): navigace (Routes, NavGraph), spodní a horní panel (TopBar), AutokolkApp se Scaffoldem.
-
-## [2.0.35] - 2026-04-14
-- Added: `PrimaryGradientButton` — CTA s gradientem, animovaným stínem (glow), pružinovým stiskem a volitelným shimmer přes gradient.
-
-## [2.0.34] - 2026-04-14
-- Added: Tlačítka glass/CTA — `GlassButton` (slot + pružinová animace), `PrimaryButton`, `SecondaryButton`, `DangerButton` (`ui/components/buttons/GlassButton.kt`).
-
-## [2.0.33] - 2026-04-14
-- Added: `GlassCard` a `GlassCardBlur` — glassmorphism karty (`GlassCard` gradient + border; `GlassCardBlur` s Haze `hazeEffect` a `HazeMaterials.thin`).
-
-## [2.0.32] - 2026-04-14
-- Added: Design tokeny — `Tokens.kt` s `AutokolkTokens` (elevation, spacing, glass, délky animací, ikony a layout výšky).
-
-## [2.0.31] - 2026-04-14
-- Added: Material 3 tvary — `Shape.kt` (`AutokolkShapes`, `PillShape`, `BottomSheetShape`, `LessonNodeShape`) a zapojení `shapes` do `AutokolkTheme`.
-
-## [2.0.30] - 2026-04-14
-- Added: Compose typografie — `Type.kt` s rodinou fontů Quicksand a `AutokolkTypography` (Material 3 hierarchie), zapojeno do `AutokolkTheme` přes `MaterialTheme.typography`.
-
-## [2.0.29] - 2026-04-14
-- Novinka: Compose ColorScheme & MaterialTheme — `darkColorScheme()` a `lightColorScheme()` napojeny na `AutokolkTheme`, preference tmavého/světlého režimu uložená v SharedPreferences přes `ThemeMode` enum, `LocalIsDarkTheme` dostupný ve všech composables.
+## [2.0.29] - 2026-04-15
+- Novinka: Compose MaterialTheme integrace — `darkColorScheme` / `lightColorScheme` namapované z Color.kt tokenů, `ThemeMode` enum (Light/Dark/Systémový) s uložením preference do `SharedPreferences`, `CompositionLocalProvider` pro propagaci režimu. Placeholder `Type.kt` a `Shape.kt` pro kroky 16–17.
 
 ## [2.0.28] - 2026-04-14
 - Novinka: Barevná paleta pro light mode (`Color.kt`) — světlá pozadí, glass-effect tokeny pro světlý režim, upravené akcentové barvy pro kontrast na světlém povrchu a tmavé textové varianty. Připraveno pro přepínání dark/light tématu.
