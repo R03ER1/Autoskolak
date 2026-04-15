@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.37] - 2026-04-15
+- Added: Centrální `NavGraph` — `AutokolkNavGraph` s `NavHost`, přechody (fade pro taby, slide pro detail, slide-up pro modály), napojení všech existujících obrazovek a placeholdery pro zatím neimplementované (`ui/navigation/NavGraph.kt`).
+- Changed: `AutokolkApp` nyní vytváří `NavHostController` a spouští `AutokolkNavGraph` místo placeholder textu.
+
 ## [2.0.36] - 2026-04-15
 - Added: Type-safe navigation routes — `Route` sealed class s 12 statickými a 4 parametrickými routami, argument konstanty a `mainTabs` helper (`ui/navigation/Routes.kt`).
 - Marked: Kroky 19–30 (fáze 2 design systém) označeny jako hotové v REDESIGN_PLAN.md.

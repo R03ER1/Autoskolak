@@ -60,7 +60,7 @@
 | 29 | Animated background (subtle particle / gradient animation) | 2 | ✅ |
 | 30 | Lottie asset příprava | 2 | ✅ |
 | 31 | Definice navigation routes | 3 | ✅ |
-| 32 | NavGraph setup | 3 | ⬜ |
+| 32 | NavGraph setup | 3 | ✅ |
 | 33 | Bottom navigation bar (animated) | 3 | ⬜ |
 | 34 | Animace ikonky v bottom baru | 3 | ⬜ |
 | 35 | Top app bar (streak, coins, lives) | 3 | ⬜ |
