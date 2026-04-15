@@ -23,6 +23,7 @@ import cz.autokolk.ui.screens.home.HomeScreen
 import cz.autokolk.ui.screens.quiz.QuizScreen
 import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
 import cz.autokolk.ui.screens.results.ResultsComposeScreen
+import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.splash.SplashScreen
 
 private const val DURATION_DEFAULT = 300
@@ -71,7 +72,7 @@ fun AutokolkNavGraph(
 
         // ── Onboarding (placeholder) ────────────────────────────────────
         composable(Route.Onboarding.route) {
-            PlaceholderScreen("Onboarding")
+            OnboardingScreen(navController)
         }
 
         // ── Main tabs — fast fade, no slide ─────────────────────────────

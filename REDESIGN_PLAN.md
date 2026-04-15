@@ -61,26 +61,26 @@
 | 30 | Lottie asset příprava | 2 | ✅ |
 | 31 | Definice navigation routes | 3 | ✅ |
 | 32 | NavGraph setup | 3 | ✅ |
-| 33 | Bottom navigation bar (animated) | 3 | ⬜ |
-| 34 | Animace ikonky v bottom baru | 3 | ⬜ |
-| 35 | Top app bar (streak, coins, lives) | 3 | ⬜ |
-| 36 | Streak bottom sheet | 3 | ⬜ |
-| 37 | Hearts / Lives bottom sheet | 3 | ⬜ |
-| 38 | Coins / XP bottom sheet | 3 | ⬜ |
-| 39 | App shell (Scaffold) | 3 | ⬜ |
-| 40 | Tab navigation logika | 3 | ⬜ |
-| 41 | Shared element transitions (příprava) | 3 | ⬜ |
-| 42 | Přepojení launcher Activity na Compose | 3 | ⬜ |
-| 43 | Onboarding data model | 4 | ⬜ |
-| 44 | Onboarding screen (HorizontalPager) | 4 | ⬜ |
-| 45 | Onboarding page content | 4 | ⬜ |
-| 46 | Onboarding controls (indikátory, tlačítka) | 4 | ⬜ |
-| 47 | Onboarding "Vyber si cíl" | 4 | ⬜ |
-| 48 | Onboarding "Nastav denní cíl" | 4 | ⬜ |
-| 49 | Onboarding "Pojmenuj lva" | 4 | ⬜ |
-| 50 | Onboarding "Demo otázka" | 4 | ⬜ |
-| 51 | Onboarding notifikace permission | 4 | ⬜ |
-| 52 | Persistentní onboarding stav | 4 | ⬜ |
+| 33 | Bottom navigation bar (animated) | 3 | ✅ |
+| 34 | Animace ikonky v bottom baru | 3 | ✅ |
+| 35 | Top app bar (streak, coins, lives) | 3 | ✅ |
+| 36 | Streak bottom sheet | 3 | ✅ |
+| 37 | Hearts / Lives bottom sheet | 3 | ✅ |
+| 38 | Coins / XP bottom sheet | 3 | ✅ |
+| 39 | App shell (Scaffold) | 3 | ✅ |
+| 40 | Tab navigation logika | 3 | ✅ |
+| 41 | Shared element transitions (příprava) | 3 | ✅ |
+| 42 | Přepojení launcher Activity na Compose | 3 | ✅ |
+| 43 | Onboarding data model | 4 | ✅ |
+| 44 | Onboarding screen (HorizontalPager) | 4 | ✅ |
+| 45 | Onboarding page content | 4 | ✅ |
+| 46 | Onboarding controls (indikátory, tlačítka) | 4 | ✅ |
+| 47 | Onboarding "Vyber si cíl" | 4 | ⏭ zrušeno (aplikace jen skupina B) |
+| 48 | Onboarding "Nastav denní cíl" | 4 | ✅ |
+| 49 | Onboarding "Pojmenuj lva" | 4 | ✅ |
+| 50 | Onboarding "Demo otázka" | 4 | ✅ |
+| 51 | Onboarding notifikace permission | 4 | ✅ |
+| 52 | Persistentní onboarding stav | 4 | ✅ |
 | 53 | Home screen scaffold | 5 | ⬜ |
 | 54 | Lesson path Canvas křivka (pozadí) | 5 | ⬜ |
 | 55 | Lesson node composable | 5 | ⬜ |
@@ -1643,6 +1643,8 @@
 ---
 
 ## Fáze 4: Onboarding
+
+> **Implementováno (2.0.39):** Flow přes `SplashScreen` → `OnboardingScreen` (ne změna `startDestination` v `AutokolkApp`). Krok 47 zrušen — obsah je jen pro skupinu B. `replay onboarding` ve Settings zatím není.
 
 ### Krok 43 — Onboarding data model
 

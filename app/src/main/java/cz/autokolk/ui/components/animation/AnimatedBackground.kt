@@ -17,14 +17,26 @@ import androidx.compose.ui.graphics.Color
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.DarkBackground
+import cz.autokolk.ui.theme.LightAccentTeal
+import cz.autokolk.ui.theme.LightBackground
+import cz.autokolk.ui.theme.LocalIsDarkTheme
 
+/**
+ * Jemný animovaný radial gradient na pozadí (Fáze 2 / onboarding).
+ */
 @Composable
 fun AnimatedBackground(
     modifier: Modifier = Modifier,
-    accentColor: Color? = null,
+    accentColor: Color = AccentCyan,
     content: @Composable () -> Unit,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "bg")
+    val isDark = LocalIsDarkTheme.current
+    val baseBg = if (isDark) DarkBackground else LightBackground
+    val secondaryAccent = if (isDark) AccentTeal else LightAccentTeal
+    val primaryAlpha = if (isDark) 0.05f else 0.08f
+    val secondaryAlpha = if (isDark) 0.03f else 0.06f
+
+    val infiniteTransition = rememberInfiniteTransition(label = "animatedBg")
     val offset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -32,22 +44,22 @@ fun AnimatedBackground(
             animation = tween(10_000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse,
         ),
-        label = "bgOffset",
+        label = "animatedBgOffset",
     )
 
-    val accent = accentColor ?: AccentCyan
-    val accent2 = accentColor ?: AccentTeal
-    val brush = Brush.radialGradient(
-        colors = listOf(
-            accent.copy(alpha = if (accentColor != null) 0.12f else 0.05f),
-            DarkBackground,
-            accent2.copy(alpha = if (accentColor != null) 0.08f else 0.03f),
+    Box(
+        modifier = modifier.background(
+            Brush.radialGradient(
+                colors = listOf(
+                    accentColor.copy(alpha = primaryAlpha),
+                    baseBg,
+                    secondaryAccent.copy(alpha = secondaryAlpha),
+                ),
+                center = Offset(offset * 1000f, offset * 1500f),
+                radius = 800f,
+            ),
         ),
-        center = Offset(offset * 1000f, offset * 1500f),
-        radius = 800f,
-    )
-
-    Box(modifier = modifier.background(brush = brush)) {
+    ) {
         content()
     }
 }

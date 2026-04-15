@@ -61,7 +61,8 @@ fun AutokolkBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 16.dp, bottom = 8.dp),
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 8.dp),
         shape = PillShape,
     ) {
         Row(

@@ -8,6 +8,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
+import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
 
 data class LessonState(
     val lessonNumber: Int,
@@ -48,6 +49,9 @@ class LessonProgress(private val context: Context) {
         const val CATEGORY_USER_MISTAKES = "user_mistakes"
         const val QUESTIONS_PER_LESSON = 10
         private const val MAX_HEARTS = 15
+
+        private const val KEY_LESSONS_TODAY_DATE = "lessons_completed_today_date"
+        private const val KEY_LESSONS_TODAY_COUNT = "lessons_completed_today_count"
         private const val RECHARGE_INTERVAL_MS = 30L * 60L * 1000L
         private const val KEY_HEARTS_FULL_SINCE = "hearts_full_since"
     }
@@ -733,9 +737,38 @@ class LessonProgress(private val context: Context) {
             .putString("last_completion_date", today)
             .apply()
         recordCompletionDate(today)
+        incrementLessonsCompletedToday()
         try { AchievementsManager(context).onStreakUpdated(streak) } catch (_: Throwable) { }
         return isFirstOfDay
     }
+
+    private fun incrementLessonsCompletedToday() {
+        val today = todayString()
+        val storedDate = prefs.getString(KEY_LESSONS_TODAY_DATE, null)
+        val count = prefs.getInt(KEY_LESSONS_TODAY_COUNT, 0)
+        val editor = prefs.edit()
+        if (storedDate != today) {
+            editor.putString(KEY_LESSONS_TODAY_DATE, today).putInt(KEY_LESSONS_TODAY_COUNT, 1)
+        } else {
+            editor.putInt(KEY_LESSONS_TODAY_COUNT, count + 1)
+        }
+        editor.apply()
+    }
+
+    /** Denní cíl lekcí (nastavení z onboardingu), výchozí 3. */
+    fun getDailyGoal(): Int {
+        val p = context.getSharedPreferences(OnboardingPreferences.PREFS_NAME, Context.MODE_PRIVATE)
+        return p.getInt(OnboardingPreferences.KEY_DAILY_GOAL, OnboardingPreferences.DEFAULT_DAILY_GOAL).coerceIn(1, 10)
+    }
+
+    /** Počet dokončených lekcí dnes (pro denní cíl). */
+    fun getLessonsCompletedToday(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_LESSONS_TODAY_DATE, null) != today) return 0
+        return prefs.getInt(KEY_LESSONS_TODAY_COUNT, 0)
+    }
+
+    fun isDailyGoalMet(): Boolean = getLessonsCompletedToday() >= getDailyGoal()
 
     private fun recordCompletionDate(date: String) {
         val raw = prefs.getStringSet("completion_dates", emptySet()) ?: emptySet()
@@ -916,5 +949,13 @@ class LessonProgress(private val context: Context) {
         val hearts = prefs.getInt("hearts_count", MAX_HEARTS)
         if (hearts < MAX_HEARTS) return 0L
         return prefs.getLong(KEY_HEARTS_FULL_SINCE, 0L)
+    }
+
+    fun registerOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun unregisterOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        prefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 } 

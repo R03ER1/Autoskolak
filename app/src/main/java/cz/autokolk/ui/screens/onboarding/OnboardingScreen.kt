@@ -2,13 +2,18 @@ package cz.autokolk.ui.screens.onboarding
 
 import android.Manifest
 import android.os.Build
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,24 +26,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.Image
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,8 +50,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -56,79 +64,85 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import cz.autokolk.LessonProgress
 import cz.autokolk.Question
+import cz.autokolk.R
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.animation.ConfettiOverlay
-import cz.autokolk.ui.components.buttons.AnswerButton
-import cz.autokolk.ui.components.buttons.AnswerState
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.screens.quiz.QuestionContent
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.DarkSurfaceVariant
 import cz.autokolk.ui.theme.GlassWhite
-import cz.autokolk.ui.theme.PillShape
+import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
-import kotlinx.coroutines.Dispatchers
+import cz.autokolk.ui.theme.PillShape
+import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
+private data class DailyGoalRow(
+    val emoji: String,
+    val title: String,
+    val subtitle: String,
+    val value: Int,
+)
+
+private val dailyGoalRows = listOf(
+    DailyGoalRow("🐢", "Pohoda", "1 lekce denně", 1),
+    DailyGoalRow("🐇", "Normální", "3 lekce denně", 3),
+    DailyGoalRow("🔥", "Intenzivní", "5 lekcí denně", 5),
+    DailyGoalRow("💀", "Šílený", "10 lekcí denně", 10),
+)
+
+private fun demoQuestion(): Question = Question(
+    id = "onboarding_demo",
+    questionText = "Smí řidič motorového vozidla za jízdy držet v ruce mobilní telefon?",
+    optionA = "Ano, pokud nepoužívá handsfree",
+    optionB = "Ne",
+    optionC = "Ano, ale jen ve městě",
+    correctAnswer = "b",
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(navController: NavHostController) {
     val context = LocalContext.current
+    val onboardingPrefs = remember { OnboardingPreferences(context) }
+    val steps = remember { buildOnboardingSteps() }
+    val pagerState = rememberPagerState(pageCount = { steps.size })
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(pageCount = { ONBOARDING_PAGE_COUNT })
 
-    var draft by remember { mutableStateOf(OnboardingDraft()) }
-    var demoQuestion by remember { mutableStateOf<Question?>(null) }
-    /** Vybrané písmeno odpovědi (A/B/C), null dokud uživatel neklikl. */
-    var demoPickedLetter by remember { mutableStateOf<String?>(null) }
-    var showNotificationPrimer by remember { mutableStateOf(false) }
+    var selectedDailyGoal by remember { mutableIntStateOf(OnboardingPreferences.DEFAULT_DAILY_GOAL) }
+    var lionName by remember { mutableStateOf(OnboardingPreferences.DEFAULT_LION_NAME) }
+    var demoQuestion by remember { mutableStateOf(demoQuestion()) }
+    var showConfetti by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        demoQuestion = withContext(Dispatchers.IO) {
-            runCatching {
-                LessonProgress(context).getRandomQuestions(1).firstOrNull()
-            }.getOrNull()
+    val bounce = remember { Animatable(1f) }
+    LaunchedEffect(lionName.length) {
+        bounce.snapTo(1f)
+        bounce.animateTo(1.06f, tween(90))
+        bounce.animateTo(1f, spring(dampingRatio = 0.45f))
+    }
+
+    val accent = steps.getOrNull(pagerState.currentPage)?.accentOrDefault() ?: AccentCyan
+
+    fun finishOnboarding() {
+        onboardingPrefs.dailyGoal = selectedDailyGoal
+        onboardingPrefs.lionName = lionName
+        onboardingPrefs.isCompleted = true
+        navController.navigate(Route.Home.route) {
+            popUpTo(Route.Onboarding.route) { inclusive = true }
         }
     }
 
-    val activeQuestion = demoQuestion ?: demoFallbackQuestion()
-    val demoCorrect = demoPickedLetter?.equals(activeQuestion.correctAnswer.trim(), ignoreCase = true) == true
+    val notifLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { finishOnboarding() }
 
-    val notifPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { _ ->
-        completeOnboarding(
-            context = context,
-            navController = navController,
-            draft = draft,
-            notificationsPromptShown = true,
-        )
-    }
-
-    fun skipEntireOnboarding() {
-        completeOnboarding(
-            context = context,
-            navController = navController,
-            draft = OnboardingDraft(),
-            notificationsPromptShown = false,
-        )
-    }
-
-    val currentAccent = remember(pagerState.currentPage) {
-        when (pagerState.currentPage) {
-            in onboardingIntroPages.indices -> onboardingIntroPages[pagerState.currentPage].accentColor
-            else -> AccentCyan
-        }
-    }
-
-    Box(Modifier.fillMaxSize()) {
-        AnimatedBackground(
-            modifier = Modifier.fillMaxSize(),
-            accentColor = currentAccent,
-        ) {
+    AnimatedBackground(
+        modifier = Modifier.fillMaxSize(),
+        accentColor = accent,
+    ) {
+        Box(Modifier.fillMaxSize()) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -137,92 +151,82 @@ fun OnboardingScreen(navController: NavHostController) {
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.weight(1f),
+                    userScrollEnabled = false,
                 ) { page ->
-                    when (page) {
-                        in onboardingIntroPages.indices -> OnboardingIntroPageContent(onboardingIntroPages[page])
-                        4 -> LicensePage(draft.selectedLicense) { draft = draft.copy(selectedLicense = it) }
-                        5 -> DailyGoalPage(draft.dailyGoalLessons) { draft = draft.copy(dailyGoalLessons = it) }
-                        6 -> LionNamePage(draft.lionName) { draft = draft.copy(lionName = it) }
-                        7 -> DemoQuestionPage(
-                            question = activeQuestion,
-                            pickedLetter = demoPickedLetter,
-                            onPick = { letter ->
-                                if (demoPickedLetter != null) return@DemoQuestionPage
-                                demoPickedLetter = letter
+                    when (val step = steps[page]) {
+                        is OnboardingStep.InfoPage -> OnboardingInfoPage(step)
+                        OnboardingStep.DailyGoalPage -> OnboardingDailyGoalPage(
+                            selected = selectedDailyGoal,
+                            onSelect = { selectedDailyGoal = it },
+                        )
+                        OnboardingStep.NameLionPage -> OnboardingNameLionPage(
+                            lionName = lionName,
+                            onLionNameChange = { lionName = it },
+                            imageScale = bounce.value,
+                        )
+                        OnboardingStep.DemoQuestionPage -> OnboardingDemoQuestionPage(
+                            question = demoQuestion,
+                            onAnswer = { key ->
+                                demoQuestion = demoQuestion.copy(userAnswer = key)
+                                val correct = key == "b"
+                                showConfetti = correct
                             },
+                        )
+                        OnboardingStep.NotificationPage -> OnboardingNotificationPage(
+                            onAllow = {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                } else {
+                                    finishOnboarding()
+                                }
+                            },
+                            onSkip = { finishOnboarding() },
                         )
                     }
                 }
 
-                OnboardingBottomBar(
-                    pagerState = pagerState,
-                    scope = scope,
-                    demoPickedLetter = demoPickedLetter,
-                    onSkipAll = { skipEntireOnboarding() },
-                    onNextPage = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    },
-                    onFinishDemo = { showNotificationPrimer = true },
-                )
-            }
-        }
-
-        if (demoCorrect && pagerState.currentPage == 7) {
-            ConfettiOverlay(
-                isActive = true,
-                modifier = Modifier.fillMaxSize(),
-                particleCount = 80,
-            )
-        }
-
-        if (showNotificationPrimer) {
-            NotificationPrimerOverlay(
-                onAllow = {
-                    showNotificationPrimer = false
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        completeOnboarding(
-                            context = context,
-                            navController = navController,
-                            draft = draft,
-                            notificationsPromptShown = true,
-                        )
-                    }
-                },
-                onSkipNotifications = {
-                    showNotificationPrimer = false
-                    completeOnboarding(
-                        context = context,
-                        navController = navController,
-                        draft = draft,
-                        notificationsPromptShown = true,
+                if (steps[pagerState.currentPage] !is OnboardingStep.NotificationPage) {
+                    OnboardingFooter(
+                        pageCount = steps.size,
+                        currentPage = pagerState.currentPage,
+                        accent = accent,
+                        isInfoPage = steps[pagerState.currentPage] is OnboardingStep.InfoPage,
+                        isLastPage = pagerState.currentPage == steps.lastIndex,
+                        isDemoPage = steps[pagerState.currentPage] is OnboardingStep.DemoQuestionPage,
+                        demoAnswered = demoQuestion.userAnswer != null,
+                        hasNotificationStep = steps.any { it is OnboardingStep.NotificationPage },
+                        onSkip = {
+                            scope.launch { pagerState.animateScrollToPage(4) }
+                        },
+                        onNext = {
+                            scope.launch {
+                                when {
+                                    pagerState.currentPage < steps.lastIndex -> {
+                                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                    }
+                                    else -> finishOnboarding()
+                                }
+                            }
+                        },
+                        onFinishFromDemo = { finishOnboarding() },
                     )
-                },
+                }
+            }
+
+            ConfettiOverlay(
+                isActive = showConfetti,
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }
 }
 
-private fun demoFallbackQuestion(): Question = Question(
-    id = "onboarding_demo",
-    questionText = "Kdy odbočuješ vlevo, které světlo rozsvítíš?",
-    optionA = "Levé směrové světlo",
-    optionB = "Pravé směrové světlo",
-    optionC = "Dálková světla",
-    correctAnswer = "A",
-)
-
 @Composable
-private fun OnboardingIntroPageContent(page: OnboardingIntroPage) {
-    val compositionResult = rememberLottieComposition(LottieCompositionSpec.Asset(page.lottieAsset))
-    val composition = compositionResult.value
+private fun OnboardingInfoPage(page: OnboardingStep.InfoPage) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset(page.lottieAssetPath))
     Column(
         Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -234,13 +238,14 @@ private fun OnboardingIntroPageContent(page: OnboardingIntroPage) {
         )
         Spacer(Modifier.height(32.dp))
         Text(
-            page.title,
+            text = page.title,
             style = MaterialTheme.typography.headlineLarge,
+            color = TextPrimary,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            page.description,
+            text = page.description,
             style = MaterialTheme.typography.bodyLarge,
             color = TextSecondary,
             textAlign = TextAlign.Center,
@@ -249,42 +254,69 @@ private fun OnboardingIntroPageContent(page: OnboardingIntroPage) {
 }
 
 @Composable
-private fun LicensePage(selected: String, onSelect: (String) -> Unit) {
+private fun OnboardingDailyGoalPage(
+    selected: Int,
+    onSelect: (Int) -> Unit,
+) {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            "Co chceš řídit?",
-            style = MaterialTheme.typography.headlineSmall,
+            "Nastav si denní cíl",
+            style = MaterialTheme.typography.headlineMedium,
+            color = TextPrimary,
             textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Vyber skupinu oprávnění (filtr otázek doplníme později).",
-            style = MaterialTheme.typography.bodyMedium,
+            "Kolik lekcí chceš denně zvládnout?",
+            style = MaterialTheme.typography.bodyLarge,
             color = TextSecondary,
             textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(24.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            licenseOptions.chunked(3).forEach { row ->
+        dailyGoalRows.forEach { row ->
+            val selectedRow = row.value == selected
+            val scale by animateFloatAsState(
+                targetValue = if (selectedRow) 1.04f else 1f,
+                animationSpec = spring(dampingRatio = 0.65f),
+                label = "goalRowScale",
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp)
+                    .scale(scale)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(TextPrimary.copy(alpha = 0.06f))
+                    .then(
+                        if (selectedRow) {
+                            Modifier.border(2.dp, AccentCyan, RoundedCornerShape(16.dp))
+                        } else {
+                            Modifier.border(1.dp, GlassWhite, RoundedCornerShape(16.dp))
+                        },
+                    )
+                    .clickable { onSelect(row.value) }
+                    .padding(16.dp),
+            ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                    modifier = Modifier.fillMaxWidth(),
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    row.forEach { code ->
-                        FilterChip(
-                            selected = selected == code,
-                            onClick = { onSelect(code) },
-                            label = { Text(code) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = AccentCyan.copy(alpha = 0.35f),
-                            ),
-                        )
+                    Text(row.emoji, style = MaterialTheme.typography.headlineMedium)
+                    Spacer(Modifier.width(16.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(row.title, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+                        Text(row.subtitle, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                    }
+                    if (selectedRow) {
+                        Text("✓", style = MaterialTheme.typography.titleLarge, color = AccentCyan)
                     }
                 }
             }
@@ -293,204 +325,206 @@ private fun LicensePage(selected: String, onSelect: (String) -> Unit) {
 }
 
 @Composable
-private fun DailyGoalPage(selectedLessons: Int, onSelect: (Int) -> Unit) {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            "Nastav si denní cíl",
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "Kolik lekcí denně je pro tebe reálných?",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(24.dp))
-        dailyGoalOptions.forEach { opt ->
-            val selected = opt.lessonsPerDay == selectedLessons
-            val scale by animateFloatAsState(if (selected) 1.04f else 1f, label = "goalScale")
-            Card(
-                onClick = { onSelect(opt.lessonsPerDay) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp)
-                    .scale(scale),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (selected) AccentCyan.copy(alpha = 0.2f) else DarkSurfaceVariant,
-                ),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Row(
-                    Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text("${opt.emoji}  ${opt.label}", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "${opt.lessonsPerDay}× denně",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
-                    )
-                }
+private fun OnboardingNameLionPage(
+    lionName: String,
+    onLionNameChange: (String) -> Unit,
+    imageScale: Float,
+) {
+    val context = LocalContext.current
+    val alexBitmap = remember(context) {
+        try {
+            context.assets.open("images/alex/AlexHappy.png").use { stream ->
+                BitmapFactory.decodeStream(stream)?.asImageBitmap()
             }
+        } catch (_: Throwable) {
+            null
         }
     }
-}
-
-@Composable
-private fun LionNamePage(name: String, onNameChange: (String) -> Unit) {
-    val bounce by animateFloatAsState(
-        targetValue = if (name.isNotEmpty()) 1.03f else 1f,
-        label = "lionBounce",
-    )
     Column(
         Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
             "Pojmenuj svého lva",
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.headlineMedium,
+            color = TextPrimary,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Jméno se použije v notifikacích i v péči o Alexe.",
-            style = MaterialTheme.typography.bodyMedium,
+            "Bude tě doprovázet celou cestu k řidičáku.",
+            style = MaterialTheme.typography.bodyLarge,
             color = TextSecondary,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
-        Text(
-            text = "🦁",
-            style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.scale(bounce),
-        )
-        Spacer(Modifier.height(16.dp))
+        if (alexBitmap != null) {
+            Image(
+                bitmap = alexBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(200.dp)
+                    .graphicsLayer {
+                        scaleX = imageScale
+                        scaleY = imageScale
+                    },
+            )
+        } else {
+            Image(
+                painter = painterResource(R.drawable.ic_alex),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(200.dp)
+                    .graphicsLayer {
+                        scaleX = imageScale
+                        scaleY = imageScale
+                    },
+            )
+        }
+        Spacer(Modifier.height(24.dp))
         OutlinedTextField(
-            value = name,
-            onValueChange = onNameChange,
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
+            value = lionName,
+            onValueChange = { raw ->
+                if (raw.length <= 20) onLionNameChange(raw)
+            },
             label = { Text("Jméno") },
-            placeholder = { Text("Alex") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = TextPrimary,
+                unfocusedTextColor = TextPrimary,
+                focusedLabelColor = TextSecondary,
+                unfocusedLabelColor = TextSecondary,
+                focusedBorderColor = AccentCyan,
+                unfocusedBorderColor = GlassWhite,
+            ),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 @Composable
-private fun DemoQuestionPage(
+private fun OnboardingDemoQuestionPage(
     question: Question,
-    pickedLetter: String?,
-    onPick: (String) -> Unit,
+    onAnswer: (String) -> Unit,
 ) {
-    fun buttonState(label: String): AnswerState {
-        if (pickedLetter == null) return AnswerState.DEFAULT
-        val correct = question.correctAnswer.trim().uppercase()
-        val l = label.uppercase()
-        if (l == correct) return AnswerState.CORRECT
-        if (pickedLetter.equals(l, ignoreCase = true)) return AnswerState.WRONG
-        return AnswerState.DEFAULT
-    }
-
+    val awaiting = question.userAnswer != null
     Column(
         Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(top = 24.dp),
     ) {
         Text(
-            "Ukázková otázka",
-            style = MaterialTheme.typography.labelLarge,
-            color = TextSecondary,
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            question.questionText,
+            "Vyzkoušej si ukázkovou otázku",
             style = MaterialTheme.typography.titleLarge,
+            color = TextPrimary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
         )
-        Spacer(Modifier.height(8.dp))
-        Surface(
-            color = AccentCyan.copy(alpha = 0.08f),
-            shape = RoundedCornerShape(12.dp),
-        ) {
-            Text(
-                "Tip: nahoře v aplikaci najdeš streak, mince a životy — stejně jako po dokončení onboardingu.",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(12.dp),
-                color = TextSecondary,
-            )
-        }
-        Spacer(Modifier.height(20.dp))
-        AnswerButton(
-            text = question.optionA,
-            state = buttonState("A"),
-            label = "A",
-            onClick = { onPick("A") },
+        Spacer(Modifier.height(16.dp))
+        QuestionContent(
+            question = question,
+            awaitingAdvance = awaiting,
+            isTest = false,
+            onPick = { key ->
+                if (question.userAnswer == null) onAnswer(key)
+            },
         )
-        Spacer(Modifier.height(10.dp))
-        AnswerButton(
-            text = question.optionB,
-            state = buttonState("B"),
-            label = "B",
-            onClick = { onPick("B") },
-        )
-        Spacer(Modifier.height(10.dp))
-        AnswerButton(
-            text = question.optionC,
-            state = buttonState("C"),
-            label = "C",
-            onClick = { onPick("C") },
-        )
-        if (pickedLetter != null) {
+        if (awaiting) {
             Spacer(Modifier.height(16.dp))
-            val ok = pickedLetter.equals(question.correctAnswer.trim(), ignoreCase = true)
+            val correct = question.userAnswer == "b"
             Text(
-                if (ok) "Vidíš? To zvládneš!" else "Správně je ${question.correctAnswer.uppercase()} — v appce dostaneš vysvětlení.",
-                style = MaterialTheme.typography.titleMedium,
+                text = if (correct) "Skvěle! Vidíš? To zvládneš!" else "Zkus to znovu příště — důležité je učit se!",
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (correct) AccentCyan else TextSecondary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
             )
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun OnboardingBottomBar(
-    pagerState: PagerState,
-    scope: kotlinx.coroutines.CoroutineScope,
-    demoPickedLetter: String?,
-    onSkipAll: () -> Unit,
-    onNextPage: () -> Unit,
-    onFinishDemo: () -> Unit,
+private fun OnboardingNotificationPage(
+    onAllow: () -> Unit,
+    onSkip: () -> Unit,
 ) {
-    val lastIndex = ONBOARDING_PAGE_COUNT - 1
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = "🔔",
+            style = MaterialTheme.typography.displayLarge,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            "Připomínky",
+            style = MaterialTheme.typography.headlineMedium,
+            color = TextPrimary,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(12.dp))
+        Text(
+            "Pošleme ti připomínku, abys nepřišel o streak a o Alexe!",
+            style = MaterialTheme.typography.bodyLarge,
+            color = TextSecondary,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(32.dp))
+        PrimaryGradientButton(
+            text = "Povolit notifikace",
+            onClick = onAllow,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(12.dp))
+        TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
+            Text("Teď ne", color = TextSecondary)
+        }
+    }
+}
+
+@Composable
+private fun OnboardingFooter(
+    pageCount: Int,
+    currentPage: Int,
+    accent: Color,
+    isInfoPage: Boolean,
+    isLastPage: Boolean,
+    isDemoPage: Boolean,
+    demoAnswered: Boolean,
+    hasNotificationStep: Boolean,
+    onSkip: () -> Unit,
+    onNext: () -> Unit,
+    onFinishFromDemo: () -> Unit,
+) {
     Column(
         Modifier.padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            repeat(ONBOARDING_PAGE_COUNT) { index ->
-                val current = pagerState.currentPage == index
+            repeat(pageCount) { index ->
+                val active = index == currentPage
                 val width by animateDpAsState(
-                    if (current) 24.dp else 8.dp,
-                    label = "dotW",
+                    targetValue = if (active) 24.dp else 8.dp,
+                    label = "onboardingDotW",
                 )
                 val color by animateColorAsState(
-                    if (current) AccentCyan else GlassWhite.copy(alpha = 0.4f),
-                    label = "dotC",
+                    targetValue = if (active) accent else GlassWhite,
+                    label = "onboardingDotC",
                 )
                 Box(
                     Modifier
@@ -502,99 +536,49 @@ private fun OnboardingBottomBar(
             }
         }
         Spacer(Modifier.height(24.dp))
+
         when {
-            pagerState.currentPage == lastIndex -> {
-                when {
-                    demoPickedLetter == null -> {
-                        Text(
-                            "Vyber odpověď",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
-                        )
+            isLastPage && !hasNotificationStep && isDemoPage && demoAnswered -> {
+                PrimaryGradientButton(
+                    text = "Začít!",
+                    onClick = onFinishFromDemo,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            isDemoPage && !demoAnswered -> {
+                PrimaryGradientButton(
+                    text = "Vyber odpověď",
+                    onClick = { },
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            isDemoPage -> {
+                PrimaryGradientButton(
+                    text = "Další",
+                    onClick = onNext,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            isInfoPage -> {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(onClick = onSkip) {
+                        Text("Přeskočit", color = TextSecondary)
                     }
-                    else -> {
-                        PrimaryGradientButton(
-                            text = "Začít!",
-                            onClick = onFinishDemo,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                    PrimaryGradientButton(text = "Další", onClick = onNext)
                 }
             }
             else -> {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    TextButton(onClick = onSkipAll) {
-                        Text("Přeskočit", color = TextSecondary)
-                    }
-                    PrimaryGradientButton(text = "Další", onClick = onNextPage)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun NotificationPrimerOverlay(
-    onAllow: () -> Unit,
-    onSkipNotifications: () -> Unit,
-) {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.72f)),
-    ) {
-        Card(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(24.dp)
-                .fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = DarkSurfaceVariant),
-            shape = RoundedCornerShape(20.dp),
-        ) {
-            Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    "Připomínky streaku",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    "Pošleme ti připomínku, abys nepřišel o streak. Můžeš to kdykoli změnit v nastavení systému.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(Modifier.height(20.dp))
                 PrimaryGradientButton(
-                    text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        "Povolit notifikace"
-                    } else {
-                        "Rozumím"
-                    },
-                    onClick = onAllow,
+                    text = "Další",
+                    onClick = onNext,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Spacer(Modifier.height(8.dp))
-                TextButton(onClick = onSkipNotifications, modifier = Modifier.fillMaxWidth()) {
-                    Text("Nechat bez připomínek", color = TextSecondary)
-                }
             }
         }
-    }
-}
-
-private fun completeOnboarding(
-    context: android.content.Context,
-    navController: NavHostController,
-    draft: OnboardingDraft,
-    notificationsPromptShown: Boolean,
-) {
-    OnboardingPreferences.saveOnboardingResult(
-        context = context,
-        draft = draft,
-        notificationsOptInShown = notificationsPromptShown,
-    )
-    navController.navigate(Route.Home.route) {
-        popUpTo(Route.Onboarding.route) { inclusive = true }
     }
 }

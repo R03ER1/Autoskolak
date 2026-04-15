@@ -7,6 +7,14 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.39] - 2026-04-15
+- Added: Fáze 4 onboarding — `OnboardingScreen` (HorizontalPager), info stránky s Lottie, denní cíl, pojmenování lva, demo otázka, na Android 13+ krok s žádostí o notifikace (`ui/screens/onboarding/`).
+- Added: `OnboardingPreferences` (`onboarding_prefs`), `AnimatedBackground`, `OnboardingData` / `buildOnboardingSteps()`.
+- Added: `LessonProgress` — počítadlo lekcí dnes, `getDailyGoal()`, `getLessonsCompletedToday()`, `isDailyGoalMet()`, `registerOnLessonProgressChanged()` / `unregister…`.
+- Added: `AnswerButton`, `RingProgress`, `QuizProgressBar`, `ConfettiOverlay` (stub), závislost `material-icons-extended`.
+- Changed: `SplashScreen` po splashu vede na onboarding, pokud ještě není dokončen; `NavGraph` napojuje `OnboardingScreen`.
+- Changed: `PrimaryGradientButton` shimmer používá `fillMaxSize()` místo `matchParentSize`; oprava `BottomNavBar` padding API.
+
 ## [2.0.38] - 2026-04-15
 - Added: Animovaný bottom navigation bar s glassmorphism stylem, spring animacemi ikon a glow efektem (`ui/components/navigation/BottomNavBar.kt`).
 - Added: Top bar se statistikami (streak, coins, lives) s pulsující animací při nízkém počtu životů (`ui/components/navigation/TopBar.kt`).

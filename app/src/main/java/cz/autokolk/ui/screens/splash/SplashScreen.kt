@@ -45,6 +45,7 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
@@ -67,10 +68,13 @@ fun SplashScreen(navController: NavHostController) {
 
     val splitInstallManager = remember { SplitInstallManagerFactory.create(context) }
 
-    fun navigateToHome() {
+    fun navigateAfterSplash() {
         if (state == SplashState.NAVIGATING) return
         state = SplashState.NAVIGATING
-        navController.navigate(Route.Home.route) {
+        val onboardingPrefs = OnboardingPreferences(context)
+        val destination =
+            if (onboardingPrefs.isCompleted) Route.Home.route else Route.Onboarding.route
+        navController.navigate(destination) {
             popUpTo(Route.Splash.route) { inclusive = true }
         }
     }
@@ -78,7 +82,7 @@ fun SplashScreen(navController: NavHostController) {
     fun checkTermsThenNavigate() {
         val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         if (prefs.getBoolean("terms_accepted_v1", false)) {
-            navigateToHome()
+            navigateAfterSplash()
         } else {
             state = SplashState.TERMS
         }
@@ -223,7 +227,7 @@ fun SplashScreen(navController: NavHostController) {
             onAccept = {
                 context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
                     .edit().putBoolean("terms_accepted_v1", true).apply()
-                navigateToHome()
+                navigateAfterSplash()
             },
             onLinkClick = {
                 try {

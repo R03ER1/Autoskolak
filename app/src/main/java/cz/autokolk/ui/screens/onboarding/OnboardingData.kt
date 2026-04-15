@@ -1,67 +1,68 @@
 package cz.autokolk.ui.screens.onboarding
 
+import android.os.Build
 import androidx.compose.ui.graphics.Color
 import cz.autokolk.ui.theme.AccentBlue
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.WarningAmber
 
-/** Počet stránek v onboardingu (4 úvodní + cíl + tempo + jméno + demo). */
-internal const val ONBOARDING_PAGE_COUNT = 8
+sealed class OnboardingStep {
+    data class InfoPage(
+        val title: String,
+        val description: String,
+        val lottieAssetPath: String,
+        val accentColor: Color,
+    ) : OnboardingStep()
 
-internal data class OnboardingIntroPage(
-    val title: String,
-    val description: String,
-    /** Cesta k assetu v [android.content.res.AssetManager], např. `lottie/onboarding_welcome.json`. */
-    val lottieAsset: String,
-    val accentColor: Color,
-)
+    data object DailyGoalPage : OnboardingStep()
+    data object NameLionPage : OnboardingStep()
+    data object DemoQuestionPage : OnboardingStep()
+    data object NotificationPage : OnboardingStep()
+}
 
-internal val onboardingIntroPages: List<OnboardingIntroPage> = listOf(
-    OnboardingIntroPage(
-        title = "Vítej v Autoškoláku!",
-        description = "Připrav se na zkoušku hravě a rychle.",
-        lottieAsset = "lottie/onboarding_welcome.json",
-        accentColor = AccentCyan,
-    ),
-    OnboardingIntroPage(
-        title = "Tohle je Alex",
-        description = "Tvůj lev, který potřebuje tvoji pomoc. Uč se a nakrmíš ho!",
-        lottieAsset = "lottie/onboarding_alex.json",
-        accentColor = AccentTeal,
-    ),
-    OnboardingIntroPage(
-        title = "Sbírej body",
-        description = "Za každou dokončenou lekci získáš body a prodloužíš streak.",
-        lottieAsset = "lottie/onboarding_points.json",
-        accentColor = WarningAmber,
-    ),
-    OnboardingIntroPage(
-        title = "Zvládni zkoušku",
-        description = "Až budeš připraven, vyzkoušej si ostrý test jako na úřadě.",
-        lottieAsset = "lottie/onboarding_test.json",
-        accentColor = AccentBlue,
-    ),
-)
+fun buildOnboardingSteps(): List<OnboardingStep> = buildList {
+    add(
+        OnboardingStep.InfoPage(
+            title = "Vítej v Autoškoláku!",
+            description = "Připrav se na zkoušku hravě a rychle.",
+            lottieAssetPath = "lottie/onboarding_welcome.json",
+            accentColor = AccentCyan,
+        ),
+    )
+    add(
+        OnboardingStep.InfoPage(
+            title = "Tohle je Alex",
+            description = "Tvůj lev, který potřebuje tvoji pomoc. Uč se a nakrm ho!",
+            lottieAssetPath = "lottie/onboarding_alex.json",
+            accentColor = AccentTeal,
+        ),
+    )
+    add(
+        OnboardingStep.InfoPage(
+            title = "Sbírej body",
+            description = "Za každou lekci získáš body a prodloužíš svůj streak.",
+            lottieAssetPath = "lottie/onboarding_points.json",
+            accentColor = WarningAmber,
+        ),
+    )
+    add(
+        OnboardingStep.InfoPage(
+            title = "Zvládni zkoušku",
+            description = "Až budeš připraven, vyzkoušej si ostrý test.",
+            lottieAssetPath = "lottie/onboarding_test.json",
+            accentColor = AccentBlue,
+        ),
+    )
+    add(OnboardingStep.DailyGoalPage)
+    add(OnboardingStep.NameLionPage)
+    add(OnboardingStep.DemoQuestionPage)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        add(OnboardingStep.NotificationPage)
+    }
+}
 
-/** Skupiny řidičáků (filtrace otázek v budoucnu). */
-internal val licenseOptions = listOf("AM", "A", "B", "C", "D", "T")
-
-internal data class DailyGoalOption(
-    val lessonsPerDay: Int,
-    val label: String,
-    val emoji: String,
-)
-
-internal val dailyGoalOptions: List<DailyGoalOption> = listOf(
-    DailyGoalOption(1, "Pohoda", "🐢"),
-    DailyGoalOption(3, "Normální", "🐇"),
-    DailyGoalOption(5, "Intenzivní", "🔥"),
-    DailyGoalOption(10, "Šílený", "💀"),
-)
-
-data class OnboardingDraft(
-    val selectedLicense: String = "B",
-    val dailyGoalLessons: Int = 3,
-    val lionName: String = "Alex",
-)
+fun OnboardingStep.accentOrDefault(): Color = when (this) {
+    is OnboardingStep.InfoPage -> accentColor
+    else -> AccentCyan
+}
