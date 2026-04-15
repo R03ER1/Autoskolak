@@ -31,7 +31,6 @@ data class QuizUiState(
     val lastWasCorrect: Boolean? = null,
     val comboStreak: Int = 0,
     val shakeToken: Int = 0,
-    val testRemainingMs: Long? = null,
     val showQuitDialog: Boolean = false,
     /** Před odkrytím správně/špatně (lesson mód). */
     val pendingAnswerKey: String? = null,
@@ -51,19 +50,11 @@ sealed class QuizFinish {
         val firstOfDay: Boolean,
         val pointsAwarded: Int,
     ) : QuizFinish()
-
-    data class Test(
-        val score: Int,
-        val total: Int,
-        val firstOfDay: Boolean,
-        val pointsAwarded: Int,
-    ) : QuizFinish()
 }
 
 class QuizViewModel(
     application: Application,
     private val lessonId: Int,
-    private val isTest: Boolean,
     @Suppress("UNUSED_PARAMETER") private val categoryId: Int,
     private val isReview: Boolean,
 ) : AndroidViewModel(application) {
@@ -76,16 +67,12 @@ class QuizViewModel(
     private val _finish = MutableStateFlow<QuizFinish?>(null)
     val finish: StateFlow<QuizFinish?> = _finish.asStateFlow()
 
-    private var timerJob: Job? = null
     private var revealJob: Job? = null
     private var hasCompleted: Boolean = false
 
     init {
         loadQuestions()
         refreshHearts()
-        if (isTest) {
-            startTestTimer(45L * 60L * 1000L)
-        }
     }
 
     fun clearFinish() {
@@ -119,50 +106,27 @@ class QuizViewModel(
     }
 
     override fun onCleared() {
-        timerJob?.cancel()
         revealJob?.cancel()
         super.onCleared()
     }
 
     private fun loadQuestions() {
         val qs = when {
-            isTest -> {
-                val pool = lessonProgress.getRandomQuestions(50)
-                if (pool.size >= 10) pool else lessonProgress.getRandomQuestions(25)
-            }
             lessonId > 0 -> lessonProgress.getQuestionsForLesson(lessonId)
             else -> emptyList()
         }
         _state.value = QuizUiState(questions = qs, hearts = lessonProgress.getCurrentHearts())
     }
 
-    private fun startTestTimer(totalMs: Long) {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            var t = totalMs
-            while (t > 0) {
-                _state.update { it.copy(testRemainingMs = t) }
-                delay(250)
-                t -= 250
-            }
-            _state.update { it.copy(testRemainingMs = 0L) }
-            completeTestMode()
-        }
-    }
-
     fun selectAnswer(key: String) {
         val s = _state.value
         if (s.showNoLivesOverlay) return
-        if (!isTest && s.awaitingAdvance) return
-        if (!isTest && s.pendingAnswerKey != null) return
+        if (s.awaitingAdvance) return
+        if (s.pendingAnswerKey != null) return
         val q = s.questions.getOrNull(s.index) ?: return
-        if (q.userAnswer != null && !isTest) return
+        if (q.userAnswer != null) return
 
         val norm = normalizeAnswerKey(key)
-        if (isTest) {
-            applyAnswer(q, norm)
-            return
-        }
 
         revealJob?.cancel()
         _state.update { it.copy(pendingAnswerKey = norm) }
@@ -179,14 +143,12 @@ class QuizViewModel(
         val s = _state.value
         q.userAnswer = norm
         val correct = norm == resolveCorrectKey(q)
-        if (!isTest) {
-            lessonProgress.recordMistakeStreak(q.id, correct)
-            try {
-                AchievementsManager(getApplication()).onAnswer(correct)
-            } catch (_: Throwable) {
-            }
+        lessonProgress.recordMistakeStreak(q.id, correct)
+        try {
+            AchievementsManager(getApplication()).onAnswer(correct)
+        } catch (_: Throwable) {
         }
-        if (!isTest && !isReview && lessonId > 0 && !lessonProgress.hasInfiniteLives()) {
+        if (!isReview && lessonId > 0 && !lessonProgress.hasInfiniteLives()) {
             if (!correct) {
                 val consumed = lessonProgress.consumeHeart()
                 if (consumed) {
@@ -200,22 +162,10 @@ class QuizViewModel(
         val newCombo = if (correct) s.comboStreak + 1 else 0
         val heartsNow = lessonProgress.getCurrentHearts()
         val outOfLives =
-            !isTest && !isReview && lessonId > 0 &&
+            !isReview && lessonId > 0 &&
                 !lessonProgress.hasInfiniteLives() &&
                 !correct &&
                 heartsNow <= 0
-
-        if (isTest) {
-            _state.update {
-                it.copy(
-                    lastWasCorrect = correct,
-                    comboStreak = newCombo,
-                    shakeToken = if (!correct) it.shakeToken + 1 else it.shakeToken,
-                    hearts = heartsNow,
-                )
-            }
-            return
-        }
 
         if (!correct) {
             buzzWrong()
@@ -240,20 +190,6 @@ class QuizViewModel(
     fun advance() {
         val s = _state.value
         if (s.showNoLivesOverlay) return
-        if (isTest) {
-            val last = s.questions.lastIndex
-            if (s.index >= last) {
-                completeTestMode()
-            } else {
-                _state.update {
-                    it.copy(
-                        index = it.index + 1,
-                        lastWasCorrect = null,
-                    )
-                }
-            }
-            return
-        }
         if (!s.awaitingAdvance) return
         val last = s.questions.lastIndex
         if (s.index >= last) {
@@ -280,48 +216,7 @@ class QuizViewModel(
 
     fun confirmQuit() {
         _state.update { it.copy(showQuitDialog = false) }
-        if (isTest) completeTestMode() else completeLessonMode()
-    }
-
-    private fun completeTestMode() {
-        if (hasCompleted) return
-        val qs = _state.value.questions
-        if (qs.isEmpty()) {
-            hasCompleted = true
-            _finish.value = QuizFinish.Test(score = 0, total = 50, firstOfDay = false, pointsAwarded = 0)
-            return
-        }
-        var correct = 0
-        for (q in qs) {
-            val ok = normalizeAnswerKey(q.userAnswer) == resolveCorrectKey(q)
-            lessonProgress.recordMistakeStreak(q.id, ok)
-            if (ok) correct++
-        }
-        try {
-            AchievementsManager(getApplication()).onTestCorrectAdded(correct)
-        } catch (_: Throwable) {
-        }
-        val firstOfDay = try {
-            lessonProgress.updateStreakOnLessonCompleted()
-        } catch (_: Throwable) {
-            false
-        }
-        val weighted = (correct * 50 / qs.size.coerceAtLeast(1)).coerceIn(0, 50)
-        try {
-            if (weighted > 0) lessonProgress.addPoints(weighted)
-        } catch (_: Throwable) {
-        }
-        try {
-            lessonProgress.addTestScore(weighted, 50)
-        } catch (_: Throwable) {
-        }
-        hasCompleted = true
-        _finish.value = QuizFinish.Test(
-            score = weighted,
-            total = 50,
-            firstOfDay = firstOfDay,
-            pointsAwarded = weighted,
-        )
+        completeLessonMode()
     }
 
     private fun completeLessonMode() {

@@ -36,15 +36,11 @@ fun QuestionContent(
             }
         }
         val sel = normalizeAnswerKey(question.userAnswer)
-        val correct = resolveCorrectKey(question)
         if (isTest) {
             if (sel.isEmpty()) return AnswerState.DEFAULT
-            return when {
-                key == correct -> AnswerState.CORRECT
-                key == sel && sel != correct -> AnswerState.WRONG
-                else -> AnswerState.DEFAULT
-            }
+            return if (key == sel) AnswerState.SELECTED else AnswerState.DEFAULT
         }
+        val correct = resolveCorrectKey(question)
         if (!awaitingAdvance) {
             return AnswerState.DEFAULT
         }

@@ -46,7 +46,6 @@ import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.animation.FloatingReward
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.sound.QuizTestCountdownSoundEffect
 import cz.autokolk.ui.theme.DarkSurfaceVariant
 
 @Composable
@@ -57,12 +56,17 @@ fun QuizScreen(
     categoryId: Int,
     isReview: Boolean,
 ) {
+    if (isTest) {
+        TestQuizSession(navController)
+        return
+    }
+
     val context = LocalContext.current
     val application = context.applicationContext as Application
     val lessonProgress = remember { LessonProgress(application) }
     val vm: QuizViewModel = viewModel(
-        factory = remember(lessonId, isTest, categoryId, isReview) {
-            QuizViewModelFactory(application, lessonId, isTest, categoryId, isReview)
+        factory = remember(lessonId, categoryId, isReview) {
+            QuizViewModelFactory(application, lessonId, categoryId, isReview)
         },
     )
     val state by vm.state.collectAsStateWithLifecycle()
@@ -95,25 +99,9 @@ fun QuizScreen(
                 }
                 vm.clearFinish()
             }
-            is QuizFinish.Test -> {
-                navController.navigate(
-                    Route.Results(
-                        lessonId = -1,
-                        score = f.score,
-                        total = f.total,
-                        firstOfDay = f.firstOfDay,
-                        pointsAwarded = f.pointsAwarded,
-                    ).buildPath(),
-                ) {
-                    popUpTo(Route.Home.route) { inclusive = false }
-                }
-                vm.clearFinish()
-            }
             null -> {}
         }
     }
-
-    QuizTestCountdownSoundEffect(state.testRemainingMs)
 
     val total = state.questions.size.coerceAtLeast(1)
     val progress = ((state.index + 1).toFloat() / total.toFloat()).coerceIn(0f, 1f)
@@ -133,12 +121,12 @@ fun QuizScreen(
                 .graphicsLayer { translationX = shake.value },
         ) {
             ConfettiOverlay(
-                isActive = !isTest && state.awaitingAdvance && state.lastWasCorrect == true && state.comboStreak >= 10,
+                isActive = state.awaitingAdvance && state.lastWasCorrect == true && state.comboStreak >= 10,
                 modifier = Modifier.fillMaxSize(),
             )
 
             FloatingReward(
-                visible = !isTest && state.showCoinPopup,
+                visible = state.showCoinPopup,
                 amount = state.coinPopupAmount,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -157,9 +145,10 @@ fun QuizScreen(
                     progress = progress,
                     current = state.index + 1,
                     total = total,
-                    testRemainingMs = if (isTest) state.testRemainingMs else null,
-                    hearts = if (!isTest) state.hearts else null,
+                    testRemainingMs = null,
+                    hearts = state.hearts,
                     comboStreak = state.comboStreak,
+                    showCombo = true,
                     onClose = { vm.requestQuit() },
                 )
                 Spacer(Modifier.height(6.dp))
@@ -191,29 +180,20 @@ fun QuizScreen(
                                 question = question,
                                 awaitingAdvance = state.awaitingAdvance,
                                 pendingAnswerKey = state.pendingAnswerKey,
-                                isTest = isTest,
+                                isTest = false,
                                 onPick = { vm.selectAnswer(it) },
                             )
                         }
                     }
                 }
-                if (!isTest) {
-                    QuizResultStrip(
-                        visible = state.awaitingAdvance && state.lastWasCorrect != null,
-                        correct = state.lastWasCorrect == true,
-                        combo = state.comboStreak,
-                        funFact = currentQuestion?.funFact,
-                        wrongDetail = wrongDetail,
-                        onContinue = { vm.advance() },
-                    )
-                } else {
-                    TextButton(
-                        onClick = { vm.advance() },
-                        modifier = Modifier.padding(16.dp),
-                    ) {
-                        Text(if (state.index >= state.questions.lastIndex) "Ukončit test" else "Další otázka")
-                    }
-                }
+                QuizResultStrip(
+                    visible = state.awaitingAdvance && state.lastWasCorrect != null,
+                    correct = state.lastWasCorrect == true,
+                    combo = state.comboStreak,
+                    funFact = currentQuestion?.funFact,
+                    wrongDetail = wrongDetail,
+                    onContinue = { vm.advance() },
+                )
             }
 
             if (state.showNoLivesOverlay) {
@@ -251,12 +231,11 @@ fun QuizScreen(
 private class QuizViewModelFactory(
     private val application: Application,
     private val lessonId: Int,
-    private val isTest: Boolean,
     private val categoryId: Int,
     private val isReview: Boolean,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return QuizViewModel(application, lessonId, isTest, categoryId, isReview) as T
+        return QuizViewModel(application, lessonId, categoryId, isReview) as T
     }
 }

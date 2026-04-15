@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.49] - 2026-04-15
+- Zkouška v Compose: stránka testu, statistiky, průběh zkoušky (25 otázek, 30 minut, odpočet před startem, posun mezi otázkami prstem), podrobné výsledky posledního pokusu.
+- Uložení pokusů do databáze v telefonu; starší graf ze starého nastavení se při prvním spuštění přenesl.
+
 ## [2.0.48] - 2026-04-15
 - Fáze 7 (Alex): celá stránka Alexe v Compose (krmení, obchod, přejmenování), `AlexDeathScreen`, odstranění starých Activity; odkaz z legacy menu na Compose s Alex záložkou.
 - Notifikace hladu: úrovně 50 / 20 / 5 %, velký obrázek, tlačítko Nakrmit.

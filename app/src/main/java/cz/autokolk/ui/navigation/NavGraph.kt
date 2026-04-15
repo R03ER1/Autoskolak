@@ -29,6 +29,9 @@ import cz.autokolk.ui.screens.results.ResultsComposeScreen
 import cz.autokolk.ui.screens.streak.StreakScreen
 import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.splash.SplashScreen
+import cz.autokolk.ui.screens.test.TestResultsScreen
+import cz.autokolk.ui.screens.test.TestScreen
+import cz.autokolk.ui.screens.test.TestStatsScreen
 
 private const val DURATION_DEFAULT = 300
 private const val DURATION_TAB = 150
@@ -122,7 +125,7 @@ fun AutokolkNavGraph(
             popEnterTransition = { tabEnter() },
             popExitTransition = { tabExit() },
         ) {
-            PlaceholderScreen("Zkouška")
+            TestScreen(navController = navController)
         }
 
         composable(
@@ -199,17 +202,17 @@ fun AutokolkNavGraph(
         }
 
         composable(
-            route = Route.TestResults(testId = 0).route,
+            route = Route.TestResults(testId = 0L).route,
             arguments = Route.TestResults.arguments,
         ) { entry ->
-            val testId = entry.arguments!!.getInt(Route.ARG_TEST_ID)
-            PlaceholderScreen("Test Results #$testId")
+            val testId = entry.arguments!!.getLong(Route.ARG_TEST_ID)
+            TestResultsScreen(navController = navController, attemptId = testId)
         }
 
         // ── Secondary static screens ────────────────────────────────────
 
         composable(Route.TestStats.route) {
-            PlaceholderScreen("Statistiky zkoušek")
+            TestStatsScreen(navController = navController)
         }
 
         composable(Route.Achievements.route) {

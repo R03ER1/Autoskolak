@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.49] - 2026-04-15
+- Fáze 8 (Zkouška): Compose `TestScreen` (hub, graf, odkaz na statistiky), `TestQuizSession` s `TestViewModel` (25 otázek, 30 min, countdown 3–2–1, `HorizontalPager`, dokončení), `TestResultsScreen` + `Route.TestResults` s `Long` ID, `TestStatsScreen`, `ScoresChart` (Canvas + animace).
+- Room (`test_attempts`, `test_answer_rows`), `TestAttemptRepository`, migrace historických skóre z `LessonProgress` prefs; po dokončení testu dual-write `addTestScore` + záznam pokusu s detaily odpovědí.
+- `QuizViewModel` už neobsahuje testový režim; v testu se v průběhu nezobrazuje správnost odpovědí u tlačítek (`QuestionContent`).
+
 ## [2.0.48] - 2026-04-15
 - Fáze 7 (Alex): Compose `AlexScreen`, `AlexCharacter`, `FoodMenuSheet`, `ShopSheet` (brýle + „Již brzy“), `AlexViewModel` napojený na `HungerManager` / `LessonProgress`, animace krmení a `FloatingReward` za útratu bodů.
 - `AlexDeathScreen` v navigaci (podrž 3 s, oživení na 50 %, confetti); odstraněny `AlexActivity` / `AlexDeathActivity` a související fragmenty z manifestu; legacy navigace na Alex přes `ComposeMainActivity` + `ComposeNavIntent`.

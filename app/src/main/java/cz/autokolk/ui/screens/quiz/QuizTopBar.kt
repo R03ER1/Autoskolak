@@ -51,10 +51,11 @@ fun QuizTopBar(
     comboStreak: Int,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    showCombo: Boolean = true,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth()) {
-            if (comboStreak >= 2) {
+            if (showCombo && comboStreak >= 2) {
                 val msg = when {
                     comboStreak >= 10 -> "💯 PERFEKTNÍ!"
                     comboStreak >= 5 -> "🔥🔥 ${comboStreak}× combo! Super!"

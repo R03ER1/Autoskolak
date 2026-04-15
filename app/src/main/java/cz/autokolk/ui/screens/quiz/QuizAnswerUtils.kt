@@ -50,3 +50,12 @@ internal fun correctAnswerIndex(question: Question): Int {
         else -> 0
     }
 }
+
+internal fun answerKeyToDisplayLabel(question: Question, key: String): String {
+    return when (normalizeAnswerKey(key)) {
+        "a" -> question.optionA
+        "b" -> question.optionB
+        "c" -> question.optionC
+        else -> key.ifBlank { "—" }
+    }
+}

@@ -78,12 +78,12 @@ sealed class Route(val route: String) {
         }
     }
 
-    data class TestResults(val testId: Int) : Route("test_results/{$ARG_TEST_ID}") {
+    data class TestResults(val testId: Long) : Route("test_results/{$ARG_TEST_ID}") {
         fun buildPath(): String = "test_results/$testId"
 
         companion object {
             val arguments: List<NamedNavArgument> = listOf(
-                navArgument(ARG_TEST_ID) { type = NavType.IntType },
+                navArgument(ARG_TEST_ID) { type = NavType.LongType },
             )
         }
     }
