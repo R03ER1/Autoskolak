@@ -22,8 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import cz.autokolk.LessonProgress
+import cz.autokolk.LevelUpPending
+import cz.autokolk.ui.components.feedback.LevelUpOverlay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,6 +66,14 @@ fun ResultsComposeScreen(
     replaySubEncoded: String = Route.Results.NO_REPLAY,
     replayFocusEncoded: String = Route.Results.NO_REPLAY,
 ) {
+    val context = LocalContext.current
+    val lessonProgress = remember { LessonProgress(context) }
+    var levelUpPending by remember { mutableStateOf<LevelUpPending?>(null) }
+
+    LaunchedEffect(Unit) {
+        levelUpPending = lessonProgress.consumePendingLevelUp()
+    }
+
     val isTest = lessonId < 0
     val percentage = if (total > 0) (score * 100 / total) else 0
     val passed = percentage >= 80
@@ -200,6 +213,13 @@ fun ResultsComposeScreen(
                     Text("Zkusit znovu", color = AccentCyan)
                 }
             }
+        }
+        levelUpPending?.let { pending ->
+            LevelUpOverlay(
+                pending = pending,
+                onDismiss = { levelUpPending = null },
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
 }

@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.56] - 2026-04-15
+- Fáze 11 (gamifikace): XP a úrovně, odměna při level-up na výsledku lekce, denní výzvy na Home, zmrazení streaku za mince, milníky streaku a koruna u Alexe, power-upy v lekci (eliminace / přeskočení / nápověda), lokální týdenní přehled XP, rozšířené achievementy, 2× XP z rewarded reklamy, bonusové kolo a mystery box (denní limity + pity), denní přihlášení, sezónní banner, revize chyb, obchod s bonusy, sdílení streaku, widget na ploše (streak + výzvy).
+
 ## [2.0.55] - 2026-04-15
 - Fáze 10: Nastavení v Compose (profil, téma Systém/Světlý/Tmavý, zvuky, vibrace, biometrický zámek, denní cíl, úspěchy, changelog, smazání postupu), obrazovky Úspěchy a Historie změn; splash s Lottie a lepší stav stahování DFM; nový celoobrazovkový efekt při odemčení úspěchu (Lottie + konfety). Odstraněny legacy Settings/Achievements/Changelog Activity.
 

@@ -188,7 +188,41 @@ class AchievementsManager(private val context: Context) {
         try {
             LessonProgress(context).addPoints(150)
             onPointsEarned(150) // Count towards earned total
+            try {
+                LessonProgress(context).addXp(XpRewardTable.achievementBonus(), applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+            } catch (_: Throwable) {
+            }
         } catch (_: Throwable) { }
+    }
+
+    fun onAnswerTimeHints() {
+        val h = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        if (h in 0..3) {
+            unlockOneShot("ach_night_owl", "Noční sova", "Procvičuj po půlnoci")
+        }
+        if (h in 5..6) {
+            unlockOneShot("ach_early_bird", "Ranní pták", "Začni před šestou")
+        }
+    }
+
+    fun onLessonCombo10() {
+        unlockOneShot("ach_combo_10", "Combo ×10", "Deset správných v řadě v lekci")
+    }
+
+    fun onLessonGamification(firstEverLessonComplete: Boolean, perfectLesson: Boolean) {
+        if (firstEverLessonComplete) {
+            unlockOneShot("ach_first_lesson", "První lekce", "Dokončil jsi první lekci")
+        }
+        if (perfectLesson) {
+            unlockOneShot("ach_perfect_lesson", "Stoprocentně", "100 % v lekci")
+        }
+    }
+
+    private fun unlockOneShot(key: String, title: String, description: String) {
+        if (prefs.getBoolean(key, false)) return
+        prefs.edit().putBoolean(key, true).apply()
+        reward()
+        notifyAchievementUnlock(title, 3)
     }
 
     private fun todayString(): String {
@@ -261,6 +295,43 @@ class AchievementsManager(private val context: Context) {
                     progress = progress,
                 ),
             )
+        }
+
+        fun addOneShot(key: String, title: String, description: String) {
+            val unlocked = prefs.getBoolean(key, false)
+            add(
+                AchievementRowUi(
+                    id = key,
+                    title = title,
+                    description = description,
+                    unlocked = unlocked,
+                    progress = if (unlocked) 1f else 0f,
+                ),
+            )
+        }
+        addOneShot("ach_first_lesson", "První lekce", "Dokončit první lekci")
+        addOneShot("ach_perfect_lesson", "Stoprocentně", "100 % správně v lekci")
+        addOneShot("ach_combo_10", "Combo ×10", "10 správných odpovědí v řadě v jedné lekci")
+        addOneShot("ach_night_owl", "Noční sova", "Odpověz správně po půlnoci")
+        addOneShot("ach_early_bird", "Ranní pták", "Odpověz správně brzy ráno")
+        val lp = try {
+            LessonProgress(context)
+        } catch (_: Throwable) {
+            null
+        }
+        if (lp != null) {
+            listOf(7, 30, 100, 365).forEach { day ->
+                val unlocked = lp.isStreakMilestoneClaimed(day)
+                add(
+                    AchievementRowUi(
+                        id = "streak_bonus_$day",
+                        title = "Streak bonus — $day dní",
+                        description = "Dosáhni $day dní v řadě (bonusové mince)",
+                        unlocked = unlocked,
+                        progress = if (unlocked) 1f else 0f,
+                    ),
+                )
+            }
         }
     }
 

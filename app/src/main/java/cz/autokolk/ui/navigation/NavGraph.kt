@@ -33,6 +33,9 @@ import cz.autokolk.ui.screens.onboarding.OnboardingScreen
 import cz.autokolk.ui.screens.splash.SplashScreen
 import cz.autokolk.ui.screens.achievements.AchievementsScreen
 import cz.autokolk.ui.screens.changelog.ChangelogScreen
+import cz.autokolk.ui.screens.gamification.CoinShopScreen
+import cz.autokolk.ui.screens.gamification.ReviseMistakesScreen
+import cz.autokolk.ui.screens.gamification.WeeklyXpScreen
 import cz.autokolk.ui.screens.settings.SettingsScreen
 import cz.autokolk.ui.screens.test.TestResultsScreen
 import cz.autokolk.ui.screens.test.TestScreen
@@ -271,6 +274,18 @@ fun AutokolkNavGraph(
 
         composable(Route.Changelog.route) {
             ChangelogScreen(navController = navController)
+        }
+
+        composable(Route.WeeklyXp.route) {
+            WeeklyXpScreen(navController = navController)
+        }
+
+        composable(Route.ReviseMistakes.route) {
+            ReviseMistakesScreen(navController = navController)
+        }
+
+        composable(Route.CoinShop.route) {
+            CoinShopScreen(navController = navController)
         }
 
         // ── Modal screens — slide up from bottom ────────────────────────

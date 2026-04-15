@@ -19,6 +19,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,14 +53,24 @@ fun StreakSheet(
     lessonProgress: LessonProgress,
     onDismiss: () -> Unit,
     onStreakUpdated: () -> Unit,
+    onRefreshStats: () -> Unit = {},
 ) {
     if (!isVisible) return
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            lessonProgress.consumeFrozenLabelForYesterday()
+        }
+    }
 
     val composition by rememberLottieComposition(
         LottieCompositionSpec.Asset("lottie/streak_fire.json"),
     )
     val activity = LocalContext.current as? Activity
     var adLoading by remember { mutableStateOf(false) }
+    var freezeMsg by remember { mutableStateOf<String?>(null) }
+    val pendingFreeze = lessonProgress.hasPendingStreakFreeze()
+    val coins = lessonProgress.getTotalPoints()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -91,9 +102,47 @@ fun StreakSheet(
             )
             Spacer(Modifier.height(24.dp))
 
-            StreakWeekRow(streakHistory)
+            StreakWeekRow(
+                history = streakHistory,
+                frozenDayIndices = computeFrozenIndices(lessonProgress),
+            )
+
+            freezeMsg?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                )
+            }
 
             Spacer(Modifier.height(24.dp))
+
+            PrimaryGradientButton(
+                text = when {
+                    pendingFreeze -> "Zmrazení aktivní (příští vynechaný den)"
+                    coins < 20 -> "Zmrazit streak (20 mincí) — nemáš dost mincí"
+                    else -> "Zmrazit streak na zítřek (20 mincí)"
+                },
+                onClick = {
+                    freezeMsg = null
+                    if (pendingFreeze) return@PrimaryGradientButton
+                    if (coins < 20) {
+                        freezeMsg = "Potřebuješ 20 mincí."
+                        return@PrimaryGradientButton
+                    }
+                    if (lessonProgress.buyStreakFreezeWithCoins()) {
+                        freezeMsg = "Streak je chráněný při jednom vynechaném dni."
+                        onRefreshStats()
+                    } else {
+                        freezeMsg = "Nepodařilo se zaplatit."
+                    }
+                },
+                enabled = !pendingFreeze && coins >= 20,
+            )
+
+            Spacer(Modifier.height(16.dp))
 
             val shouldShowProtection = streak > 0
                 && streakHistory.isNotEmpty()
@@ -117,8 +166,17 @@ fun StreakSheet(
     }
 }
 
+private fun computeFrozenIndices(lessonProgress: LessonProgress): Set<Int> {
+    if (!lessonProgress.wasYesterdayStreakFrozen()) return emptySet()
+    // Historie: index 0 = dnes, 1 = včera
+    return setOf(1)
+}
+
 @Composable
-private fun StreakWeekRow(history: List<Boolean>) {
+private fun StreakWeekRow(
+    history: List<Boolean>,
+    frozenDayIndices: Set<Int> = emptySet(),
+) {
     val dayLabels = listOf("Dnes", "1", "2", "3", "4", "5", "6")
 
     Row(
@@ -127,6 +185,7 @@ private fun StreakWeekRow(history: List<Boolean>) {
     ) {
         history.take(7).forEachIndexed { index, completed ->
             val isToday = index == 0
+            val frozen = index in frozenDayIndices
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
@@ -136,13 +195,18 @@ private fun StreakWeekRow(history: List<Boolean>) {
                             else Modifier
                         )
                         .background(
-                            color = if (completed) AccentCyan else TextTertiary.copy(alpha = 0.2f),
+                            color = when {
+                                frozen -> WarningAmber.copy(alpha = 0.85f)
+                                completed -> AccentCyan
+                                else -> TextTertiary.copy(alpha = 0.2f)
+                            },
                             shape = CircleShape,
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (completed) {
-                        Text("✓", color = DarkSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                    when {
+                        frozen -> Text("❄", color = DarkSurfaceVariant, style = MaterialTheme.typography.labelSmall)
+                        completed -> Text("✓", color = DarkSurfaceVariant, style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 Spacer(Modifier.height(4.dp))

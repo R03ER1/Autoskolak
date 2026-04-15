@@ -164,6 +164,7 @@ fun AlexScreen(
                 AlexCharacter(
                     mood = state.mood,
                     hasSunglassesVisual = state.hasSunglassesVisual,
+                    showStreakCrown = state.showStreakCrown,
                     modifier = Modifier.size(250.dp),
                     bounceTrigger = state.bounceTrigger,
                     heartParticlesTrigger = state.heartParticlesTrigger,

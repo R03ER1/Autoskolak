@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import cz.autokolk.DailyChallengeUi
 import cz.autokolk.GlobalLesson
 import cz.autokolk.LessonProgress
 import cz.autokolk.RandomEventManager
@@ -26,6 +27,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _randomEvent = MutableStateFlow<RandomEventManager.RandomEventPresentation?>(null)
     val randomEvent: StateFlow<RandomEventManager.RandomEventPresentation?> = _randomEvent.asStateFlow()
 
+    private val _dailyChallenges = MutableStateFlow<List<DailyChallengeUi>>(emptyList())
+    val dailyChallenges: StateFlow<List<DailyChallengeUi>> = _dailyChallenges.asStateFlow()
+
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
         refresh()
     }
@@ -43,10 +47,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun refresh() {
         viewModelScope.launch {
             lessonProgress.normalizeStreakForToday()
+            try {
+                lessonProgress.grantDailyLoginIfNeeded()
+            } catch (_: Throwable) {
+            }
             val plan = lessonProgress.getGlobalLessonPlan()
             val reordered = HomeLessonOrdering.reorderPlan(plan)
             _reorderedPlan.value = reordered
             _pathRows.value = HomePathListBuilder.buildRows(lessonProgress, reordered)
+            _dailyChallenges.value = lessonProgress.snapshotDailyChallenges()
         }
     }
 

@@ -40,6 +40,7 @@ import kotlin.math.roundToInt
 fun AlexCharacter(
     mood: AlexMood,
     hasSunglassesVisual: Boolean,
+    showStreakCrown: Boolean = false,
     modifier: Modifier = Modifier,
     bounceTrigger: Long = 0L,
     heartParticlesTrigger: Long = 0L,
@@ -89,6 +90,15 @@ fun AlexCharacter(
     }
 
     Box(modifier, contentAlignment = Alignment.Center) {
+        if (showStreakCrown) {
+            Text(
+                "👑",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = (-12).dp),
+            )
+        }
         if (showHeart) {
             Text(
                 "♥",

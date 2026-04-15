@@ -26,10 +26,13 @@ fun QuestionContent(
     onPick: (String) -> Unit,
     /** V testu: vybraná odpověď z mapy ve ViewModelu (spolehlivě invaliduje Compose). */
     testSelectionKey: String? = null,
+    eliminatedOptionKeys: Set<String> = emptySet(),
+    hintLine: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val canChange = isTest || (!awaitingAdvance && pendingAnswerKey == null)
     fun stateFor(key: String): AnswerState {
+        if (key in eliminatedOptionKeys) return AnswerState.ELIMINATED
         if (!isTest && !awaitingAdvance && pendingAnswerKey != null) {
             val p = normalizeAnswerKey(pendingAnswerKey)
             return when {
@@ -64,6 +67,18 @@ fun QuestionContent(
                     .fillMaxWidth()
                     .padding(20.dp),
             )
+            if (!hintLine.isNullOrBlank()) {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = "💡 $hintLine",
+                    color = TextPrimary.copy(alpha = 0.85f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                )
+            }
         }
         Spacer(Modifier.height(16.dp))
         AnswerButton(

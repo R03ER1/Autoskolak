@@ -20,6 +20,9 @@ sealed class Route(val route: String) {
     data object Settings : Route("settings")
     data object Achievements : Route("achievements")
     data object Changelog : Route("changelog")
+    data object WeeklyXp : Route("weekly_xp")
+    data object ReviseMistakes : Route("revise_mistakes")
+    data object CoinShop : Route("coin_shop")
     data object Streak : Route("streak")
     data object AlexDeath : Route("alex_death")
 

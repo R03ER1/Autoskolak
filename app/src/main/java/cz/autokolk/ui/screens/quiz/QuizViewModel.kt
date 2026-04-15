@@ -16,6 +16,7 @@ import cz.autokolk.HeartRefillJobService
 import cz.autokolk.LessonPoints
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
+import cz.autokolk.XpRewardTable
 import cz.autokolk.ui.settings.AppSettingsStore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -40,6 +41,10 @@ data class QuizUiState(
     val showCoinPopup: Boolean = false,
     /** Zobrazené „+N“ u odměny. */
     val coinPopupAmount: Int = 1,
+    val eliminatedOptionKeys: Set<String> = emptySet(),
+    val hintVisible: Boolean = false,
+    val powerUpUsedThisQuestion: Boolean = false,
+    val skippedQuestionIds: Set<String> = emptySet(),
 )
 
 sealed class QuizSession {
@@ -89,6 +94,8 @@ class QuizViewModel(
 
     private var revealJob: Job? = null
     private var hasCompleted: Boolean = false
+    private var maxComboThisLesson: Int = 0
+    private val skippedQuestionIdSet = mutableSetOf<String>()
 
     private val practiceSeenFlags = mutableListOf<Boolean>()
     private var practiceAwardedBuckets: Int = 0
@@ -197,6 +204,7 @@ class QuizViewModel(
         if (s.pendingAnswerKey != null) return
         val q = s.questions.getOrNull(s.index) ?: return
         if (q.userAnswer != null) return
+        if (normalizeAnswerKey(key) in s.eliminatedOptionKeys) return
 
         val norm = normalizeAnswerKey(key)
 
@@ -241,6 +249,25 @@ class QuizViewModel(
         }
 
         val newCombo = if (correct) s.comboStreak + 1 else 0
+        if (correct) {
+            maxComboThisLesson = maxOf(maxComboThisLesson, newCombo)
+            try {
+                lessonProgress.incrementDailyCorrectAnswers()
+            } catch (_: Throwable) {
+            }
+            if (session is QuizSession.Lesson) {
+                try {
+                    AchievementsManager(getApplication()).onAnswerTimeHints()
+                } catch (_: Throwable) {
+                }
+                if (newCombo >= 10) {
+                    try {
+                        AchievementsManager(getApplication()).onLessonCombo10()
+                    } catch (_: Throwable) {
+                    }
+                }
+            }
+        }
         val heartsNow = lessonProgress.getCurrentHearts()
         val isLesson = session is QuizSession.Lesson
         val lessonSession = session as? QuizSession.Lesson
@@ -287,6 +314,9 @@ class QuizViewModel(
                 awaitingAdvance = false,
                 lastWasCorrect = null,
                 showCoinPopup = false,
+                eliminatedOptionKeys = emptySet(),
+                hintVisible = false,
+                powerUpUsedThisQuestion = false,
             )
         }
         if (session is QuizSession.Practice) {
@@ -329,10 +359,15 @@ class QuizViewModel(
             return
         }
         val qs = _state.value.questions
-        val correctAnswers = qs.count { normalizeAnswerKey(it.userAnswer) == resolveCorrectKey(it) }
-        val totalQuestions = qs.size
+        val skipped = skippedQuestionIdSet.toSet()
+        val qsActive = qs.filter { it.id !in skipped }
+        val correctAnswers = qsActive.count { normalizeAnswerKey(it.userAnswer) == resolveCorrectKey(it) }
+        val totalQuestions = qsActive.size.coerceAtLeast(1)
+        val priorState = lessonProgress.getLessonState(session.lessonId)
+        val wasFirstEverComplete = !priorState.completed
         if (!session.isReview) {
             val incorrectIds = qs.mapNotNull { q ->
+                if (q.id in skipped) return@mapNotNull q.id
                 if (normalizeAnswerKey(q.userAnswer) != resolveCorrectKey(q)) q.id else null
             }.toSet()
             lessonProgress.saveLessonProgress(session.lessonId, incorrectIds)
@@ -340,16 +375,22 @@ class QuizViewModel(
             val currentState = lessonProgress.getLessonState(session.lessonId)
             val remaining = currentState.incorrectQuestionIds.toMutableSet()
             qs.forEach { q ->
+                if (q.id in skipped) return@forEach
                 if (normalizeAnswerKey(q.userAnswer) == resolveCorrectKey(q)) {
                     remaining.remove(q.id)
                 }
             }
+            skipped.forEach { id -> remaining.add(id) }
             lessonProgress.saveLessonProgress(session.lessonId, remaining)
         }
         val firstOfDay = try {
             lessonProgress.updateStreakOnLessonCompleted()
         } catch (_: Throwable) {
             false
+        }
+        try {
+            lessonProgress.onDailyChallengeLessonsProgress()
+        } catch (_: Throwable) {
         }
         val pointsAwarded = LessonPoints.computeLessonPointsAwarded(
             isPractice = false,
@@ -363,6 +404,31 @@ class QuizViewModel(
                 lessonProgress.addPoints(pointsAwarded)
             } catch (_: Throwable) {
             }
+        }
+        val comboMult = when {
+            maxComboThisLesson >= 10 -> 1.1f
+            maxComboThisLesson >= 5 -> 1.05f
+            else -> 1f
+        }
+        try {
+            val lessonXp = XpRewardTable.lessonXp(
+                correctAnswers = correctAnswers,
+                totalQuestions = totalQuestions,
+                isReview = session.isReview,
+            )
+            lessonProgress.addXp(lessonXp, applyDoubleXpFromAds = true, sessionComboMultiplier = comboMult)
+            if (firstOfDay) {
+                lessonProgress.addXp(XpRewardTable.streakFirstLessonOfDay(), applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+            }
+        } catch (_: Throwable) {
+        }
+        try {
+            val perfect = totalQuestions > 0 && correctAnswers == totalQuestions && skipped.isEmpty()
+            AchievementsManager(getApplication()).onLessonGamification(
+                firstEverLessonComplete = wasFirstEverComplete && !session.isReview,
+                perfectLesson = perfect && !session.isReview,
+            )
+        } catch (_: Throwable) {
         }
         hasCompleted = true
         _finish.value = QuizFinish.Lesson(
@@ -384,6 +450,11 @@ class QuizViewModel(
         } catch (_: Throwable) {
             false
         }
+        try {
+            lessonProgress.addXp(8, applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+            lessonProgress.onDailyChallengeLessonsProgress()
+        } catch (_: Throwable) {
+        }
         hasCompleted = true
         _finish.value = QuizFinish.Practice(
             score = correctAnswers,
@@ -395,6 +466,90 @@ class QuizViewModel(
             replaySubKey = session.subcategoryKey,
             replayFocusQuestionId = session.focusQuestionId,
         )
+    }
+
+    fun usePowerUpEliminate(): Boolean {
+        val s = _state.value
+        if (session !is QuizSession.Lesson || session.isReview) return false
+        if (s.showNoLivesOverlay || s.awaitingAdvance || s.pendingAnswerKey != null) return false
+        if (s.powerUpUsedThisQuestion) return false
+        val q = s.questions.getOrNull(s.index) ?: return false
+        if (q.userAnswer != null) return false
+        val correct = resolveCorrectKey(q)
+        val wrong = listOf("a", "b", "c").filter {
+            it != correct && it !in s.eliminatedOptionKeys
+        }
+        if (wrong.isEmpty()) return false
+        if (!lessonProgress.spendPoints(5)) return false
+        val pick = wrong.random()
+        _state.update {
+            it.copy(
+                eliminatedOptionKeys = it.eliminatedOptionKeys + pick,
+                powerUpUsedThisQuestion = true,
+            )
+        }
+        return true
+    }
+
+    fun usePowerUpSkip(): Boolean {
+        val s = _state.value
+        if (session !is QuizSession.Lesson || session.isReview) return false
+        if (s.showNoLivesOverlay || s.awaitingAdvance || s.pendingAnswerKey != null) return false
+        if (s.powerUpUsedThisQuestion) return false
+        val q = s.questions.getOrNull(s.index) ?: return false
+        if (q.id in skippedQuestionIdSet) return false
+        if (!lessonProgress.spendPoints(10)) return false
+        skippedQuestionIdSet.add(q.id)
+        _state.update {
+            it.copy(
+                powerUpUsedThisQuestion = true,
+                skippedQuestionIds = skippedQuestionIdSet.toSet(),
+            )
+        }
+        goToNextQuestionOrFinish()
+        return true
+    }
+
+    fun usePowerUpHint(): Boolean {
+        val s = _state.value
+        if (session !is QuizSession.Lesson || session.isReview) return false
+        if (s.showNoLivesOverlay || s.awaitingAdvance || s.pendingAnswerKey != null) return false
+        if (s.powerUpUsedThisQuestion) return false
+        val q = s.questions.getOrNull(s.index) ?: return false
+        if (q.userAnswer != null) return false
+        if (!lessonProgress.spendPoints(3)) return false
+        _state.update {
+            it.copy(
+                hintVisible = true,
+                powerUpUsedThisQuestion = true,
+            )
+        }
+        return true
+    }
+
+    private fun goToNextQuestionOrFinish() {
+        val s = _state.value
+        if (s.showNoLivesOverlay) return
+        val last = s.questions.lastIndex
+        if (s.index >= last) {
+            completeSession()
+            return
+        }
+        val next = s.index + 1
+        _state.update {
+            it.copy(
+                index = next,
+                awaitingAdvance = false,
+                lastWasCorrect = null,
+                showCoinPopup = false,
+                eliminatedOptionKeys = emptySet(),
+                hintVisible = false,
+                powerUpUsedThisQuestion = false,
+            )
+        }
+        if (session is QuizSession.Practice) {
+            onPracticeQuestionDisplayed(next)
+        }
     }
 
     private fun buzzLight() {

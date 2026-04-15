@@ -1,5 +1,6 @@
 package cz.autokolk.ui.components.sheets
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,11 +17,18 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import cz.autokolk.LessonProgress
 import cz.autokolk.R
+import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.BottomSheetShape
@@ -36,8 +44,14 @@ fun CoinsSheet(
     isVisible: Boolean,
     totalCoins: Int,
     onDismiss: () -> Unit,
+    lessonProgress: LessonProgress? = null,
+    onStatsRefresh: () -> Unit = {},
 ) {
     if (!isVisible) return
+
+    val context = LocalContext.current
+    val activity = context as? Activity
+    var bonusMsg by remember { mutableStateOf<String?>(null) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -84,6 +98,30 @@ fun CoinsSheet(
             CoinInfoRow("+20", "Bezchybná lekce", AccentCyan)
             CoinInfoRow("+5", "Denní streak", WarningAmber)
             CoinInfoRow("-5", "Nakrmit Alexe", ErrorRed)
+
+            Spacer(Modifier.height(16.dp))
+
+            if (lessonProgress != null && activity != null) {
+                PrimaryGradientButton(
+                    text = "2× XP na 30 min (reklama)",
+                    onClick = {
+                        bonusMsg = null
+                        RewardedAdHelper.showForDoubleXp(activity, lessonProgress) { ok ->
+                            bonusMsg = if (ok) "2× XP je aktivní!" else "Reklamu se nepodařilo přehrát."
+                            if (ok) onStatsRefresh()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                bonusMsg?.let {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary,
+                    )
+                }
+            }
 
             Spacer(Modifier.height(16.dp))
         }

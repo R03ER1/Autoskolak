@@ -123,6 +123,24 @@ fun SettingsScreen(navController: NavHostController) {
             }
 
             item {
+                SettingsGroup("Gamifikace") {
+                    ClickableSetting(
+                        title = "Týdenní přehled XP",
+                        onClick = { navController.navigate(Route.WeeklyXp.route) },
+                    )
+                    ClickableSetting(
+                        title = "Obchod a bonusy",
+                        onClick = { navController.navigate(Route.CoinShop.route) },
+                    )
+                    ClickableSetting(
+                        title = "Revize chyb",
+                        subtitle = "Spaced repetition — tvoje chyby",
+                        onClick = { navController.navigate(Route.ReviseMistakes.route) },
+                    )
+                }
+            }
+
+            item {
                 SettingsGroup("Učení") {
                     SwitchSetting(
                         title = "Biometrický zámek",

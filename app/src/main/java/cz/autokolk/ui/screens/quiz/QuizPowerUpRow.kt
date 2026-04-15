@@ -23,6 +23,9 @@ import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun QuizPowerUpRow(
+    enabled: Boolean,
+    onEliminate: () -> Unit,
+    onSkip: () -> Unit,
     onHint: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -33,11 +36,26 @@ fun QuizPowerUpRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PowerUpPill(icon = Icons.Outlined.Delete, label = "5", onClick = onHint)
-        PowerUpPill(icon = Icons.Outlined.SkipNext, label = "10", onClick = onHint)
-        PowerUpPill(icon = Icons.Outlined.Lightbulb, label = "3", onClick = onHint)
+        PowerUpPill(
+            icon = Icons.Outlined.Delete,
+            label = "5",
+            onClick = onEliminate,
+            enabled = enabled,
+        )
+        PowerUpPill(
+            icon = Icons.Outlined.SkipNext,
+            label = "10",
+            onClick = onSkip,
+            enabled = enabled,
+        )
+        PowerUpPill(
+            icon = Icons.Outlined.Lightbulb,
+            label = "3",
+            onClick = onHint,
+            enabled = enabled,
+        )
         Text(
-            text = "Brzy",
+            text = "1 akce / otázku",
             style = MaterialTheme.typography.labelSmall,
             color = TextSecondary,
             modifier = Modifier.padding(start = 4.dp),
@@ -50,9 +68,11 @@ private fun PowerUpPill(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
     onClick: () -> Unit,
+    enabled: Boolean,
 ) {
     Surface(
         onClick = onClick,
+        enabled = enabled,
         shape = PillShape,
         color = GlassFill.copy(alpha = 0.35f),
         border = androidx.compose.foundation.BorderStroke(

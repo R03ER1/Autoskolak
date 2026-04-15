@@ -204,6 +204,7 @@ fun AutokolkApp(
                 refreshStats()
                 streakSheetVisible = false
             },
+            onRefreshStats = { refreshStats() },
         )
 
         HeartsSheet(
@@ -218,6 +219,8 @@ fun AutokolkApp(
             isVisible = coinsSheetVisible,
             totalCoins = coins,
             onDismiss = { coinsSheetVisible = false },
+            lessonProgress = lessonProgress,
+            onStatsRefresh = { refreshStats() },
         )
 
         BiometricLockHost()

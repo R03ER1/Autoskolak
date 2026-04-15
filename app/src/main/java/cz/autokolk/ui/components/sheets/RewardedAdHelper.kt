@@ -45,6 +45,19 @@ object RewardedAdHelper {
         }, onResult = onResult)
     }
 
+    /**
+     * Po shlédnutí reklamy aktivuje 30 minut 2× XP ([LessonProgress.activateDoubleXpForMinutes]).
+     */
+    fun showForDoubleXp(
+        activity: Activity,
+        lessonProgress: LessonProgress,
+        onResult: (Boolean) -> Unit,
+    ) {
+        showAd(activity, onReward = {
+            lessonProgress.activateDoubleXpForMinutes(30)
+        }, onResult = onResult)
+    }
+
     private fun showAd(
         activity: Activity,
         onReward: () -> Unit,

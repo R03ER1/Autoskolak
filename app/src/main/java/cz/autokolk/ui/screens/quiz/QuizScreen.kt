@@ -197,13 +197,28 @@ fun QuizScreen(
                     showCombo = !isPractice,
                     onClose = { vm.requestQuit() },
                 )
-                Spacer(Modifier.height(6.dp))
-                QuizPowerUpRow(
-                    onHint = {
-                        Toast.makeText(context, "Nápovědy a bonusy přijdou ve Fázi 11.", Toast.LENGTH_SHORT).show()
-                    },
-                )
-                Spacer(Modifier.height(6.dp))
+                if (!isPractice) {
+                    Spacer(Modifier.height(6.dp))
+                    QuizPowerUpRow(
+                        enabled = !isReview && !state.awaitingAdvance && state.pendingAnswerKey == null,
+                        onEliminate = {
+                            if (!vm.usePowerUpEliminate()) {
+                                Toast.makeText(context, "Nelze použít (mince nebo už jedna akce).", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        onSkip = {
+                            if (!vm.usePowerUpSkip()) {
+                                Toast.makeText(context, "Nelze přeskočit (mince nebo už jedna akce).", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        onHint = {
+                            if (!vm.usePowerUpHint()) {
+                                Toast.makeText(context, "Nelze zobrazit nápovědu (mince nebo už jedna akce).", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    Spacer(Modifier.height(6.dp))
+                }
                 Box(Modifier.weight(1f)) {
                     AnimatedContent(
                         targetState = state.index,
@@ -228,6 +243,13 @@ fun QuizScreen(
                                 pendingAnswerKey = state.pendingAnswerKey,
                                 isTest = false,
                                 onPick = { vm.selectAnswer(it) },
+                                eliminatedOptionKeys = state.eliminatedOptionKeys,
+                                hintLine = if (state.hintVisible) {
+                                    question.explanation?.takeIf { it.isNotBlank() }
+                                        ?: "Přečti zadání znovu — někdy stačí vyloučit jednu z možností."
+                                } else {
+                                    null
+                                },
                             )
                         }
                     }

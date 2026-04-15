@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AutokolkShapes
@@ -48,6 +49,7 @@ import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.GlassWhite
 import cz.autokolk.ui.theme.SuccessGreen
 import cz.autokolk.ui.theme.TextPrimary
+import cz.autokolk.ui.theme.TextTertiary
 import cz.autokolk.ui.theme.WarningAmber
 import kotlin.math.PI
 import kotlin.math.cos
@@ -58,6 +60,7 @@ enum class AnswerState {
     SELECTED,
     CORRECT,
     WRONG,
+    ELIMINATED,
 }
 
 @Composable
@@ -85,6 +88,7 @@ fun AnswerButton(
             AnswerState.CORRECT -> SuccessGreen
             AnswerState.WRONG -> ErrorRed
             AnswerState.SELECTED -> AccentCyan
+            AnswerState.ELIMINATED -> TextTertiary
             AnswerState.DEFAULT -> GlassWhite
         },
         label = "answerBorder",
@@ -99,6 +103,7 @@ fun AnswerButton(
     val bgBrush = when (state) {
         AnswerState.CORRECT -> Brush.horizontalGradient(listOf(SuccessGreen.copy(0.85f), SuccessGreen))
         AnswerState.WRONG -> Brush.horizontalGradient(listOf(ErrorRed.copy(0.85f), ErrorRed))
+        AnswerState.ELIMINATED -> Brush.linearGradient(listOf(GlassFill.copy(0.35f), GlassFill.copy(0.1f)))
         else -> Brush.linearGradient(listOf(GlassFill, GlassFill.copy(alpha = 0.02f)))
     }
 
@@ -141,7 +146,7 @@ fun AnswerButton(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(),
-                    enabled = enabled,
+                    enabled = enabled && state != AnswerState.ELIMINATED,
                     role = Role.Button,
                     onClick = onClick,
                 )
@@ -157,6 +162,7 @@ fun AnswerButton(
                                 AnswerState.CORRECT -> Color.White.copy(alpha = 0.25f)
                                 AnswerState.WRONG -> Color.White.copy(alpha = 0.25f)
                                 AnswerState.SELECTED -> AccentCyan.copy(alpha = 0.2f)
+                                AnswerState.ELIMINATED -> TextTertiary.copy(alpha = 0.25f)
                                 AnswerState.DEFAULT -> GlassWhite.copy(alpha = 0.15f)
                             },
                         ),
@@ -177,7 +183,8 @@ fun AnswerButton(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TextPrimary,
+                    color = TextPrimary.copy(alpha = if (state == AnswerState.ELIMINATED) 0.45f else 1f),
+                    textDecoration = if (state == AnswerState.ELIMINATED) TextDecoration.LineThrough else null,
                     modifier = Modifier.weight(1f),
                 )
             }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import cz.autokolk.AchievementsManager
 import cz.autokolk.HungerManager
 import cz.autokolk.LessonProgress
+import cz.autokolk.XpRewardTable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +35,8 @@ data class AlexState(
     val bounceTrigger: Long = 0L,
     val heartParticlesTrigger: Long = 0L,
     val snackMessage: String? = null,
+    /** Koruna za streak milník 30 dní. */
+    val showStreakCrown: Boolean = false,
 )
 
 class AlexViewModel(application: Application) : AndroidViewModel(application) {
@@ -54,6 +57,7 @@ class AlexViewModel(application: Application) : AndroidViewModel(application) {
         if (key == null ||
             key == "lion_name" ||
             key == "total_points" ||
+            key == "total_xp_v1" ||
             key.startsWith("accessory_")
         ) {
             refreshState()
@@ -85,6 +89,7 @@ class AlexViewModel(application: Application) : AndroidViewModel(application) {
                 sunglassesOwned = lessonProgress.hasSunglasses(),
                 isFrozen = hungerManager.isFrozenNow(),
                 coins = lessonProgress.getTotalPoints(),
+                showStreakCrown = lessonProgress.hasStreak30CrownUnlocked(),
             )
         }
     }
@@ -182,6 +187,11 @@ class AlexViewModel(application: Application) : AndroidViewModel(application) {
             }
             try {
                 AchievementsManager(getApplication()).onFed(item.achievementKey)
+            } catch (_: Throwable) {
+            }
+            try {
+                lessonProgress.addXp(XpRewardTable.feedAlex(), applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+                lessonProgress.incrementDailyFeedCount()
             } catch (_: Throwable) {
             }
 

@@ -69,6 +69,27 @@ class LessonProgress(private val context: Context) {
         private const val KEY_LESSONS_TODAY_COUNT = "lessons_completed_today_count"
         private const val RECHARGE_INTERVAL_MS = 30L * 60L * 1000L
         private const val KEY_HEARTS_FULL_SINCE = "hearts_full_since"
+
+        private const val KEY_TOTAL_XP = "total_xp_v1"
+        private const val KEY_XP_BY_DAY_JSON = "xp_by_day_json"
+        private const val KEY_DOUBLE_XP_UNTIL_MS = "double_xp_until_ms"
+        private const val KEY_PENDING_LEVEL_UP = "pending_level_up_level"
+        private const val KEY_PENDING_LEVEL_TITLE = "pending_level_up_title"
+        private const val KEY_PENDING_LEVEL_BONUS_COINS = "pending_level_up_bonus_coins"
+        private const val KEY_WEEKLY_XP_BEST = "weekly_xp_personal_best"
+        private const val KEY_STREAK_MILESTONE_CLAIMED = "streak_milestone_claimed"
+        private const val KEY_PENDING_STREAK_CELEBRATION = "pending_streak_celebration"
+        private const val KEY_DC_ANSWERS_DATE = "dc_answers_date"
+        private const val KEY_DC_ANSWERS_COUNT = "dc_answers_count"
+        private const val KEY_DC_FEED_DATE = "dc_feed_date"
+        private const val KEY_DC_FEED_COUNT = "dc_feed_count"
+        private const val KEY_DAILY_LOGIN_GRANT = "daily_login_grant_date"
+        private const val KEY_WHEEL_PITY = "bonus_wheel_pity"
+        private const val KEY_WHEEL_DAY = "bonus_wheel_day"
+        private const val KEY_WHEEL_COUNT_DAY = "bonus_wheel_count_day"
+        private const val KEY_BOX_DAY = "mystery_box_day"
+        private const val KEY_BOX_COUNT_DAY = "mystery_box_count_day"
+        private const val KEY_BOX_PITY = "mystery_box_pity"
     }
 
     // --- Accessories ownership flags ---
@@ -834,6 +855,7 @@ class LessonProgress(private val context: Context) {
         recordCompletionDate(today)
         incrementLessonsCompletedToday()
         try { AchievementsManager(context).onStreakUpdated(streak) } catch (_: Throwable) { }
+        try { checkStreakMilestones(streak) } catch (_: Throwable) { }
         return isFirstOfDay
     }
 
@@ -896,6 +918,7 @@ class LessonProgress(private val context: Context) {
     }
 
     fun normalizeStreakForToday() {
+        tryApplyStreakFreezeForMissedDay()
         val today = todayString()
         val last = prefs.getString("last_completion_date", null)
         val streak = prefs.getInt("streak_count", 0)
@@ -937,6 +960,59 @@ class LessonProgress(private val context: Context) {
         cal.add(java.util.Calendar.DATE, -1)
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
         return sdf.format(cal.time)
+    }
+
+    private fun dayBeforeYesterdayString(): String {
+        val cal = java.util.Calendar.getInstance()
+        cal.add(java.util.Calendar.DATE, -2)
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        return sdf.format(cal.time)
+    }
+
+    /**
+     * Pokud uživatel minul právě jeden den a má aktivní zmrazení,
+     * doplní virtuální dokončení včerejška bez navýšení streaku.
+     */
+    private fun tryApplyStreakFreezeForMissedDay() {
+        if (!prefs.getBoolean("streak_freeze_pending", false)) return
+        val last = prefs.getString("last_completion_date", null) ?: return
+        val yest = yesterdayString()
+        val today = todayString()
+        if (last == today || last == yest) return
+        if (last != dayBeforeYesterdayString()) {
+            prefs.edit().putBoolean("streak_freeze_pending", false).apply()
+            return
+        }
+        val frozenSet = prefs.getStringSet("frozen_streak_dates", emptySet())?.toMutableSet() ?: mutableSetOf()
+        frozenSet.add(yest)
+        prefs.edit()
+            .putString("last_completion_date", yest)
+            .putBoolean("streak_freeze_pending", false)
+            .putStringSet("frozen_streak_dates", frozenSet)
+            .apply()
+    }
+
+    /** 20 mincí — ochrana před ztrátou streaku při vynechání jednoho dne (viz [tryApplyStreakFreezeForMissedDay]). */
+    fun buyStreakFreezeWithCoins(): Boolean {
+        if (!spendPoints(20)) return false
+        prefs.edit().putBoolean("streak_freeze_pending", true).apply()
+        return true
+    }
+
+    fun hasPendingStreakFreeze(): Boolean = prefs.getBoolean("streak_freeze_pending", false)
+
+    /** Včera bylo „zmrazené“ (spotřebovaný štít). */
+    fun wasYesterdayStreakFrozen(): Boolean {
+        val set = prefs.getStringSet("frozen_streak_dates", emptySet()) ?: emptySet()
+        return yesterdayString() in set
+    }
+
+    fun consumeFrozenLabelForYesterday() {
+        val yest = yesterdayString()
+        val set = prefs.getStringSet("frozen_streak_dates", emptySet())?.toMutableSet() ?: return
+        if (set.remove(yest)) {
+            prefs.edit().putStringSet("frozen_streak_dates", set).apply()
+        }
     }
 
     // --- Hearts (Lives) tracking ---
@@ -1047,6 +1123,347 @@ class LessonProgress(private val context: Context) {
         if (hearts < MAX_HEARTS) return 0L
         return prefs.getLong(KEY_HEARTS_FULL_SINCE, 0L)
     }
+
+    // region --- XP, double XP, weekly XP chart ---
+
+    fun getTotalXp(): Int = prefs.getInt(KEY_TOTAL_XP, 0)
+
+    fun getDoubleXpRemainingMs(): Long {
+        val until = prefs.getLong(KEY_DOUBLE_XP_UNTIL_MS, 0L)
+        val now = System.currentTimeMillis()
+        return (until - now).coerceAtLeast(0L)
+    }
+
+    /** 30 minut 2× XP (např. po rewarded reklamě). */
+    fun activateDoubleXpForMinutes(minutes: Int) {
+        val addMs = minutes.coerceIn(1, 120) * 60_000L
+        val now = System.currentTimeMillis()
+        val cur = prefs.getLong(KEY_DOUBLE_XP_UNTIL_MS, 0L).coerceAtLeast(now)
+        val base = maxOf(cur, now)
+        prefs.edit().putLong(KEY_DOUBLE_XP_UNTIL_MS, base + addMs).apply()
+    }
+
+    private fun xpMultiplierInternal(): Float {
+        val until = prefs.getLong(KEY_DOUBLE_XP_UNTIL_MS, 0L)
+        return if (System.currentTimeMillis() < until) 2f else 1f
+    }
+
+    /**
+     * Přičte XP (s kombinovaným násobičem: double XP + [sessionComboMultiplier] z aktivní session).
+     * @param sessionComboMultiplier např. 1.1f při combo ≥ 5 v lekci
+     */
+    fun addXp(
+        baseAmount: Int,
+        applyDoubleXpFromAds: Boolean = true,
+        sessionComboMultiplier: Float = 1f,
+    ): XpGrantResult {
+        if (baseAmount <= 0) return XpGrantResult.none(getTotalXp())
+        val mult = (if (applyDoubleXpFromAds) xpMultiplierInternal() else 1f) *
+            sessionComboMultiplier.coerceIn(1f, 1.25f)
+        val gained = (baseAmount * mult).toInt().coerceAtLeast(1)
+        val beforeXp = getTotalXp()
+        val beforeLevel = XpSystem.levelForTotalXp(beforeXp)
+        val afterXp = beforeXp + gained
+        prefs.edit().putInt(KEY_TOTAL_XP, afterXp).apply()
+        recordXpForDay(gained)
+        updateWeeklyXpRecord()
+        val afterLevel = XpSystem.levelForTotalXp(afterXp)
+        var bonus = 0
+        if (afterLevel.level > beforeLevel.level) {
+            bonus = XpSystem.bonusCoinsForLevelUp(afterLevel.level)
+            if (bonus > 0) {
+                try {
+                    addPoints(bonus)
+                } catch (_: Throwable) {
+                }
+            }
+            prefs.edit()
+                .putInt(KEY_PENDING_LEVEL_UP, afterLevel.level)
+                .putString(KEY_PENDING_LEVEL_TITLE, afterLevel.title)
+                .putInt(KEY_PENDING_LEVEL_BONUS_COINS, bonus)
+                .apply()
+        }
+        return XpGrantResult(
+            xpAdded = gained,
+            totalXpAfter = afterXp,
+            levelBefore = beforeLevel,
+            levelAfter = afterLevel,
+            leveledUp = afterLevel.level > beforeLevel.level,
+            levelUpBonusCoins = if (afterLevel.level > beforeLevel.level) bonus else 0,
+        )
+    }
+
+    fun consumePendingLevelUp(): LevelUpPending? {
+        val lv = prefs.getInt(KEY_PENDING_LEVEL_UP, 0)
+        if (lv <= 0) return null
+        val title = prefs.getString(KEY_PENDING_LEVEL_TITLE, "") ?: ""
+        val bonus = prefs.getInt(KEY_PENDING_LEVEL_BONUS_COINS, 0)
+        prefs.edit()
+            .remove(KEY_PENDING_LEVEL_UP)
+            .remove(KEY_PENDING_LEVEL_TITLE)
+            .remove(KEY_PENDING_LEVEL_BONUS_COINS)
+            .apply()
+        return LevelUpPending(level = lv, title = title, bonusCoins = bonus)
+    }
+
+    /** XP za posledních 7 kalendářních dní (včetně dnes), index 0 = nejstarší den v okně. */
+    fun getXpLast7Days(): List<Int> {
+        val map = readXpByDayMap()
+        val cal = java.util.Calendar.getInstance()
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        return (6 downTo 0).map { offset ->
+            val c = java.util.Calendar.getInstance()
+            c.add(java.util.Calendar.DATE, -offset)
+            val key = sdf.format(c.time)
+            map[key] ?: 0
+        }
+    }
+
+    fun getXpSumLast7Days(): Int = getXpLast7Days().sum()
+
+    fun getXpPrevious7DaysSum(): Int {
+        val map = readXpByDayMap()
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        var sum = 0
+        for (off in 13 downTo 7) {
+            val c = java.util.Calendar.getInstance()
+            c.add(java.util.Calendar.DATE, -off)
+            sum += map[sdf.format(c.time)] ?: 0
+        }
+        return sum
+    }
+
+    fun getWeeklyXpPersonalBest(): Int = prefs.getInt(KEY_WEEKLY_XP_BEST, 0)
+
+    private fun updateWeeklyXpRecord() {
+        val sum = getXpSumLast7Days()
+        val best = prefs.getInt(KEY_WEEKLY_XP_BEST, 0)
+        if (sum > best) {
+            prefs.edit().putInt(KEY_WEEKLY_XP_BEST, sum).apply()
+        }
+    }
+
+    private fun recordXpForDay(amount: Int) {
+        if (amount <= 0) return
+        val today = todayString()
+        val map = readXpByDayMap().toMutableMap()
+        map[today] = (map[today] ?: 0) + amount
+        val cutoffCal = java.util.Calendar.getInstance()
+        cutoffCal.add(java.util.Calendar.DATE, -21)
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val cutoff = sdf.format(cutoffCal.time)
+        map.keys.filter { it < cutoff }.forEach { map.remove(it) }
+        prefs.edit().putString(KEY_XP_BY_DAY_JSON, gson.toJson(map)).apply()
+    }
+
+    private fun readXpByDayMap(): Map<String, Int> {
+        val json = prefs.getString(KEY_XP_BY_DAY_JSON, null) ?: return emptyMap()
+        return try {
+            val type = object : TypeToken<MutableMap<String, Int>>() {}.type
+            gson.fromJson<MutableMap<String, Int>>(json, type) ?: emptyMap()
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    private fun checkStreakMilestones(streak: Int) {
+        val claimed = prefs.getStringSet(KEY_STREAK_MILESTONE_CLAIMED, emptySet())?.toMutableSet() ?: mutableSetOf()
+        val milestones = listOf(
+            7 to 50,
+            30 to 200,
+            100 to 1000,
+            365 to 2500,
+        )
+        var changed = false
+        var lastCelebration: Pair<Int, Int>? = null
+        for ((day, coins) in milestones) {
+            val key = "m$day"
+            if (streak < day || key in claimed) continue
+            claimed.add(key)
+            changed = true
+            try {
+                addPoints(coins)
+            } catch (_: Throwable) {
+            }
+            lastCelebration = day to coins
+        }
+        if (changed) {
+            val ed = prefs.edit().putStringSet(KEY_STREAK_MILESTONE_CLAIMED, claimed)
+            if (lastCelebration?.first == 30) {
+                ed.putBoolean("accessory_streak30_crown", true)
+            }
+            if (lastCelebration != null) {
+                val (d, c) = lastCelebration
+                ed.putString(KEY_PENDING_STREAK_CELEBRATION, "$d|$c")
+            }
+            ed.apply()
+        }
+    }
+
+    fun consumePendingStreakCelebration(): Pair<Int, Int>? {
+        val raw = prefs.getString(KEY_PENDING_STREAK_CELEBRATION, null) ?: return null
+        prefs.edit().remove(KEY_PENDING_STREAK_CELEBRATION).apply()
+        val parts = raw.split('|')
+        if (parts.size != 2) return null
+        val day = parts[0].toIntOrNull() ?: return null
+        val coins = parts[1].toIntOrNull() ?: return null
+        return day to coins
+    }
+
+    fun hasStreak30CrownUnlocked(): Boolean = prefs.getBoolean("accessory_streak30_crown", false)
+
+    fun isStreakMilestoneClaimed(day: Int): Boolean {
+        val claimed = prefs.getStringSet(KEY_STREAK_MILESTONE_CLAIMED, emptySet()) ?: emptySet()
+        return "m$day" in claimed
+    }
+
+    // region Daily challenges
+
+    fun incrementDailyCorrectAnswers(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_DC_ANSWERS_DATE, null) != today) {
+            prefs.edit().putString(KEY_DC_ANSWERS_DATE, today).putInt(KEY_DC_ANSWERS_COUNT, 0).apply()
+        }
+        val n = prefs.getInt(KEY_DC_ANSWERS_COUNT, 0) + 1
+        prefs.edit().putInt(KEY_DC_ANSWERS_COUNT, n).apply()
+        tryGrantDailyChallengeXp("ans10", 10, 10)
+        return n
+    }
+
+    fun incrementDailyFeedCount(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_DC_FEED_DATE, null) != today) {
+            prefs.edit().putString(KEY_DC_FEED_DATE, today).putInt(KEY_DC_FEED_COUNT, 0).apply()
+        }
+        val n = prefs.getInt(KEY_DC_FEED_COUNT, 0) + 1
+        prefs.edit().putInt(KEY_DC_FEED_COUNT, n).apply()
+        tryGrantDailyChallengeXp("feed1", 1, 5)
+        return n
+    }
+
+    private fun tryGrantDailyChallengeXp(id: String, target: Int, rewardXp: Int) {
+        val today = todayString()
+        val keyDone = "dc_${today}_${id}_done"
+        if (prefs.getBoolean(keyDone, false)) return
+        val prog = when (id) {
+            "ans10" -> prefs.getInt(KEY_DC_ANSWERS_COUNT, 0)
+            "less2" -> getLessonsCompletedToday()
+            "feed1" -> prefs.getInt(KEY_DC_FEED_COUNT, 0)
+            else -> return
+        }
+        if (prog < target) return
+        prefs.edit().putBoolean(keyDone, true).apply()
+        try {
+            addXp(rewardXp, applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+        } catch (_: Throwable) {
+        }
+    }
+
+    fun onDailyChallengeLessonsProgress() {
+        tryGrantDailyChallengeXp("less2", 2, 20)
+    }
+
+    /** Jednou denně: malý bonus XP + mince. */
+    fun grantDailyLoginIfNeeded(): Boolean {
+        val today = todayString()
+        if (prefs.getString(KEY_DAILY_LOGIN_GRANT, null) == today) return false
+        prefs.edit().putString(KEY_DAILY_LOGIN_GRANT, today).apply()
+        try {
+            addXp(15, applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+            addPoints(12)
+        } catch (_: Throwable) {
+        }
+        return true
+    }
+
+    /**
+     * Bonusové kolo (max 3× denně), odměna v mincích; pity přidává bonus po slabých tocích.
+     */
+    fun rollBonusWheel(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_WHEEL_DAY, null) != today) {
+            prefs.edit().putString(KEY_WHEEL_DAY, today).putInt(KEY_WHEEL_COUNT_DAY, 0).apply()
+        }
+        val cnt = prefs.getInt(KEY_WHEEL_COUNT_DAY, 0)
+        if (cnt >= 3) return 0
+        prefs.edit().putInt(KEY_WHEEL_COUNT_DAY, cnt + 1).apply()
+        val pity = prefs.getInt(KEY_WHEEL_PITY, 0)
+        val rng = java.util.Random()
+        val r = rng.nextInt(100)
+        val base = when {
+            r < 40 -> 8 + rng.nextInt(12)
+            r < 78 -> 18 + rng.nextInt(17)
+            else -> 32 + rng.nextInt(28)
+        }
+        val bonus = pity * 8
+        val coins = (base + bonus).coerceIn(5, 130)
+        val newPity = if (coins < 22) (pity + 1).coerceAtMost(6) else 0
+        prefs.edit().putInt(KEY_WHEEL_PITY, newPity).apply()
+        addPoints(coins)
+        return coins
+    }
+
+    fun openMysteryBox(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_BOX_DAY, null) != today) {
+            prefs.edit().putString(KEY_BOX_DAY, today).putInt(KEY_BOX_COUNT_DAY, 0).apply()
+        }
+        val cnt = prefs.getInt(KEY_BOX_COUNT_DAY, 0)
+        if (cnt >= 2) return 0
+        prefs.edit().putInt(KEY_BOX_COUNT_DAY, cnt + 1).apply()
+        val pity = prefs.getInt(KEY_BOX_PITY, 0)
+        val rng = java.util.Random()
+        val roll = rng.nextInt(100)
+        val base = when {
+            pity >= 4 -> 55 + rng.nextInt(40)
+            roll < 45 -> 10 + rng.nextInt(18)
+            roll < 82 -> 24 + rng.nextInt(26)
+            else -> 45 + rng.nextInt(35)
+        }
+        val newPity = if (base < 35) pity + 1 else 0
+        prefs.edit().putInt(KEY_BOX_PITY, newPity.coerceAtMost(6)).apply()
+        addPoints(base)
+        try {
+            addXp(8, applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+        } catch (_: Throwable) {
+        }
+        return base
+    }
+
+    fun snapshotDailyChallenges(): List<DailyChallengeUi> {
+        val today = todayString()
+        fun done(id: String) = prefs.getBoolean("dc_${today}_${id}_done", false)
+        val ans = if (prefs.getString(KEY_DC_ANSWERS_DATE, null) != today) 0 else prefs.getInt(KEY_DC_ANSWERS_COUNT, 0)
+        val lessons = getLessonsCompletedToday()
+        val feed = if (prefs.getString(KEY_DC_FEED_DATE, null) != today) 0 else prefs.getInt(KEY_DC_FEED_COUNT, 0)
+        return listOf(
+            DailyChallengeUi(
+                id = "ans10",
+                title = "10 správných odpovědí",
+                progress = (ans / 10f).coerceIn(0f, 1f),
+                done = done("ans10"),
+                rewardXp = 10,
+            ),
+            DailyChallengeUi(
+                id = "less2",
+                title = "Dokonči 2 lekce",
+                progress = (lessons / 2f).coerceIn(0f, 1f),
+                done = done("less2"),
+                rewardXp = 20,
+            ),
+            DailyChallengeUi(
+                id = "feed1",
+                title = "Nakrm Alexe",
+                progress = (feed / 1f).coerceIn(0f, 1f),
+                done = done("feed1"),
+                rewardXp = 5,
+            ),
+        )
+    }
+
+    // endregion
+
+    // endregion XP
 
     fun registerOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)

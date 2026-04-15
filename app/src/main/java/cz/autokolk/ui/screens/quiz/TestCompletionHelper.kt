@@ -4,6 +4,7 @@ import android.app.Application
 import cz.autokolk.AchievementsManager
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
+import cz.autokolk.XpRewardTable
 
 internal object TestCompletionHelper {
 
@@ -44,6 +45,10 @@ internal object TestCompletionHelper {
         }
         try {
             lessonProgress.addTestScore(weighted, 50)
+        } catch (_: Throwable) {
+        }
+        try {
+            lessonProgress.addXp(XpRewardTable.testXp(weighted), applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
         } catch (_: Throwable) {
         }
         return weighted to firstOfDay

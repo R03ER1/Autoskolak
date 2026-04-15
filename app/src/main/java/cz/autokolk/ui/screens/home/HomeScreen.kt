@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cz.autokolk.GlobalLesson
+import cz.autokolk.SeasonalEvents
 import cz.autokolk.ui.components.feedback.RandomEventOverlay
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
@@ -55,6 +56,7 @@ fun HomeScreen(
     val rows by vm.pathRows.collectAsStateWithLifecycle()
     val reordered by vm.reorderedPlan.collectAsStateWithLifecycle()
     val randomEvent by vm.randomEvent.collectAsStateWithLifecycle()
+    val dailyChallenges by vm.dailyChallenges.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -85,6 +87,8 @@ fun HomeScreen(
             done.toFloat() / reordered.size.toFloat()
         }
     }
+
+    val seasonalMessage = SeasonalEvents.activeMessage()
 
     val currentLessonIndex = remember(rows) {
         rows.indexOfFirst {
@@ -129,6 +133,14 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(horizontal = 8.dp, vertical = 8.dp),
         ) {
+            item(key = "daily_challenges") {
+                DailyChallengesRow(challenges = dailyChallenges)
+            }
+            if (seasonalMessage != null) {
+                item(key = "seasonal_banner") {
+                    SeasonalBanner(message = seasonalMessage)
+                }
+            }
             items(rows, key = { row ->
                 when (row) {
                     is HomePathRow.Header -> "h:${row.title}:${row.doneCount}:${row.totalCount}"
@@ -167,6 +179,14 @@ fun HomeScreen(
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
+                                    if (row.totalCount > 0 && row.doneCount >= row.totalCount) {
+                                        Spacer(Modifier.height(6.dp))
+                                        Text(
+                                            text = "🏆 Sekce dokončena",
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = TextPrimary,
+                                        )
+                                    }
                                     Spacer(Modifier.height(10.dp))
                                     val frac = if (row.totalCount > 0) {
                                         row.doneCount.toFloat() / row.totalCount.toFloat()
