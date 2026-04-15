@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.47] - 2026-04-15
+- Oprava: kvíz už nepadá na vibraci — v manifestu je `VIBRATE`, ViewModel před voláním kontroluje oprávnění.
+
 ## [2.0.46] - 2026-04-15
 - Oprava: tlačítko odpovědi v kvízu — animace částic neblokuje klepnutí a neměla by shazovat aplikaci.
 

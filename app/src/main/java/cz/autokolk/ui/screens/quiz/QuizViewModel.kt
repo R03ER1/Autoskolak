@@ -1,11 +1,14 @@
 package cz.autokolk.ui.screens.quiz
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.autokolk.AchievementsManager
@@ -392,6 +395,11 @@ class QuizViewModel(
 
     private fun vibrate(durationMs: Long, amplitude: Int) {
         val app = getApplication<Application>()
+        if (ContextCompat.checkSelfPermission(app, Manifest.permission.VIBRATE)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
         val v = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vm = app.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
             vm?.defaultVibrator
@@ -399,16 +407,19 @@ class QuizViewModel(
             @Suppress("DEPRECATION")
             app.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         } ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(
-                VibrationEffect.createOneShot(
-                    durationMs,
-                    amplitude.coerceIn(1, 255),
-                ),
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            v.vibrate(durationMs)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(
+                    VibrationEffect.createOneShot(
+                        durationMs,
+                        amplitude.coerceIn(1, 255),
+                    ),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                v.vibrate(durationMs)
+            }
+        } catch (_: SecurityException) {
         }
     }
 }

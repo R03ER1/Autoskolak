@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.47] - 2026-04-15
+- Fixed: pád kvízu při vibraci — doplněno `android.permission.VIBRATE` v manifestu; `QuizViewModel.vibrate` kontroluje oprávnění a ignoruje `SecurityException`.
+
 ## [2.0.46] - 2026-04-15
 - Fixed: `AnswerButton` — částice po správné odpovědi přes `drawBehind` místo `Canvas` nad tlačítkem (zabrání crashi / blokování klepnutí při animaci burst).
 
