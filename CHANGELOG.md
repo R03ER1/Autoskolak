@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.50] - 2026-04-15
+- Oprava buildu po aktualizaci nástrojů: `TestAttemptDao` používá blokující dotazy (`*Blocking`) místo `suspend`, aby Room KSP znovu generoval `TestAttemptDao_Impl` bez konfliktu `Continuation<? super T>` vs `Continuation<T>` u `compileDebugJavaWithJavac`.
+
 ## [2.0.49] - 2026-04-15
 - Fáze 8 (Zkouška): Compose `TestScreen` (hub, graf, odkaz na statistiky), `TestQuizSession` s `TestViewModel` (25 otázek, 30 min, countdown 3–2–1, `HorizontalPager`, dokončení), `TestResultsScreen` + `Route.TestResults` s `Long` ID, `TestStatsScreen`, `ScoresChart` (Canvas + animace).
 - Room (`test_attempts`, `test_answer_rows`), `TestAttemptRepository`, migrace historických skóre z `LessonProgress` prefs; po dokončení testu dual-write `addTestScore` + záznam pokusu s detaily odpovědí.

@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.50] - 2026-04-15
+- Oprava sestavení aplikace (Room / novější kompilátor): databázové dotazy na pokusy zkoušky jsou blokující uvnitř IO vlákna, aby projekt zase šel přeložit.
+
 ## [2.0.49] - 2026-04-15
 - Zkouška v Compose: stránka testu, statistiky, průběh zkoušky (25 otázek, 30 minut, odpočet před startem, posun mezi otázkami prstem), podrobné výsledky posledního pokusu.
 - Uložení pokusů do databáze v telefonu; starší graf ze starého nastavení se při prvním spuštění přenesl.

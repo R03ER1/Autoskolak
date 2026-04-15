@@ -1,6 +1,7 @@
 package cz.autokolk.data.test
 
 import android.content.Context
+import androidx.room.withTransaction
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
 import kotlinx.coroutines.Dispatchers
@@ -75,26 +76,30 @@ class TestAttemptRepository(
             correctCount = correct,
             hasAnswerDetails = true,
         )
-        val id = dao.insertAttemptWithAnswersBlocking(attempt, answers)
+        val id = db.withTransaction {
+            val attemptId = dao.insertAttemptBlocking(attempt)
+            dao.insertAnswersBlocking(answers.map { it.copy(attemptId = attemptId) })
+            attemptId
+        }
         Pair(id, weighted)
     }
 
     suspend fun getAttempt(id: Long): TestAttemptEntity? = withContext(Dispatchers.IO) {
-        dao.getAttemptById(id)
+        dao.getAttemptByIdBlocking(id)
     }
 
     suspend fun getAnswers(attemptId: Long): List<TestAnswerEntity> = withContext(Dispatchers.IO) {
-        dao.getAnswersForAttempt(attemptId)
+        dao.getAnswersForAttemptBlocking(attemptId)
     }
 
     suspend fun getChartScoresDescending(limit: Int = 60): List<Int> = withContext(Dispatchers.IO) {
-        dao.getRecentScoresDescending(limit)
+        dao.getRecentScoresDescendingBlocking(limit)
     }
 
     suspend fun getStats(): TestStatsSnapshot = withContext(Dispatchers.IO) {
-        val count = dao.countAttempts()
-        val avg = dao.averageScore(maxScore = 50) ?: 0.0
-        val passAll = dao.passRatePercentAll() ?: 0.0
+        val count = dao.countAttemptsBlocking()
+        val avg = dao.averageScoreBlocking(maxScore = 50) ?: 0.0
+        val passAll = dao.passRatePercentAllBlocking() ?: 0.0
         TestStatsSnapshot(
             attemptCount = count,
             averageScore = avg,
