@@ -53,8 +53,9 @@ class TestAttemptStatsActivity : AutokolkActivity() {
                     true
                 }
                 R.id.nav_lion -> {
-                    val intent = android.content.Intent(this, AlexActivity::class.java)
+                    val intent = android.content.Intent(this, ComposeMainActivity::class.java)
                         .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_OPEN_TAB, cz.autokolk.ui.navigation.ComposeNavIntent.OPEN_TAB_ALEX)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     finish()

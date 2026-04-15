@@ -1,275 +1,358 @@
 package cz.autokolk.ui.screens.alex
 
-import android.app.Application
+import android.graphics.BitmapFactory
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import cz.autokolk.LessonProgress
-import cz.autokolk.ui.components.buttons.PrimaryGradientButton
-import cz.autokolk.ui.components.media.AssetImageFromPath
+import cz.autokolk.R
+import cz.autokolk.audio.SoundManager
+import cz.autokolk.ui.components.animation.FloatingReward
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.AccentTeal
+import cz.autokolk.ui.theme.DarkBackground
+import cz.autokolk.ui.theme.ErrorRed
+import cz.autokolk.ui.theme.SuccessGreen
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
+import cz.autokolk.ui.theme.WarningAmber
+import kotlin.math.roundToInt
 
-private fun alexImageAsset(hunger: Int, sunglasses: Boolean): String {
-    val base = when {
-        hunger <= 20 -> "AlexHungry.png"
-        hunger <= 40 -> "AlexSad.png"
-        hunger <= 60 -> "Alex.png"
-        hunger <= 80 -> "AlexHappy.png"
-        else -> "AlexCool.png"
-    }
-    val name = if (sunglasses) "C$base" else base
-    return "images/alex/$name"
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AlexScreen(navController: NavHostController) {
+fun AlexScreen(
+    navController: NavHostController,
+    viewModel: AlexViewModel = viewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
-    val application = context.applicationContext as Application
-    val vm: AlexViewModel = viewModel(factory = AlexViewModelFactory(application))
-    val state by vm.state.collectAsStateWithLifecycle()
-    val lessonProgress = remember { LessonProgress(context) }
+    DisposableEffect(lifecycleOwner) {
+        val obs = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshState()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(obs)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+    }
 
-    LaunchedEffect(state.hunger) {
-        if (state.hunger <= 0) {
+    LaunchedEffect(state.hungerPercent) {
+        if (state.hungerPercent <= 0) {
             navController.navigate(Route.AlexDeath.route) {
                 launchSingleTop = true
             }
         }
     }
 
-    var foodOpen by remember { mutableStateOf(false) }
-    var shopOpen by remember { mutableStateOf(false) }
+    LaunchedEffect(state.snackMessage) {
+        val msg = state.snackMessage ?: return@LaunchedEffect
+        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+        viewModel.clearSnack()
+    }
+
+    LaunchedEffect(state.feedPhase) {
+        if (state.feedPhase == AlexFeedAnimationPhase.Bouncing) {
+            SoundManager.play(SoundManager.Sound.ALEX_FEED)
+            SoundManager.play(SoundManager.Sound.COIN)
+        }
+    }
+
     var renameOpen by remember { mutableStateOf(false) }
-    var renameText by remember { mutableStateOf(state.lionName) }
+    var renameDraft by remember { mutableStateOf(state.lionName) }
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val moodTint = remember(state.mood) {
+        when (state.mood) {
+            AlexMood.Happy -> Color.Transparent
+            AlexMood.Neutral -> Color(0x14FFFFFF)
+            AlexMood.Hungry -> WarningAmber.copy(alpha = 0.08f)
+            AlexMood.Starving -> ErrorRed.copy(alpha = 0.10f)
+        }
+    }
 
-    Column(
+    Box(
         Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .background(
+                Brush.verticalGradient(
+                    listOf(DarkBackground, moodTint, DarkBackground),
+                ),
+            ),
     ) {
-        Text(
-            text = hungerTitle(state.lionName, state.hunger),
-            style = MaterialTheme.typography.titleLarge,
-            color = TextPrimary,
-        )
-        state.frozenLabel?.let {
-            Text(it, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
-        }
-        Spacer(Modifier.height(12.dp))
-        val progress = state.hunger / 100f
-        AnimatedProgressBar(
-            progress = progress,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp),
-        )
-        Spacer(Modifier.height(16.dp))
-        AssetImageFromPath(
-            assetPath = alexImageAsset(state.hunger, lessonProgress.isSunglassesEnabled()),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
-        )
-        Spacer(Modifier.height(16.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            PrimaryGradientButton(
-                text = "Jídlo",
-                onClick = { foodOpen = true },
-                modifier = Modifier.weight(1f).padding(4.dp),
-            )
-            PrimaryGradientButton(
-                text = "Obchod",
-                onClick = { shopOpen = true },
-                modifier = Modifier.weight(1f).padding(4.dp),
-            )
-        }
-        Spacer(Modifier.height(8.dp))
-        TextButton(
-            onClick = {
-                renameText = state.lionName
-                renameOpen = true
-            },
-            modifier = Modifier.fillMaxWidth(),
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Přejmenovat lva")
-        }
-        state.snackMessage?.let { msg ->
-            Column {
-                Text(msg, color = TextSecondary, modifier = Modifier.padding(top = 8.dp))
-                LaunchedEffect(msg) {
-                    kotlinx.coroutines.delay(2500)
-                    vm.clearSnack()
-                }
-            }
-        }
-    }
-
-    if (foodOpen) {
-        ModalBottomSheet(
-            onDismissRequest = { foodOpen = false },
-            sheetState = sheetState,
-        ) {
-            Column(Modifier.padding(16.dp)) {
-                FoodRow("Klobása +1", "4 bodů") { vm.purchaseFood(1, 4, "klobaska", "Snězeno") }
-                FoodRow("Kuře +10", "30 bodů") { vm.purchaseFood(10, 30, "kure", "Snězeno") }
-                FoodRow("Zmrzlina +3", "10 bodů") { vm.purchaseFood(3, 10, "zmrzlina", "Snězeno") }
-                FoodRow("Mrkev +5", "16 bodů") { vm.purchaseFood(5, 16, "mrkev", "Snězeno") }
-                PrimaryGradientButton(
-                    text = "Pivo — max hlad (150)",
-                    onClick = { vm.purchaseMaxBeer() },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                )
-                PrimaryGradientButton(
-                    text = "Kamení — 48 h bez hladu (80)",
-                    onClick = { vm.purchaseFreeze() },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-    }
-
-    if (shopOpen) {
-        ModalBottomSheet(onDismissRequest = { shopOpen = false }) {
-            Column(Modifier.padding(16.dp)) {
-                Text("Obchod", style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(8.dp))
-                val cost = 400
-                PrimaryGradientButton(
-                    text = "Sluneční brýle ($cost)",
-                    onClick = {
-                        if (lessonProgress.buySunglassesIfAffordable(cost)) {
-                            vm.refresh()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                if (lessonProgress.hasSunglasses()) {
-                    Text(
-                        if (lessonProgress.isSunglassesEnabled()) "Brýle zapnuté" else "Brýle vypnuté",
-                        color = TextSecondary,
-                    )
-                    TextButton(
-                        onClick = {
-                            lessonProgress.setSunglassesEnabled(!lessonProgress.isSunglassesEnabled())
-                            vm.refresh()
+            Spacer(Modifier.height(16.dp))
+            Text(
+                state.lionName,
+                style = MaterialTheme.typography.headlineLarge,
+                color = TextPrimary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick = {
+                            renameDraft = state.lionName
+                            renameOpen = true
                         },
-                    ) {
-                        Text("Přepnout brýle")
-                    }
-                }
+                    )
+                    .padding(8.dp),
+            )
+            Text(
+                state.title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(Modifier.height(24.dp))
+            Box(contentAlignment = Alignment.Center) {
+                AlexCharacter(
+                    mood = state.mood,
+                    hasSunglassesVisual = state.hasSunglassesVisual,
+                    modifier = Modifier.size(250.dp),
+                    bounceTrigger = state.bounceTrigger,
+                    heartParticlesTrigger = state.heartParticlesTrigger,
+                )
+                FlyingFoodOverlay(
+                    phase = state.feedPhase,
+                    assetPath = state.feedFoodAssetPath,
+                )
             }
+
+            Spacer(Modifier.height(24.dp))
+            HungerBar(percent = state.hungerPercent, isFrozen = state.isFrozen)
+
+            Spacer(Modifier.height(24.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                AlexActionChip(
+                    label = "Nakrmit",
+                    iconRes = R.drawable.ic_food,
+                    tint = AccentTeal,
+                    onClick = { viewModel.openFoodMenu() },
+                )
+                AlexActionChip(
+                    label = "Obchod",
+                    iconRes = R.drawable.ic_shop,
+                    tint = AccentCyan,
+                    onClick = { viewModel.openShop() },
+                )
+            }
+            Spacer(Modifier.height(32.dp))
+        }
+
+        FloatingReward(
+            visible = state.lastSpendRewardCoins != null,
+            amount = state.lastSpendRewardCoins ?: 0,
+            textOverride = state.lastSpendRewardCoins?.let { "-$it bodů" },
+            modifier = Modifier.align(Alignment.TopCenter),
+            onDismiss = { viewModel.dismissFeedSpendPopup() },
+        )
+
+        if (state.showFoodMenu) {
+            FoodMenuSheet(
+                state = state,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeFoodMenu() },
+            )
+        }
+        if (state.showShop) {
+            ShopSheet(
+                state = state,
+                viewModel = viewModel,
+                onDismiss = { viewModel.closeShop() },
+            )
         }
     }
 
     if (renameOpen) {
         AlertDialog(
             onDismissRequest = { renameOpen = false },
-            title = { Text("Jméno lva") },
+            title = { Text("Přejmenovat lva", color = TextPrimary) },
             text = {
-                OutlinedTextField(
-                    value = renameText,
-                    onValueChange = { renameText = it },
-                    singleLine = true,
-                )
+                Column {
+                    Text(
+                        "Tvůj lev se bude jmenovat: $renameDraft",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = renameDraft,
+                        onValueChange = { renameDraft = it.take(24) },
+                        singleLine = true,
+                        label = { Text("Jméno (1–20 znaků, bez emoji)") },
+                    )
+                }
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val cost = 50
-                        if (lessonProgress.hasRenameUnlocked() || lessonProgress.buyRenameIfAffordable(cost)) {
-                            vm.setLionName(renameText)
+                        if (AlexViewModel.isValidLionName(renameDraft)) {
+                            viewModel.renameLion(renameDraft)
                             renameOpen = false
+                        } else {
+                            android.widget.Toast.makeText(
+                                context,
+                                "Neplatné jméno",
+                                android.widget.Toast.LENGTH_SHORT,
+                            ).show()
                         }
                     },
-                ) {
-                    Text("Uložit")
-                }
+                ) { Text("Uložit") }
             },
             dismissButton = {
-                TextButton(onClick = { renameOpen = false }) {
-                    Text("Zrušit")
-                }
+                TextButton(onClick = { renameOpen = false }) { Text("Zrušit") }
             },
         )
     }
 }
 
 @Composable
-private fun FoodRow(label: String, price: String, onClick: () -> Unit) {
+private fun FlyingFoodOverlay(
+    phase: AlexFeedAnimationPhase,
+    assetPath: String?,
+) {
+    val ctx = LocalContext.current
+    val bmp = remember(assetPath, phase) {
+        if (assetPath == null) return@remember null
+        runCatching {
+            ctx.assets.open(assetPath).use { BitmapFactory.decodeStream(it)?.asImageBitmap() }
+        }.getOrNull()
+    }
+    val offsetY = remember { Animatable(120f) }
+    LaunchedEffect(phase, assetPath) {
+        if (phase == AlexFeedAnimationPhase.Flying && assetPath != null) {
+            offsetY.snapTo(120f)
+            offsetY.animateTo(0f, tween(320))
+        } else {
+            offsetY.snapTo(0f)
+        }
+    }
+    if (phase == AlexFeedAnimationPhase.Flying && bmp != null) {
+        androidx.compose.foundation.Image(
+            bitmap = bmp,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(56.dp)
+                .offset { IntOffset(0, offsetY.value.roundToInt()) },
+        )
+    }
+}
+
+@Composable
+private fun AlexActionChip(
+    label: String,
+    iconRes: Int,
+    tint: Color,
+    onClick: () -> Unit,
+) {
     Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .background(TextPrimary.copy(alpha = 0.08f), RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Column {
-            Text(label, color = TextPrimary)
-            Text(price, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
-        }
-        TextButton(onClick = onClick) {
-            Text("Koupit")
-        }
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(22.dp),
+        )
+        Text(label, style = MaterialTheme.typography.titleSmall, color = TextPrimary)
     }
 }
 
-private fun hungerTitle(lion: String, hunger: Int): String {
-    val hungerLevel = (hunger / 10) * 10
-    return when (hungerLevel) {
-        0 -> "$lion je úplně vyhladovělý!"
-        10 -> "$lion má obrovský hlad!"
-        20 -> "$lion je velmi hladový!"
-        30 -> "$lion má velký hlad!"
-        40 -> "$lion má hlad!"
-        50 -> "$lion je trochu hladový!"
-        60 -> "$lion je v pořádku!"
-        70 -> "$lion se cítí dobře!"
-        80 -> "$lion je spokojený!"
-        90 -> "$lion je velmi spokojený!"
-        100 -> "$lion se velmi dobře napapal!"
-        else -> "$lion je v pořádku!"
+@Composable
+fun HungerBar(percent: Int, isFrozen: Boolean) {
+    val gradientLead = when {
+        percent > 60 -> SuccessGreen
+        percent > 30 -> WarningAmber
+        else -> ErrorRed
     }
-}
-
-private class AlexViewModelFactory(
-    private val application: Application,
-) : androidx.lifecycle.ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        return AlexViewModel(application) as T
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("Sytost", style = MaterialTheme.typography.labelLarge, color = TextPrimary)
+            Text(
+                "$percent%",
+                style = MaterialTheme.typography.labelLarge,
+                color = gradientLead,
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        AnimatedProgressBar(
+            progress = percent / 100f,
+            accent = gradientLead,
+            height = 12.dp,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (isFrozen) {
+            Text(
+                "Hlad zmrazen",
+                style = MaterialTheme.typography.labelMedium,
+                color = AccentCyan,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
     }
 }

@@ -12,133 +12,222 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-data class AlexUiState(
+data class AlexState(
     val lionName: String = "Alex",
-    val hunger: Int = HungerManager.MAX_HUNGER,
-    val points: Int = 0,
-    val frozenLabel: String? = null,
+    val title: String = moodTitle(AlexMood.Happy),
+    val hungerPercent: Int = 100,
+    val mood: AlexMood = AlexMood.Happy,
+    /** Zobrazení „cool“ varianty (brýle zapnuté a vlastněné). */
+    val hasSunglassesVisual: Boolean = false,
+    val sunglassesOwned: Boolean = false,
+    val isFrozen: Boolean = false,
+    val coins: Int = 0,
+    val foodItems: List<AlexFoodItem> = DefaultAlexFoodMenu,
+    val showFoodMenu: Boolean = false,
+    val showShop: Boolean = false,
+    val feedPhase: AlexFeedAnimationPhase = AlexFeedAnimationPhase.Idle,
+    val feedFoodAssetPath: String? = null,
+    /** Útrata za poslední krmení (pro FloatingReward). */
+    val lastSpendRewardCoins: Int? = null,
+    val bounceTrigger: Long = 0L,
+    val heartParticlesTrigger: Long = 0L,
     val snackMessage: String? = null,
-    val feedAnimToken: Int = 0,
 )
 
 class AlexViewModel(application: Application) : AndroidViewModel(application) {
 
     private val hungerManager = HungerManager(application)
     private val lessonProgress = LessonProgress(application)
-    private val prefs = application.getSharedPreferences("lesson_progress", android.content.Context.MODE_PRIVATE)
-    private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
-        refresh()
+
+    private val _state = MutableStateFlow(AlexState())
+    val state: StateFlow<AlexState> = _state.asStateFlow()
+
+    private val hungerPrefs = application.getSharedPreferences("hunger_prefs", Application.MODE_PRIVATE)
+
+    private val hungerPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+        refreshState()
     }
 
-    private val _state = MutableStateFlow(AlexUiState())
-    val state: StateFlow<AlexUiState> = _state.asStateFlow()
+    private val lessonPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == null ||
+            key == "lion_name" ||
+            key == "total_points" ||
+            key.startsWith("accessory_")
+        ) {
+            refreshState()
+        }
+    }
 
     init {
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        refresh()
-        viewModelScope.launch {
-            while (isActive) {
-                delay(30_000)
-                refresh()
-            }
-        }
+        hungerPrefs.registerOnSharedPreferenceChangeListener(hungerPrefsListener)
+        lessonProgress.registerOnLessonProgressChanged(lessonPrefsListener)
+        refreshState()
     }
 
     override fun onCleared() {
-        prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        hungerPrefs.unregisterOnSharedPreferenceChangeListener(hungerPrefsListener)
+        lessonProgress.unregisterOnLessonProgressChanged(lessonPrefsListener)
         super.onCleared()
     }
 
-    fun refresh() {
-        val hm = HungerManager(getApplication())
-        val h = hm.getCurrentHunger()
-        val frozen = if (hm.isFrozenNow()) {
-            val now = System.currentTimeMillis()
-            val until = hm.getFreezeUntilEpochMillis()
-            val remaining = (until - now).coerceAtLeast(0L)
-            val hours = (remaining / 3_600_000L).toInt()
-            val minutes = ((remaining % 3_600_000L) / 60_000L).toInt()
-            "Hladovění začne za ${hours} hod a ${minutes} min"
-        } else {
-            null
-        }
-        _state.update {
-            it.copy(
-                lionName = prefs.getString("lion_name", "Alex") ?: "Alex",
-                hunger = h,
-                points = lessonProgress.getTotalPoints(),
-                frozenLabel = frozen,
+    fun refreshState() {
+        val h = hungerManager.getCurrentHunger()
+        val mood = hungerPercentToMood(h)
+        _state.update { s ->
+            s.copy(
+                lionName = lessonProgress.getLionName(),
+                title = moodTitle(mood),
+                hungerPercent = h,
+                mood = mood,
+                hasSunglassesVisual = lessonProgress.isSunglassesEnabled(),
+                sunglassesOwned = lessonProgress.hasSunglasses(),
+                isFrozen = hungerManager.isFrozenNow(),
+                coins = lessonProgress.getTotalPoints(),
             )
         }
     }
 
-    fun setLionName(name: String) {
-        val clean = name.trim().ifEmpty { "Alex" }
-        prefs.edit().putString("lion_name", clean).apply()
-        refresh()
+    fun openFoodMenu() {
+        _state.update { it.copy(showFoodMenu = true, snackMessage = null) }
+    }
+
+    fun closeFoodMenu() {
+        _state.update { it.copy(showFoodMenu = false) }
+    }
+
+    fun openShop() {
+        _state.update { it.copy(showShop = true, snackMessage = null) }
+    }
+
+    fun closeShop() {
+        _state.update { it.copy(showShop = false) }
     }
 
     fun clearSnack() {
         _state.update { it.copy(snackMessage = null) }
     }
 
-    fun purchaseFood(hungerDelta: Int, cost: Int, foodKey: String, successMsg: String) {
-        val h = hungerManager.getCurrentHunger()
-        if (h + hungerDelta > HungerManager.MAX_HUNGER) {
-            _state.update { it.copy(snackMessage = "Nelze přes 100") }
-            return
-        }
-        if (!lessonProgress.spendPoints(cost)) {
-            _state.update { it.copy(snackMessage = "Nedostatek bodů") }
-            return
-        }
-        hungerManager.setCurrentHunger((h + hungerDelta).coerceAtMost(HungerManager.MAX_HUNGER))
-        try {
-            AchievementsManager(getApplication()).onFed(foodKey)
-        } catch (_: Throwable) {
-        }
-        _state.update {
-            it.copy(
-                snackMessage = successMsg,
-                feedAnimToken = it.feedAnimToken + 1,
-            )
-        }
-        refresh()
+    fun setSunglassesEnabled(enabled: Boolean) {
+        lessonProgress.setSunglassesEnabled(enabled)
+        refreshState()
     }
 
-    fun purchaseMaxBeer() {
-        val h = hungerManager.getCurrentHunger()
-        if (h >= HungerManager.MAX_HUNGER) {
-            _state.update { it.copy(snackMessage = "Už na maximu") }
-            return
-        }
-        if (!lessonProgress.spendPoints(150)) {
+    /** @return true při úspěchu */
+    fun buySunglasses(): Boolean {
+        val ok = lessonProgress.buySunglassesIfAffordable(1000)
+        refreshState()
+        if (!ok) {
             _state.update { it.copy(snackMessage = "Nedostatek bodů") }
-            return
         }
-        hungerManager.setCurrentHunger(HungerManager.MAX_HUNGER)
-        try {
-            AchievementsManager(getApplication()).onFed("pivo")
-        } catch (_: Throwable) {
-        }
-        _state.update { it.copy(snackMessage = "+ MAX", feedAnimToken = it.feedAnimToken + 1) }
-        refresh()
+        return ok
     }
 
-    fun purchaseFreeze() {
-        if (!lessonProgress.spendPoints(80)) {
-            _state.update { it.copy(snackMessage = "Nedostatek bodů") }
-            return
+    fun feed(item: AlexFoodItem) {
+        if (_state.value.feedPhase != AlexFeedAnimationPhase.Idle) return
+        viewModelScope.launch {
+            val h0 = hungerManager.getCurrentHunger()
+            when (item.kind) {
+                AlexFeedKind.Delta -> {
+                    if (h0 + item.hungerDelta > HungerManager.MAX_HUNGER) {
+                        _state.update { it.copy(snackMessage = "Nelze přes 100") }
+                        return@launch
+                    }
+                    if (!lessonProgress.spendPoints(item.priceCoins)) {
+                        _state.update { it.copy(snackMessage = "Nedostatek bodů") }
+                        return@launch
+                    }
+                }
+                AlexFeedKind.FullMax -> {
+                    if (h0 >= HungerManager.MAX_HUNGER) {
+                        _state.update { it.copy(snackMessage = "Už na maximu") }
+                        return@launch
+                    }
+                    if (!lessonProgress.spendPoints(item.priceCoins)) {
+                        _state.update { it.copy(snackMessage = "Nedostatek bodů") }
+                        return@launch
+                    }
+                }
+                AlexFeedKind.FreezeDecay -> {
+                    if (!lessonProgress.spendPoints(item.priceCoins)) {
+                        _state.update { it.copy(snackMessage = "Nedostatek bodů") }
+                        return@launch
+                    }
+                }
+            }
+
+            _state.update {
+                it.copy(
+                    feedPhase = AlexFeedAnimationPhase.Flying,
+                    feedFoodAssetPath = item.assetImagePath,
+                    lastSpendRewardCoins = item.priceCoins,
+                    showFoodMenu = false,
+                )
+            }
+            delay(320)
+
+            when (item.kind) {
+                AlexFeedKind.Delta -> {
+                    hungerManager.setCurrentHunger(
+                        (h0 + item.hungerDelta).coerceAtMost(HungerManager.MAX_HUNGER),
+                    )
+                }
+                AlexFeedKind.FullMax -> {
+                    hungerManager.setCurrentHunger(HungerManager.MAX_HUNGER)
+                }
+                AlexFeedKind.FreezeDecay -> {
+                    hungerManager.freezeDecayForHours(48)
+                }
+            }
+            try {
+                AchievementsManager(getApplication()).onFed(item.achievementKey)
+            } catch (_: Throwable) {
+            }
+
+            val animKey = System.currentTimeMillis()
+            _state.update {
+                it.copy(
+                    feedPhase = AlexFeedAnimationPhase.Bouncing,
+                    bounceTrigger = animKey,
+                    heartParticlesTrigger = animKey,
+                )
+            }
+            delay(550)
+
+            _state.update { it.copy(feedPhase = AlexFeedAnimationPhase.Done) }
+            delay(200)
+            refreshState()
+            _state.update {
+                it.copy(
+                    feedPhase = AlexFeedAnimationPhase.Idle,
+                    feedFoodAssetPath = null,
+                )
+            }
         }
-        hungerManager.freezeDecayForHours(48)
-        try {
-            AchievementsManager(getApplication()).onFed("kameni")
-        } catch (_: Throwable) {
+    }
+
+    fun dismissFeedSpendPopup() {
+        _state.update { it.copy(lastSpendRewardCoins = null) }
+    }
+
+    companion object {
+        private val SYMBOL_OTHER = Regex("\\p{So}")
+        private val NAME_ALLOWED = Regex("^[\\p{L}\\p{N}\\s'.-]{1,20}$")
+
+        fun isValidLionName(name: String): Boolean {
+            val t = name.trim()
+            if (t.length !in 1..20) return false
+            if (SYMBOL_OTHER.containsMatchIn(t)) return false
+            if (!NAME_ALLOWED.matches(t)) return false
+            return true
         }
-        _state.update { it.copy(snackMessage = "+ 48h bez hladu") }
-        refresh()
+    }
+
+    fun renameLion(newName: String): Boolean {
+        if (!isValidLionName(newName)) return false
+        lessonProgress.setLionName(newName.trim())
+        refreshState()
+        return true
     }
 }

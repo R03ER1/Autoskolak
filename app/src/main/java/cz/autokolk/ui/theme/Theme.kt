@@ -12,10 +12,15 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 
-// region Color schemes
+// ---------------------------------------------------------------------------
+// Material 3 color schemes
+// ---------------------------------------------------------------------------
 
 private val DarkColors = darkColorScheme(
     primary = AccentCyan,
@@ -32,7 +37,6 @@ private val DarkColors = darkColorScheme(
     onSurfaceVariant = TextSecondary,
     error = ErrorRed,
     onError = TextPrimary,
-    outline = GlassWhite,
 )
 
 private val LightColors = lightColorScheme(
@@ -42,62 +46,86 @@ private val LightColors = lightColorScheme(
     background = LightBackground,
     surface = LightSurface,
     surfaceVariant = LightSurfaceVariant,
-    onPrimary = androidx.compose.ui.graphics.Color.White,
-    onSecondary = androidx.compose.ui.graphics.Color.White,
-    onTertiary = androidx.compose.ui.graphics.Color.White,
+    onPrimary = LightSurface,
+    onSecondary = LightSurface,
+    onTertiary = LightSurface,
     onBackground = LightTextPrimary,
     onSurface = LightTextPrimary,
     onSurfaceVariant = LightTextSecondary,
     error = ErrorRed,
-    onError = androidx.compose.ui.graphics.Color.White,
-    outline = LightGlassBorder,
+    onError = LightSurface,
 )
 
-// endregion
+// ---------------------------------------------------------------------------
+// Dark-mode preference (persisted in SharedPreferences)
+// ---------------------------------------------------------------------------
 
-// region Theme mode
+enum class ThemeMode { SYSTEM, DARK, LIGHT }
 
-enum class ThemeMode { LIGHT, DARK, SYSTEM }
+private const val PREFS_NAME = "autokolk_theme"
+private const val KEY_THEME_MODE = "theme_mode"
 
-val LocalThemeMode = staticCompositionLocalOf { ThemeMode.SYSTEM }
-
-class ThemePreferences(context: Context) {
-    private val prefs = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
-
-    var themeMode: ThemeMode
-        get() = ThemeMode.entries.getOrElse(prefs.getInt("theme_mode", 2)) { ThemeMode.SYSTEM }
-        set(value) = prefs.edit().putInt("theme_mode", value.ordinal).apply()
+/**
+ * Reads the stored [ThemeMode] from SharedPreferences.
+ * Falls back to [ThemeMode.SYSTEM] when no value has been persisted yet.
+ */
+fun readThemeMode(context: Context): ThemeMode {
+    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    val stored = prefs.getString(KEY_THEME_MODE, null)
+    return stored?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: ThemeMode.SYSTEM
 }
 
-// endregion
+fun writeThemeMode(context: Context, mode: ThemeMode) {
+    context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        .edit()
+        .putString(KEY_THEME_MODE, mode.name)
+        .apply()
+}
+
+/**
+ * Composition-local that tells any composable whether dark theme is currently active.
+ * Provided by [AutokolkTheme]; defaults to `true` (dark) when accessed outside a theme.
+ */
+val LocalIsDarkTheme = compositionLocalOf { true }
+
+// ---------------------------------------------------------------------------
+// Root theme composable
+// ---------------------------------------------------------------------------
 
 @Composable
 fun AutokolkTheme(
-    themeMode: ThemeMode = LocalThemeMode.current,
+    themeMode: ThemeMode? = null,
     content: @Composable () -> Unit,
 ) {
-    val darkTheme = when (themeMode) {
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    val context = LocalContext.current
+    val resolvedMode by remember(themeMode) {
+        mutableStateOf(themeMode ?: readThemeMode(context))
     }
-    val colorScheme = if (darkTheme) DarkColors else LightColors
+
+    val systemDark = isSystemInDarkTheme()
+    val isDark = when (resolvedMode) {
+        ThemeMode.DARK -> true
+        ThemeMode.LIGHT -> false
+        ThemeMode.SYSTEM -> systemDark
+    }
+
+    val colorScheme = if (isDark) DarkColors else LightColors
 
     val activity = LocalContext.current as? ComponentActivity
     SideEffect {
         activity?.enableEdgeToEdge(
-            statusBarStyle = if (darkTheme)
+            statusBarStyle = if (isDark)
                 SystemBarStyle.dark(Color.TRANSPARENT)
             else
                 SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
-            navigationBarStyle = if (darkTheme)
+            navigationBarStyle = if (isDark)
                 SystemBarStyle.dark(Color.TRANSPARENT)
             else
                 SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
         )
     }
 
-    CompositionLocalProvider(LocalThemeMode provides themeMode) {
+    CompositionLocalProvider(LocalIsDarkTheme provides isDark) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = AutokolkTypography,

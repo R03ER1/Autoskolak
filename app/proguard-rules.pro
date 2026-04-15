@@ -39,7 +39,3 @@
 
 # Apache Commons CSV (used for questions)
 -keep class org.apache.commons.csv.** { *; }
-
-# Navigation / Compose — serializované argumenty rout
--keep class cz.autokolk.ui.navigation.Route { *; }
--keep class cz.autokolk.ui.navigation.Route$* { *; }

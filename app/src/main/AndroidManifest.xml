@@ -44,11 +44,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AlexActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".PracticeActivity"
             android:exported="false"
             android:theme="@style/Theme.Autokolk.NoActionBar"
@@ -84,13 +79,9 @@
             android:theme="@style/Theme.Autokolk.NoActionBar"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AlexDeathActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ComposeMainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Autokolk.NoActionBar"
             android:screenOrientation="portrait">
             <intent-filter>

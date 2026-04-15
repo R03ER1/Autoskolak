@@ -94,8 +94,9 @@ class HomeActivity : AutokolkActivity() {
             when (item.itemId) {
                 R.id.nav_home -> true // already here
                 R.id.nav_lion -> {
-                    val intent = Intent(this, AlexActivity::class.java)
+                    val intent = Intent(this, ComposeMainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_OPEN_TAB, cz.autokolk.ui.navigation.ComposeNavIntent.OPEN_TAB_ALEX)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     true

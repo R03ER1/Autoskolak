@@ -33,13 +33,18 @@ import cz.autokolk.ui.components.sheets.CoinsSheet
 import cz.autokolk.ui.components.sheets.HeartsSheet
 import cz.autokolk.ui.components.sheets.StreakSheet
 import cz.autokolk.ui.navigation.AutokolkNavGraph
+import cz.autokolk.ui.navigation.ComposeNavIntent
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.navigateToTab
+import kotlinx.coroutines.delay
 
 private val tabRoutes = Route.mainTabs.map { it.route }.toSet()
 
 @Composable
-fun AutokolkApp() {
+fun AutokolkApp(
+    initialOpenTab: String? = null,
+    onConsumeInitialTab: () -> Unit = {},
+) {
     val navController = rememberNavController()
     val currentEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentEntry?.destination?.route
@@ -86,6 +91,24 @@ fun AutokolkApp() {
     LaunchedEffect(currentRoute) {
         if (!onHomeTab) {
             tutorialLessonRectState.value = null
+        }
+    }
+
+    LaunchedEffect(initialOpenTab) {
+        val tab = initialOpenTab ?: return@LaunchedEffect
+        try {
+            if (tab == ComposeNavIntent.OPEN_TAB_ALEX) {
+                repeat(100) {
+                    val r = navController.currentDestination?.route
+                    if (r != null && r != Route.Splash.route) {
+                        navController.navigateToTab(Route.Alex)
+                        return@LaunchedEffect
+                    }
+                    delay(50)
+                }
+            }
+        } finally {
+            onConsumeInitialTab()
         }
     }
 

@@ -20,6 +20,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import cz.autokolk.ui.screens.alex.AlexDeathScreen
+import cz.autokolk.ui.screens.alex.AlexScreen
 import cz.autokolk.ui.screens.home.HomeScreen
 import cz.autokolk.ui.screens.quiz.QuizScreen
 import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
@@ -107,7 +109,7 @@ fun AutokolkNavGraph(
             popEnterTransition = { tabEnter() },
             popExitTransition = { tabExit() },
         ) {
-            PlaceholderScreen("Alex")
+            AlexScreen(navController = navController)
         }
 
         composable(
@@ -237,7 +239,7 @@ fun AutokolkNavGraph(
             popEnterTransition = { modalEnter() },
             popExitTransition = { modalExit() },
         ) {
-            PlaceholderScreen("Alex Death")
+            AlexDeathScreen(navController = navController)
         }
     }
 }

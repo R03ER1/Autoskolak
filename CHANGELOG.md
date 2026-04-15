@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.48] - 2026-04-15
+- Fáze 7 (Alex): Compose `AlexScreen`, `AlexCharacter`, `FoodMenuSheet`, `ShopSheet` (brýle + „Již brzy“), `AlexViewModel` napojený na `HungerManager` / `LessonProgress`, animace krmení a `FloatingReward` za útratu bodů.
+- `AlexDeathScreen` v navigaci (podrž 3 s, oživení na 50 %, confetti); odstraněny `AlexActivity` / `AlexDeathActivity` a související fragmenty z manifestu; legacy navigace na Alex přes `ComposeMainActivity` + `ComposeNavIntent`.
+- Notifikace hladu: prahy 50 / 20 / 5 %, BigPicture, akce „Nakrmit“, deep link na Alex; `HungerManager.millisUntilNextNotificationBandEdge` + `resetTierFlags`.
+- Zvuky: `SoundManager` rozšířen o `ALEX_TAP` / `ALEX_FEED` (raw soubory volitelné).
+- Volitelné PNG v `imageassets`: `AlexSadC`, `AlexFamine` a CAlex varianty (fallback na stávající výrazy).
+
 ## [2.0.47] - 2026-04-15
 - Fixed: pád kvízu při vibraci — doplněno `android.permission.VIBRATE` v manifestu; `QuizViewModel.vibrate` kontroluje oprávnění a ignoruje `SecurityException`.
 

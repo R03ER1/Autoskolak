@@ -1,0 +1,9 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+# Ignoruj kompletně build výstupy
+build/
+**/build/
+.gradle/
+**/intermediates/
+**/generated/
+*.jar
+*.class

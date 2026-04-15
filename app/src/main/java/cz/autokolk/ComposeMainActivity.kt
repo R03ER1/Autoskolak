@@ -1,27 +1,38 @@
 package cz.autokolk
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import cz.autokolk.ui.AutokolkApp
+import cz.autokolk.ui.navigation.ComposeNavIntent
 import cz.autokolk.ui.theme.AutokolkTheme
-import cz.autokolk.ui.theme.ThemePreferences
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class ComposeMainActivity : ComponentActivity() {
+    private val openTabExtra = MutableStateFlow<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        openTabExtra.value = intent.getStringExtra(ComposeNavIntent.EXTRA_OPEN_TAB)
         enableEdgeToEdge()
         setContent {
-            val themePreferences = remember { ThemePreferences(this) }
-            var themeMode by remember { mutableStateOf(themePreferences.themeMode) }
-            AutokolkTheme(themeMode = themeMode) {
-                AutokolkApp()
+            val initialOpenTab by openTabExtra.collectAsState()
+            AutokolkTheme {
+                AutokolkApp(
+                    initialOpenTab = initialOpenTab,
+                    onConsumeInitialTab = { openTabExtra.value = null },
+                )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        openTabExtra.value = intent.getStringExtra(ComposeNavIntent.EXTRA_OPEN_TAB)
     }
 }

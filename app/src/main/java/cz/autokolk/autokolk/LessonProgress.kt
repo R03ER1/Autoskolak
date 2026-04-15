@@ -98,6 +98,13 @@ class LessonProgress(private val context: Context) {
         prefs.edit().putBoolean("accessory_sunglasses_enabled", enabled).apply()
     }
 
+    fun getLionName(): String = prefs.getString("lion_name", "Alex") ?: "Alex"
+
+    fun setLionName(name: String) {
+        val clean = name.trim().ifEmpty { "Alex" }.take(20)
+        prefs.edit().putString("lion_name", clean).apply()
+    }
+
     // --- Rename feature unlock ---
     fun hasRenameUnlocked(): Boolean {
         return prefs.getBoolean("feature_rename", false)

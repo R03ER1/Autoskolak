@@ -17,7 +17,8 @@ import androidx.compose.ui.platform.LocalContext
  * actual OGG files are added in Phase 12.
  *
  * Expected raw resource names: `sound_correct`, `sound_wrong`, `sound_streak`,
- * `sound_coin`, `sound_tap`, `sound_levelup`, `sound_countdown`.
+ * `sound_coin`, `sound_tap`, `sound_levelup`, `sound_countdown`,
+ * `sound_alex_tap`, `sound_alex_feed` (Alex mazlíček).
  */
 object SoundManager {
 
@@ -36,6 +37,8 @@ object SoundManager {
         TAP("sound_tap"),
         LEVELUP("sound_levelup"),
         COUNTDOWN("sound_countdown"),
+        ALEX_TAP("sound_alex_tap"),
+        ALEX_FEED("sound_alex_feed"),
     }
 
     fun init(context: Context) {

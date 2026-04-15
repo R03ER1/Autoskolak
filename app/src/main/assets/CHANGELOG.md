@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.48] - 2026-04-15
+- Fáze 7 (Alex): celá stránka Alexe v Compose (krmení, obchod, přejmenování), `AlexDeathScreen`, odstranění starých Activity; odkaz z legacy menu na Compose s Alex záložkou.
+- Notifikace hladu: úrovně 50 / 20 / 5 %, velký obrázek, tlačítko Nakrmit.
+- Volitelné nové výrazy lva: `AlexSadC.png`, `AlexFamine.png` a CAlex varianty (aplikace má fallback).
+
 ## [2.0.47] - 2026-04-15
 - Oprava: kvíz už nepadá na vibraci — v manifestu je `VIBRATE`, ViewModel před voláním kontroluje oprávnění.
 

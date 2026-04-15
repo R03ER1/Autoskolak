@@ -58,8 +58,7 @@ class HungerManager(context: Context) {
         if (clamped != oldHunger) {
             // If hunger increased, reset last-notified boundary so future drops notify correctly
             if (clamped > oldHunger) {
-                val nPrefs = context.getSharedPreferences("hunger_notifications", Context.MODE_PRIVATE)
-                nPrefs.edit().putInt("last_notified_hunger_level", 100).apply()
+                HungerNotificationService.resetTierFlags(context)
             }
             scheduleHungerNotification()
         }
@@ -124,9 +123,7 @@ class HungerManager(context: Context) {
 
             if (hunger != oldHunger) {
                 if (hunger > oldHunger) {
-                    // On decay reversal (e.g., feeding), reset last-notified so next thresholds will notify
-                    val nPrefs = context.getSharedPreferences("hunger_notifications", Context.MODE_PRIVATE)
-                    nPrefs.edit().putInt("last_notified_hunger_level", 100).apply()
+                    HungerNotificationService.resetTierFlags(context)
                 }
                 scheduleHungerNotification()
             }
@@ -203,6 +200,44 @@ class HungerManager(context: Context) {
             cursor += intervalMillis
             hunger -= 1
             if (hunger <= 0) break
+        }
+
+        val delay = cursor - now
+        return if (delay > 0L) delay else 0L
+    }
+
+    /**
+     * Millis until [getCurrentHunger] first becomes at or below the next notification band edge
+     * (50 → 20 → 5 → 0). Used to schedule [HungerNotificationService].
+     */
+    fun millisUntilNextNotificationBandEdge(): Long {
+        applyDecayIfNeeded()
+        val now = System.currentTimeMillis()
+
+        val freezeUntil = prefs.getLong(KEY_FREEZE_UNTIL, 0L)
+        if (freezeUntil > now) return freezeUntil - now
+
+        var hunger = prefs.getInt(KEY_HUNGER, MAX_HUNGER)
+        if (hunger <= 0) return 0L
+
+        val nextStop = when {
+            hunger > 50 -> 50
+            hunger > 20 -> 20
+            hunger > 5 -> 5
+            else -> 0
+        }
+
+        var cursor = prefs.getLong(KEY_LAST_UPDATE, now)
+        if (cursor < now) cursor = now
+
+        while (hunger > nextStop) {
+            val ratePerHour = getHourlyDecayRateFor(hunger.toDouble())
+            if (ratePerHour <= 0.0) return 0L
+            val minutesPerPoint = 60.0 / ratePerHour
+            val intervalMillis = kotlin.math.max(15L * 60L * 1000L, (minutesPerPoint * 60_000.0).toLong())
+            cursor += intervalMillis
+            hunger -= 1
+            if (hunger < 0) hunger = 0
         }
 
         val delay = cursor - now

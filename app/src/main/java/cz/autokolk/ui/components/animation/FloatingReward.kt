@@ -32,6 +32,8 @@ fun FloatingReward(
     visible: Boolean,
     amount: Int,
     modifier: Modifier = Modifier,
+    /** Když není null, zobrazí se místo `+$amount` (např. útrata u krmení). */
+    textOverride: String? = null,
     onDismiss: () -> Unit,
 ) {
     val scale by animateFloatAsState(
@@ -66,7 +68,7 @@ fun FloatingReward(
         androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
             Text(
-                text = "+$amount",
+                text = textOverride ?: "+$amount",
                 style = MaterialTheme.typography.titleLarge,
                 color = Color.White,
                 modifier = Modifier.padding(start = 8.dp),

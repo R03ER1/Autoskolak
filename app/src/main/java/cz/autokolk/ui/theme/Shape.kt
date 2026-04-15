@@ -3,7 +3,6 @@ package cz.autokolk.ui.theme
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 val AutokolkShapes = Shapes(
@@ -14,6 +13,9 @@ val AutokolkShapes = Shapes(
     extraLarge = RoundedCornerShape(32.dp),
 )
 
-val PillShape: Shape = RoundedCornerShape(50)
-val BottomSheetShape: Shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-val LessonNodeShape: Shape = CircleShape
+/** Plně zaoblené pilulky (velký poloměr rohů). */
+val PillShape = RoundedCornerShape(50.dp)
+
+val BottomSheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+
+val LessonNodeShape = CircleShape
