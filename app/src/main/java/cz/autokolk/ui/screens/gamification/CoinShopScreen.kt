@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,30 @@ fun CoinShopScreen(navController: NavHostController) {
     val activity = context as? Activity
     val lp = remember { LessonProgress(context) }
     var snack by remember { mutableStateOf<String?>(null) }
+    var showWheelDialog by remember { mutableStateOf(false) }
+    var showBoxDialog by remember { mutableStateOf(false) }
+    var shopRefresh by remember { mutableIntStateOf(0) }
+    val wheelLeft = remember(shopRefresh, lp) { lp.getBonusWheelRollsRemainingToday() }
+    val boxLeft = remember(shopRefresh, lp) { lp.getMysteryBoxOpensRemainingToday() }
+
+    if (showWheelDialog) {
+        BonusWheelDialog(
+            lessonProgress = lp,
+            onDismiss = {
+                showWheelDialog = false
+                shopRefresh++
+            },
+        )
+    }
+    if (showBoxDialog) {
+        MysteryBoxDialog(
+            lessonProgress = lp,
+            onDismiss = {
+                showBoxDialog = false
+                shopRefresh++
+            },
+        )
+    }
 
     AnimatedBackground(Modifier.fillMaxSize()) {
         Column(
@@ -69,21 +94,31 @@ fun CoinShopScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
+            Text(
+                "Bonusové kolo — zbývá $wheelLeft/3",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                modifier = Modifier.align(Alignment.Start),
+            )
+            Spacer(Modifier.height(4.dp))
             PrimaryGradientButton(
-                text = "Zatočit bonusovým kolem (max. 3× denně)",
-                onClick = {
-                    val c = lp.rollBonusWheel()
-                    snack = if (c <= 0) "Dnes už žádné kolo." else "Vyhráváš $c mincí!"
-                },
+                text = "Zatočit bonusovým kolem",
+                onClick = { showWheelDialog = true },
+                enabled = wheelLeft > 0,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
+            Text(
+                "Mystery box — zbývá $boxLeft/2",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                modifier = Modifier.align(Alignment.Start),
+            )
+            Spacer(Modifier.height(4.dp))
             PrimaryGradientButton(
-                text = "Otevřít mystery box (max. 2× denně)",
-                onClick = {
-                    val c = lp.openMysteryBox()
-                    snack = if (c <= 0) "Dnes už žádný box." else "Box: +$c mincí a malý XP bonus!"
-                },
+                text = "Otevřít mystery box",
+                onClick = { showBoxDialog = true },
+                enabled = boxLeft > 0,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))

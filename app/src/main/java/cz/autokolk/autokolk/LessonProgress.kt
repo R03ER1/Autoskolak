@@ -90,7 +90,30 @@ class LessonProgress(private val context: Context) {
         private const val KEY_BOX_DAY = "mystery_box_day"
         private const val KEY_BOX_COUNT_DAY = "mystery_box_count_day"
         private const val KEY_BOX_PITY = "mystery_box_pity"
+
+        /** XP navíc při otevření mystery boxu — musí odpovídat [openMysteryBox]. */
+        private const val MYSTERY_BOX_BONUS_XP = 8
     }
+
+    /** Zbývající točení bonusovým kolem dnes (max. 3). */
+    fun getBonusWheelRollsRemainingToday(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_WHEEL_DAY, null) != today) {
+            return 3
+        }
+        return (3 - prefs.getInt(KEY_WHEEL_COUNT_DAY, 0)).coerceAtLeast(0)
+    }
+
+    /** Zbývající otevření mystery boxu dnes (max. 2). */
+    fun getMysteryBoxOpensRemainingToday(): Int {
+        val today = todayString()
+        if (prefs.getString(KEY_BOX_DAY, null) != today) {
+            return 2
+        }
+        return (2 - prefs.getInt(KEY_BOX_COUNT_DAY, 0)).coerceAtLeast(0)
+    }
+
+    fun getMysteryBoxBonusXp(): Int = MYSTERY_BOX_BONUS_XP
 
     // --- Accessories ownership flags ---
     fun hasSunglasses(): Boolean {
@@ -1424,7 +1447,7 @@ class LessonProgress(private val context: Context) {
         prefs.edit().putInt(KEY_BOX_PITY, newPity.coerceAtMost(6)).apply()
         addPoints(base)
         try {
-            addXp(8, applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
+            addXp(MYSTERY_BOX_BONUS_XP, applyDoubleXpFromAds = true, sessionComboMultiplier = 1f)
         } catch (_: Throwable) {
         }
         return base
