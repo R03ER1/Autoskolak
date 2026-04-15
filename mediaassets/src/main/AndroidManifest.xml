@@ -4,11 +4,10 @@
 
     <dist:module
         dist:instant="false"
-        dist:title="@string/title_videoassets5">
+        dist:title="@string/title_mediaassets">
         <dist:delivery>
             <dist:on-demand />
         </dist:delivery>
         <dist:fusing dist:include="true" />
     </dist:module>
 </manifest>
-

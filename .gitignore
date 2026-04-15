@@ -9,7 +9,7 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
-# Gradle outputs in all modules (e.g. :videoassets1, :imageassets) — do not commit
+# Gradle outputs in all modules (e.g. :mediaassets) — do not commit
 **/build/
 /captures
 .externalNativeBuild

@@ -24,9 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Autoškolák"
 include(":app")
-include(":videoassets1")
-include(":videoassets2")
-include(":videoassets3")
-include(":videoassets4")
-include(":videoassets5")
-include(":imageassets")
+include(":mediaassets")

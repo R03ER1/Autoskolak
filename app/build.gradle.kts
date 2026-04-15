@@ -16,8 +16,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 42
-        versionName = "2.0.53"
+        versionCode = 43
+        versionName = "2.0.54"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -107,14 +107,7 @@ android {
         compose = true
     }
     
-    setDynamicFeatures(setOf(
-        ":imageassets",
-        ":videoassets1",
-        ":videoassets2",
-        ":videoassets3",
-        ":videoassets4",
-        ":videoassets5"
-    ))
+    setDynamicFeatures(setOf(":mediaassets"))
 }
 
 dependencies {

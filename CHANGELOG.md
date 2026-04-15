@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.54] - 2026-04-15
+- Sloučení dynamických modulů `imageassets` + `videoassets1`–`5` do jednoho modulu `mediaassets` (~155 MB souborů na disku; limit Play pro jeden feature modul je 200 MB komprimovaného stažení). Zjednodušená konfigurace Gradle a jedna žádost Split Install pro obrázky i videa.
+
 ## [2.0.53] - 2026-04-15
 - Aktualizace závislostí: Kotlin 2.2.21, KSP 2.2.21-2.0.5, AndroidX (core-ktx 1.18, lifecycle 2.10, activity-compose 1.13, WorkManager 2.11.2, Room 2.8.4, testy junit/espresso), Material 1.13, Gson, Commons CSV, Play Services Ads a UMP přes `libs.versions.toml`; WorkManager sjednocen z katalogu místo natvrdo 2.8.1.
 

@@ -174,9 +174,8 @@ class MainActivity : AutokolkActivity() {
     private var isPlaying = true
 
     /**
-     * Ensure that the dynamic feature modules containing video assets are installed.
-     * Videos are split across 5 modules (videoassets1-5), and once installed
-     * they are accessible via the app's AssetManager.
+     * Ensure the on-demand feature module with images and lesson videos is installed.
+     * After install, assets are visible through the app [AssetManager].
      */
     private fun requestVideoModulesIfNeeded() {
         try {

@@ -43,6 +43,7 @@ import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListene
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import cz.autokolk.VideoModuleRegistry
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
@@ -51,8 +52,6 @@ import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 
 private const val TAG = "SplashScreen"
-private const val IMAGE_MODULE = "imageassets"
-
 private enum class SplashState {
     CONSENT, DFM_CHECK, DFM_DOWNLOADING, TERMS, ERROR, NAVIGATING,
 }
@@ -92,19 +91,19 @@ fun SplashScreen(navController: NavHostController) {
         state = SplashState.DFM_CHECK
         statusText = "Kontrola obsahu…"
 
-        if (splitInstallManager.installedModules.contains(IMAGE_MODULE)) {
-            Log.d(TAG, "Image module already installed")
+        if (splitInstallManager.installedModules.contains(VideoModuleRegistry.MEDIA_FEATURE_MODULE_NAME)) {
+            Log.d(TAG, "Media module already installed")
             checkTermsThenNavigate()
             return
         }
 
         state = SplashState.DFM_DOWNLOADING
-        statusText = "Stahování obrázků…"
+        statusText = "Stahování obsahu…"
         downloadProgress = -1f
 
         try {
             val request = SplitInstallRequest.newBuilder()
-                .addModule(IMAGE_MODULE)
+                .addModule(VideoModuleRegistry.MEDIA_FEATURE_MODULE_NAME)
                 .build()
             splitInstallManager.startInstall(request)
                 .addOnFailureListener { e ->
@@ -121,7 +120,9 @@ fun SplashScreen(navController: NavHostController) {
 
     DisposableEffect(splitInstallManager) {
         val listener = SplitInstallStateUpdatedListener { installState ->
-            if (!installState.moduleNames().contains(IMAGE_MODULE)) return@SplitInstallStateUpdatedListener
+            if (!installState.moduleNames().contains(VideoModuleRegistry.MEDIA_FEATURE_MODULE_NAME)) {
+                return@SplitInstallStateUpdatedListener
+            }
             when (installState.status()) {
                 SplitInstallSessionStatus.DOWNLOADING -> {
                     val total = installState.totalBytesToDownload()

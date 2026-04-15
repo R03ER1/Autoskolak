@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.54] - 2026-04-15
+- Jeden dynamický modul `mediaassets` místo `imageassets` a `videoassets1`–`5` (obrázky + videa; velikost pod limitem 200 MB na modul u Google Play).
+
 ## [2.0.53] - 2026-04-15
 - Aktualizace závislostí: Kotlin 2.2.21, KSP 2.2.21-2.0.5, AndroidX (core-ktx 1.18, lifecycle 2.10, activity-compose 1.13, WorkManager 2.11.2, Room 2.8.4, testy junit/espresso), Material 1.13, Gson, Commons CSV, Play Services Ads a UMP přes `libs.versions.toml`; WorkManager sjednocen z katalogu místo natvrdo 2.8.1.
 

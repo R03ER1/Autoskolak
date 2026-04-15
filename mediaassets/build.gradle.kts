@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 android {
-    namespace = "cz.autokolk.imageassets"
-    compileSdk = 35
+    namespace = "cz.autokolk.mediaassets"
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -27,8 +27,6 @@ android {
 
 dependencies {
     implementation(project(":app"))
-    // core-ktx is already provided by base module via project(":app")
-    // Removing it to avoid duplicate androidx.collection dependency
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

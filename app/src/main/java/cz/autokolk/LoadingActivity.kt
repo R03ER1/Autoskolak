@@ -30,7 +30,7 @@ import com.google.android.ump.UserMessagingPlatform
 class LoadingActivity : AutokolkActivity() {
 
     private lateinit var splitInstallManager: SplitInstallManager
-    private val imageModuleName = "imageassets"
+    private val mediaModuleName = VideoModuleRegistry.MEDIA_FEATURE_MODULE_NAME
 
     private lateinit var statusText: TextView
     private lateinit var detailText: TextView
@@ -39,7 +39,7 @@ class LoadingActivity : AutokolkActivity() {
 
     private val stateListener = SplitInstallStateUpdatedListener { state ->
         val modules = state.moduleNames()
-        if (!modules.contains(imageModuleName)) {
+        if (!modules.contains(mediaModuleName)) {
             return@SplitInstallStateUpdatedListener
         }
         when (state.status()) {
@@ -54,7 +54,7 @@ class LoadingActivity : AutokolkActivity() {
                 }
             }
             SplitInstallSessionStatus.INSTALLED -> {
-                Log.d("LoadingActivity", "Image module '$imageModuleName' installed")
+                Log.d("LoadingActivity", "Media module '$mediaModuleName' installed")
                 ensureTermsAcceptedThenNavigate()
             }
             SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> {
@@ -69,7 +69,7 @@ class LoadingActivity : AutokolkActivity() {
                 updateProgress(null)
             }
             SplitInstallSessionStatus.FAILED -> {
-                Log.e("LoadingActivity", "Image module '$imageModuleName' installation failed: ${state.errorCode()}")
+                Log.e("LoadingActivity", "Media module '$mediaModuleName' installation failed: ${state.errorCode()}")
                 showError()
             }
         }
@@ -134,9 +134,9 @@ class LoadingActivity : AutokolkActivity() {
     }
 
     private fun startOrCheckInstall() {
-        // If the image module is already installed, we can proceed immediately.
-        if (splitInstallManager.installedModules.contains(imageModuleName)) {
-            Log.d("LoadingActivity", "Image module already installed, navigating to HomeActivity")
+        // If the media feature is already installed, we can proceed immediately.
+        if (splitInstallManager.installedModules.contains(mediaModuleName)) {
+            Log.d("LoadingActivity", "Media module already installed, navigating to HomeActivity")
             ensureTermsAcceptedThenNavigate()
             return
         }
@@ -145,21 +145,21 @@ class LoadingActivity : AutokolkActivity() {
 
         try {
             val request = SplitInstallRequest.newBuilder()
-                .addModule(imageModuleName)
+                .addModule(mediaModuleName)
                 .build()
 
-            Log.d("LoadingActivity", "Requesting install of dynamic feature module: $imageModuleName")
+            Log.d("LoadingActivity", "Requesting install of dynamic feature module: $mediaModuleName")
             splitInstallManager
                 .startInstall(request)
                 .addOnSuccessListener { sessionId ->
-                    Log.d("LoadingActivity", "Image module install started (sessionId=$sessionId)")
+                    Log.d("LoadingActivity", "Media module install started (sessionId=$sessionId)")
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("LoadingActivity", "Failed to request install for module '$imageModuleName'", exception)
+                    Log.e("LoadingActivity", "Failed to request install for module '$mediaModuleName'", exception)
                     showError()
                 }
         } catch (e: Exception) {
-            Log.e("LoadingActivity", "Error while requesting image module installation", e)
+            Log.e("LoadingActivity", "Error while requesting media module installation", e)
             showError()
         }
     }

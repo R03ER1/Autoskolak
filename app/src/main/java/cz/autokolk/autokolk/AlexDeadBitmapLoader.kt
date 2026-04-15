@@ -4,7 +4,7 @@ import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
-/** Single dead Alex asset; primary path matches `imageassets` feature module. */
+/** Single dead Alex asset; primary path matches the `mediaassets` feature module. */
 object AlexDeadBitmapLoader {
     private val PATHS = listOf(
         "images/alex/AlexDead.png",

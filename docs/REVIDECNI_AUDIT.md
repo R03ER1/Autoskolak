@@ -30,7 +30,7 @@ Aplikace **Autoškolák** (`cz.autokolk`, minSdk 24, targetSdk 35) je monolitick
 
 | Oblast | Stav | Poznámka |
 |--------|------|----------|
-| Moduly Gradle (`settings.gradle.kts`) | **[OK]** | `:app`, `:imageassets`, `:videoassets1`–`:videoassets5` |
+| Moduly Gradle (`settings.gradle.kts`) | **[OK]** | `:app`, `:mediaassets` (obrázky + videa) |
 | `dynamicFeatures` v `app/build.gradle.kts` | **[OK]** | Shoda se seznamem modulů |
 | `imageassets` — žádost o instalaci | **[OK] / [zlepšit]** | `App.onCreate` + `LoadingActivity` — dvojí request je idempotentní, ale zdvojené logování/sessions zbytečné **[P3, dluh]** |
 | `videoassets*` — on-demand | **[OK] / [zlepšit]** | Mapování soubor → modul v `MainActivity`; uživatel při chybějícím modulu nevidí vysvětlující UI, jen schované video **[P2, UX/použitelnost]** |
