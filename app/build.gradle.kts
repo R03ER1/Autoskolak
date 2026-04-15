@@ -15,8 +15,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 22
-        versionName = "2.0.32"
+        versionCode = 28
+        versionName = "2.0.36"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

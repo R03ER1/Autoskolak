@@ -7,17 +7,30 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
-## [2.0.32] - 2026-04-15
-- Novinka: Rozšířený design token systém (`Tokens.kt`) — nové kategorie tokenů: Opacity (7 úrovní průhlednosti), Content Padding (5 velikostí), rozšířené Animation durations (12 presetů od 50ms do 10s), Spring & interaction presety (damping, press scale), Border widths, další velikosti komponent (hit target, avatar, media heights), Canvas/Stroke konstanty.
+## [2.0.36] - 2026-04-15
+- Added: Type-safe navigační routes — `Route` sealed class s 12 statickými a 4 parametrickými routami, argument konstanty a `mainTabs` helper (`ui/navigation/Routes.kt`).
+- Marked: Kroky 19–30 (fáze 2 design systém) označeny jako hotové v REDESIGN_PLAN.md.
 
-## [2.0.31] - 2026-04-15
-- Novinka: Definice tvarů (`Shape.kt`) — Material3 `Shapes` s glassmorphism zaoblením (8/12/16/24/32 dp), plus vlastní `PillShape`, `BottomSheetShape` a `LessonNodeShape` pro specifické UI prvky.
+## [2.0.35] - 2026-04-14
+- Added: `PrimaryGradientButton` — CTA s gradientem, animovaným stínem (glow), pružinovým stiskem a volitelným shimmer přes gradient.
 
-## [2.0.30] - 2026-04-15
-- Novinka: Kompletní typografie s fontem Quicksand (`Type.kt`) — 5 váhových řezů (Light/Regular/Medium/SemiBold/Bold), všech 15 textových stylů Material3 s explicitním řádkováním a prokládáním písmen. Dostupné přes `MaterialTheme.typography`.
+## [2.0.34] - 2026-04-14
+- Added: Tlačítka glass/CTA — `GlassButton` (slot + pružinová animace), `PrimaryButton`, `SecondaryButton`, `DangerButton` (`ui/components/buttons/GlassButton.kt`).
 
-## [2.0.29] - 2026-04-15
-- Novinka: Compose MaterialTheme integrace — `darkColorScheme` / `lightColorScheme` namapované z Color.kt tokenů, `ThemeMode` enum (Light/Dark/Systémový) s uložením preference do `SharedPreferences`, `CompositionLocalProvider` pro propagaci režimu. Placeholder `Type.kt` a `Shape.kt` pro kroky 16–17.
+## [2.0.33] - 2026-04-14
+- Added: `GlassCard` a `GlassCardBlur` — glassmorphism karty (`GlassCard` gradient + border; `GlassCardBlur` s Haze `hazeEffect` a `HazeMaterials.thin`).
+
+## [2.0.32] - 2026-04-14
+- Added: Design tokeny — `Tokens.kt` s `AutokolkTokens` (elevation, spacing, glass, délky animací, ikony a layout výšky).
+
+## [2.0.31] - 2026-04-14
+- Added: Material 3 tvary — `Shape.kt` (`AutokolkShapes`, `PillShape`, `BottomSheetShape`, `LessonNodeShape`) a zapojení `shapes` do `AutokolkTheme`.
+
+## [2.0.30] - 2026-04-14
+- Added: Compose typografie — `Type.kt` s rodinou fontů Quicksand a `AutokolkTypography` (Material 3 hierarchie), zapojeno do `AutokolkTheme` přes `MaterialTheme.typography`.
+
+## [2.0.29] - 2026-04-14
+- Novinka: Compose ColorScheme & MaterialTheme — `darkColorScheme()` a `lightColorScheme()` napojeny na `AutokolkTheme`, preference tmavého/světlého režimu uložená v SharedPreferences přes `ThemeMode` enum, `LocalIsDarkTheme` dostupný ve všech composables.
 
 ## [2.0.28] - 2026-04-14
 - Novinka: Barevná paleta pro light mode (`Color.kt`) — světlá pozadí, glass-effect tokeny pro světlý režim, upravené akcentové barvy pro kontrast na světlém povrchu a tmavé textové varianty. Připraveno pro přepínání dark/light tématu.

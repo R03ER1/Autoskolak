@@ -47,19 +47,19 @@
 | 16 | Definice typografie | 2 | ✅ |
 | 17 | Definice tvarů (Shapes) | 2 | ✅ |
 | 18 | Rozšířený design token systém | 2 | ✅ |
-| 19 | GlassCard composable | 2 | ⬜ |
-| 20 | GlassButton composable | 2 | ⬜ |
-| 21 | PrimaryGradientButton composable | 2 | ⬜ |
-| 22 | AnswerButton composable | 2 | ⬜ |
-| 23 | AnimatedProgressBar composable | 2 | ⬜ |
-| 24 | CircularProgress / RingProgress composable | 2 | ⬜ |
-| 25 | AnimatedCounter composable | 2 | ⬜ |
-| 26 | CoinPopup / FloatingReward composable | 2 | ⬜ |
-| 27 | ConfettiOverlay composable | 2 | ⬜ |
-| 28 | Shimmer / skeleton loading efekt | 2 | ⬜ |
-| 29 | Animated background (subtle particle / gradient animation) | 2 | ⬜ |
-| 30 | Lottie asset příprava | 2 | ⬜ |
-| 31 | Definice navigation routes | 3 | ⬜ |
+| 19 | GlassCard composable | 2 | ✅ |
+| 20 | GlassButton composable | 2 | ✅ |
+| 21 | PrimaryGradientButton composable | 2 | ✅ |
+| 22 | AnswerButton composable | 2 | ✅ |
+| 23 | AnimatedProgressBar composable | 2 | ✅ |
+| 24 | CircularProgress / RingProgress composable | 2 | ✅ |
+| 25 | AnimatedCounter composable | 2 | ✅ |
+| 26 | CoinPopup / FloatingReward composable | 2 | ✅ |
+| 27 | ConfettiOverlay composable | 2 | ✅ |
+| 28 | Shimmer / skeleton loading efekt | 2 | ✅ |
+| 29 | Animated background (subtle particle / gradient animation) | 2 | ✅ |
+| 30 | Lottie asset příprava | 2 | ✅ |
+| 31 | Definice navigation routes | 3 | ✅ |
 | 32 | NavGraph setup | 3 | ⬜ |
 | 33 | Bottom navigation bar (animated) | 3 | ⬜ |
 | 34 | Animace ikonky v bottom baru | 3 | ⬜ |
