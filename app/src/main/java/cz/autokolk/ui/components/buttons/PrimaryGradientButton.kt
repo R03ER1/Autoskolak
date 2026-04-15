@@ -16,7 +16,6 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.width
@@ -29,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -100,9 +100,35 @@ fun PrimaryGradientButton(
             .padding(horizontal = 32.dp, vertical = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        // Vnitřní Box jen podle obsahu — shimmer s fillMaxSize nepřetáhne tlačítko přes celou šířku/výšku.
+        // Shimmer jen jako kresba přes obsah — žádný druhý child s fillMaxSize, který by při puštění prstu
+        // znovu roztáhl tlačítko na celou šířku rodiče (fillMaxWidth z onboardingu).
         Box(
-            Modifier.wrapContentWidth(),
+            Modifier
+                .wrapContentWidth()
+                .clip(PillShape)
+                .drawWithContent {
+                    drawContent()
+                    if (shimmerEnabled && enabled && !isPressed) {
+                        drawRect(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.White.copy(alpha = 0.16f),
+                                    Color.Transparent,
+                                ),
+                                start = Offset(
+                                    x = (shimmerPhase - 0.4f) * 400f,
+                                    y = 0f,
+                                ),
+                                end = Offset(
+                                    x = (shimmerPhase + 0.4f) * 400f,
+                                    y = size.height,
+                                ),
+                            ),
+                            size = size,
+                        )
+                    }
+                },
             contentAlignment = Alignment.Center,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -118,30 +144,6 @@ fun PrimaryGradientButton(
                     text = text,
                     color = DarkBackground,
                     fontWeight = FontWeight.Bold,
-                )
-            }
-            if (shimmerEnabled && enabled && !isPressed) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .clip(PillShape)
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.White.copy(alpha = 0.16f),
-                                    Color.Transparent,
-                                ),
-                                start = Offset(
-                                    x = (shimmerPhase - 0.4f) * 400f,
-                                    y = 0f,
-                                ),
-                                end = Offset(
-                                    x = (shimmerPhase + 0.4f) * 400f,
-                                    y = 80f,
-                                ),
-                            ),
-                        ),
                 )
             }
         }

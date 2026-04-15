@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.41] - 2026-04-15
+- Fixed: `PrimaryGradientButton` — shimmer přes `drawWithContent` místo sibling `Box(fillMaxSize)`, aby se při puštění prstu tlačítko znovu neroztáhlo na celou šířku rodiče (onboarding Přeskočit/Další).
+
 ## [2.0.40] - 2026-04-15
 - Fixed: Onboarding patička — CTA max 400dp, vycentrované; řádek Přeskočit/Další bez roztažení přes celou šířku.
 - Fixed: `PrimaryGradientButton` — shimmer uvnitř vnitřního `wrapContentWidth` Boxu, aby tlačítko nemělo divnou výšku/šířku při `fillMaxWidth`.
