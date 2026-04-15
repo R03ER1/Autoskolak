@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.40] - 2026-04-15
+- Fixed: Onboarding patička — CTA max 400dp, vycentrované; řádek Přeskočit/Další bez roztažení přes celou šířku.
+- Fixed: `PrimaryGradientButton` — shimmer uvnitř vnitřního `wrapContentWidth` Boxu, aby tlačítko nemělo divnou výšku/šířku při `fillMaxWidth`.
+
 ## [2.0.39] - 2026-04-15
 - Added: Fáze 4 onboarding — `OnboardingScreen` (HorizontalPager), info stránky s Lottie, denní cíl, pojmenování lva, demo otázka, na Android 13+ krok s žádostí o notifikace (`ui/screens/onboarding/`).
 - Added: `OnboardingPreferences` (`onboarding_prefs`), `AnimatedBackground`, `OnboardingData` / `buildOnboardingSteps()`.

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -99,44 +100,50 @@ fun PrimaryGradientButton(
             .padding(horizontal = 32.dp, vertical = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        if (shimmerEnabled && enabled && !isPressed) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .clip(PillShape)
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.White.copy(alpha = 0.16f),
-                                Color.Transparent,
-                            ),
-                            start = Offset(
-                                x = (shimmerPhase - 0.4f) * 400f,
-                                y = 0f,
-                            ),
-                            end = Offset(
-                                x = (shimmerPhase + 0.4f) * 400f,
-                                y = 80f,
+        // Vnitřní Box jen podle obsahu — shimmer s fillMaxSize nepřetáhne tlačítko přes celou šířku/výšku.
+        Box(
+            Modifier.wrapContentWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = DarkBackground,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                }
+                Text(
+                    text = text,
+                    color = DarkBackground,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            if (shimmerEnabled && enabled && !isPressed) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .clip(PillShape)
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.White.copy(alpha = 0.16f),
+                                    Color.Transparent,
+                                ),
+                                start = Offset(
+                                    x = (shimmerPhase - 0.4f) * 400f,
+                                    y = 0f,
+                                ),
+                                end = Offset(
+                                    x = (shimmerPhase + 0.4f) * 400f,
+                                    y = 80f,
+                                ),
                             ),
                         ),
-                    ),
-            )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = DarkBackground,
                 )
-                Spacer(Modifier.width(8.dp))
             }
-            Text(
-                text = text,
-                color = DarkBackground,
-                fontWeight = FontWeight.Bold,
-            )
         }
     }
 }

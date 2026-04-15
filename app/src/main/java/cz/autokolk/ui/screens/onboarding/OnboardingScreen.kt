@@ -26,6 +26,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.pager.HorizontalPager
@@ -78,6 +81,9 @@ import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.PillShape
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
+
+/** Maximální šířka CTA v patičce — na širokých displejích nepřetáhnout přes celou obrazovku. */
+private val OnboardingFooterCtaMaxWidth = 400.dp
 
 private data class DailyGoalRow(
     val emoji: String,
@@ -488,10 +494,15 @@ private fun OnboardingNotificationPage(
         PrimaryGradientButton(
             text = "Povolit notifikace",
             onClick = onAllow,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = OnboardingFooterCtaMaxWidth),
         )
         Spacer(Modifier.height(12.dp))
-        TextButton(onClick = onSkip, modifier = Modifier.fillMaxWidth()) {
+        TextButton(
+            onClick = onSkip,
+            modifier = Modifier.wrapContentWidth(),
+        ) {
             Text("Teď ne", color = TextSecondary)
         }
     }
@@ -512,7 +523,10 @@ private fun OnboardingFooter(
     onFinishFromDemo: () -> Unit,
 ) {
     Column(
-        Modifier.padding(24.dp),
+        Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -537,12 +551,17 @@ private fun OnboardingFooter(
         }
         Spacer(Modifier.height(24.dp))
 
+        // CTA: až po šířku rodiče, max 400dp — vycentrované přes horizontalAlignment sloupce
+        val ctaWidthModifier = Modifier
+            .fillMaxWidth()
+            .widthIn(max = OnboardingFooterCtaMaxWidth)
+
         when {
             isLastPage && !hasNotificationStep && isDemoPage && demoAnswered -> {
                 PrimaryGradientButton(
                     text = "Začít!",
                     onClick = onFinishFromDemo,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = ctaWidthModifier,
                 )
             }
             isDemoPage && !demoAnswered -> {
@@ -550,33 +569,41 @@ private fun OnboardingFooter(
                     text = "Vyber odpověď",
                     onClick = { },
                     enabled = false,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = ctaWidthModifier,
                 )
             }
             isDemoPage -> {
                 PrimaryGradientButton(
                     text = "Další",
                     onClick = onNext,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = ctaWidthModifier,
                 )
             }
             isInfoPage -> {
                 Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = ctaWidthModifier,
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextButton(onClick = onSkip) {
+                    TextButton(
+                        onClick = onSkip,
+                        modifier = Modifier.wrapContentWidth(),
+                    ) {
                         Text("Přeskočit", color = TextSecondary)
                     }
-                    PrimaryGradientButton(text = "Další", onClick = onNext)
+                    Spacer(Modifier.width(24.dp))
+                    PrimaryGradientButton(
+                        text = "Další",
+                        onClick = onNext,
+                        modifier = Modifier.wrapContentWidth(),
+                    )
                 }
             }
             else -> {
                 PrimaryGradientButton(
                     text = "Další",
                     onClick = onNext,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = ctaWidthModifier,
                 )
             }
         }
