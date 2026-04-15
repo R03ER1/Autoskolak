@@ -2,7 +2,7 @@
 
 > **Verze plánu:** 1.0  
 > **Datum:** 2026-04-14  
-> **Aktuální verze aplikace:** 2.0.15  
+> **Aktuální verze aplikace:** 2.0.47  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -81,39 +81,39 @@
 | 50 | Onboarding "Demo otázka" | 4 | ✅ |
 | 51 | Onboarding notifikace permission | 4 | ✅ |
 | 52 | Persistentní onboarding stav | 4 | ✅ |
-| 53 | Home screen scaffold | 5 | ⬜ |
-| 54 | Lesson path Canvas křivka (pozadí) | 5 | ⬜ |
-| 55 | Lesson node composable | 5 | ⬜ |
-| 56 | PulsingGlow efekt | 5 | ⬜ |
-| 57 | Lesson path sinusový layout | 5 | ⬜ |
-| 58 | Section headers na path | 5 | ⬜ |
-| 59 | Lesson info popup (BottomSheet) | 5 | ⬜ |
-| 60 | Scroll to current lesson | 5 | ⬜ |
-| 61 | Tutorial overlay na Home (first time) | 5 | ⬜ |
-| 62 | Random event overlay (Compose) | 5 | ⬜ |
-| 63 | Home ViewModel | 5 | ⬜ |
-| 64 | Reading lesson screen (Compose) | 5 | ⬜ |
-| 65 | Integrace se stávajícím LessonProgress | 5 | ⬜ |
-| 66 | Quiz screen scaffold | 6 | ⬜ |
-| 67 | Quiz top bar (progress + close + timer) | 6 | ⬜ |
-| 68 | Question content layout | 6 | ⬜ |
-| 69 | Quiz media (obrázky a video) | 6 | ⬜ |
-| 70 | Answer selection animace | 6 | ⬜ |
-| 71 | Result strip (correct/wrong panel) | 6 | ⬜ |
-| 72 | Quiz ViewModel | 6 | ⬜ |
-| 73 | Přechod mezi otázkami (slide animace) | 6 | ⬜ |
-| 74 | Quiz close confirmation dialog | 6 | ⬜ |
-| 75 | Quiz "streak" micro-interaction | 6 | ⬜ |
-| 76 | Quiz "power-up" hints (budoucí rozšíření) | 6 | ⬜ |
-| 77 | Správná odpověď — particle burst | 6 | ⬜ |
-| 78 | Špatná odpověď — screen shake | 6 | ⬜ |
-| 79 | Quiz timer animace (test mode) | 6 | ⬜ |
-| 80 | Quiz life-loss animace | 6 | ⬜ |
-| 81 | Results screen (lesson mode) | 6 | ⬜ |
-| 82 | Results statistika s animací count-up | 6 | ⬜ |
-| 83 | Streak celebration screen | 6 | ⬜ |
-| 84 | Quiz question number indicator | 6 | ⬜ |
-| 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ⬜ |
+| 53 | Home screen scaffold | 5 | ✅ |
+| 54 | Lesson path Canvas křivka (pozadí) | 5 | ✅ |
+| 55 | Lesson node composable | 5 | ✅ |
+| 56 | PulsingGlow efekt | 5 | ✅ |
+| 57 | Lesson path sinusový layout | 5 | ✅ |
+| 58 | Section headers na path | 5 | ✅ |
+| 59 | Lesson info popup (BottomSheet) | 5 | ✅ |
+| 60 | Scroll to current lesson | 5 | ✅ |
+| 61 | Tutorial overlay na Home (first time) | 5 | ✅ |
+| 62 | Random event overlay (Compose) | 5 | ✅ |
+| 63 | Home ViewModel | 5 | ✅ |
+| 64 | Reading lesson screen (Compose) | 5 | ✅ |
+| 65 | Integrace se stávajícím LessonProgress | 5 | ✅ |
+| 66 | Quiz screen scaffold | 6 | ✅ |
+| 67 | Quiz top bar (progress + close + timer) | 6 | ✅ |
+| 68 | Question content layout | 6 | ✅ |
+| 69 | Quiz media (obrázky a video) | 6 | ✅ |
+| 70 | Answer selection animace | 6 | ✅ |
+| 71 | Result strip (correct/wrong panel) | 6 | ✅ |
+| 72 | Quiz ViewModel | 6 | ✅ |
+| 73 | Přechod mezi otázkami (slide animace) | 6 | ✅ |
+| 74 | Quiz close confirmation dialog | 6 | ✅ |
+| 75 | Quiz "streak" micro-interaction | 6 | ✅ |
+| 76 | Quiz "power-up" hints (budoucí rozšíření) | 6 | ✅ |
+| 77 | Správná odpověď — particle burst | 6 | ✅ |
+| 78 | Špatná odpověď — screen shake | 6 | ✅ |
+| 79 | Quiz timer animace (test mode) | 6 | ✅ |
+| 80 | Quiz life-loss animace | 6 | ✅ |
+| 81 | Results screen (lesson mode) | 6 | ✅ |
+| 82 | Results statistika s animací count-up | 6 | ✅ |
+| 83 | Streak celebration screen | 6 | ✅ |
+| 84 | Quiz question number indicator | 6 | ✅ |
+| 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ✅ |
 | 86 | Alex screen scaffold | 7 | ⬜ |
 | 87 | Alex character composable s animacemi | 7 | ⬜ |
 | 88 | Hunger bar s gradient a animací | 7 | ⬜ |
