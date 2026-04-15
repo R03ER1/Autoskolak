@@ -2,7 +2,7 @@
 
 > **Verze plánu:** 1.0  
 > **Datum:** 2026-04-14  
-> **Aktuální verze aplikace:** 2.0.47  
+> **Aktuální verze aplikace:** 2.0.48  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -114,27 +114,27 @@
 | 83 | Streak celebration screen | 6 | ✅ |
 | 84 | Quiz question number indicator | 6 | ✅ |
 | 85 | Quiz "fun fact" po odpovědi (volitelné) | 6 | ✅ |
-| 86 | Alex screen scaffold | 7 | ⬜ |
-| 87 | Alex character composable s animacemi | 7 | ⬜ |
-| 88 | Hunger bar s gradient a animací | 7 | ⬜ |
-| 89 | Food menu bottom sheet | 7 | ⬜ |
-| 90 | Feed animace (Alex eating) | 7 | ⬜ |
-| 91 | Shop bottom sheet | 7 | ⬜ |
-| 92 | Alex rename dialog | 7 | ⬜ |
-| 93 | Alex death screen | 7 | ⬜ |
-| 94 | Alex ViewModel | 7 | ⬜ |
-| 95 | Alex mood systém | 7 | ⬜ |
-| 96 | Alex interakční animace (tap/swipe) | 7 | ⬜ |
-| 97 | Hunger notifikace redesign | 7 | ⬜ |
-| 98 | Test hub screen | 8 | ⬜ |
-| 99 | Scores chart (Compose) | 8 | ⬜ |
-| 100 | Test results screen | 8 | ⬜ |
-| 101 | Test detail řádky | 8 | ⬜ |
-| 102 | Test mode specifika v QuizScreen | 8 | ⬜ |
-| 103 | Test countdown overlay | 8 | ⬜ |
-| 104 | Test stats | 8 | ⬜ |
-| 105 | Test attempt ViewModel | 8 | ⬜ |
-| 106 | Test history | 8 | ⬜ |
+| 86 | Alex screen scaffold | 7 | ✅ |
+| 87 | Alex character composable s animacemi | 7 | ✅ |
+| 88 | Hunger bar s gradient a animací | 7 | ✅ |
+| 89 | Food menu bottom sheet | 7 | ✅ |
+| 90 | Feed animace (Alex eating) | 7 | ✅ |
+| 91 | Shop bottom sheet | 7 | ✅ |
+| 92 | Alex rename dialog | 7 | ✅ |
+| 93 | Alex death screen | 7 | ✅ |
+| 94 | Alex ViewModel | 7 | ✅ |
+| 95 | Alex mood systém | 7 | ✅ |
+| 96 | Alex interakční animace (tap/swipe) | 7 | ✅ |
+| 97 | Hunger notifikace redesign | 7 | ✅ |
+| 98 | Test hub screen | 8 | ✅ |
+| 99 | Scores chart (Compose) | 8 | ✅ |
+| 100 | Test results screen | 8 | ✅ |
+| 101 | Test detail řádky | 8 | ✅ |
+| 102 | Test mode specifika v QuizScreen | 8 | ✅ |
+| 103 | Test countdown overlay | 8 | ✅ |
+| 104 | Test stats | 8 | ✅ |
+| 105 | Test attempt ViewModel | 8 | ✅ |
+| 106 | Test history | 8 | ✅ |
 | 107 | Practice screen scaffold | 9 | ⬜ |
 | 108 | Category card | 9 | ⬜ |
 | 109 | Practice subcategories | 9 | ⬜ |
