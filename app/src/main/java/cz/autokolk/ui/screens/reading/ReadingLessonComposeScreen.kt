@@ -3,10 +3,12 @@ package cz.autokolk.ui.screens.reading
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -75,7 +77,12 @@ fun ReadingLessonComposeScreen(
 
     val progress = (pagerState.currentPage + 1f) / pages.size.toFloat()
 
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .displayCutoutPadding(),
+    ) {
         LinearProgressIndicator(
             progress = { progress },
             modifier = Modifier.fillMaxWidth(),

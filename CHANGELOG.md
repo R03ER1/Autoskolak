@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.44] - 2026-04-15
+- Fixed: při schovávání `QuizResultStrip` po správné odpovědi zůstává zelený tón (stav ve ViewModelu se mezitím vymaže dřív, než doběhla exit animace).
+- Fixed: `QuizScreen` a `ReadingLessonComposeScreen` — `statusBarsPadding` + `displayCutoutPadding`, aby obsah nekolidoval s výřezem kamery a status barem.
+
 ## [2.0.43] - 2026-04-15
 - Home: křivka pozadí jen z měřených uzlů (bez syntetiky přes celou výšku) + ořez výkresu na viewport; opakované klepnutí na „Domů“ znovu posune seznam k aktuální lekci.
 - Home: uzly lekcí (CURRENT/LOCKED) — modrozelený gradient z palety (`AccentCyan` / `AccentTeal` / `AccentBlue`) místo duhy podle sekce.

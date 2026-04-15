@@ -2,42 +2,36 @@ package cz.autokolk.ui.screens.quiz
 
 import android.app.Application
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import cz.autokolk.R
-import kotlinx.coroutines.delay
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,12 +39,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.navigation.Route
-
-private val quizFunFacts = listOf(
-    "Tip: Při řazení zkontroluj zpětné zrcátko.",
-    "V testu platí stejné časové limity jako u zkoušky.",
-    "Značka „Stůj“ platí pro všechny účastníky provozu.",
-)
 
 @Composable
 fun QuizScreen(
@@ -99,32 +87,7 @@ fun QuizScreen(
                 }
                 vm.clearFinish()
             }
-            is QuizFinish.Practice -> {
-                navController.navigate(
-                    Route.Results(-3, f.score, f.total).buildPath(),
-                ) {
-                    popUpTo(Route.Home.route) { inclusive = false }
-                }
-                vm.clearFinish()
-            }
             null -> {}
-        }
-    }
-
-    var heartLossVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(state.heartLossToken) {
-        if (state.heartLossToken > 0) {
-            heartLossVisible = true
-            delay(800)
-            heartLossVisible = false
-        }
-    }
-
-    val funFactLine = remember(state.shakeToken, state.lastWasCorrect) {
-        if (state.lastWasCorrect == false) {
-            quizFunFacts[state.shakeToken % quizFunFacts.size]
-        } else {
-            null
         }
     }
 
@@ -136,26 +99,16 @@ fun QuizScreen(
             .fillMaxSize()
             .graphicsLayer { translationX = shake.value },
     ) {
-        AnimatedVisibility(
-            visible = heartLossVisible,
-            enter = fadeIn(),
-            exit = fadeOut(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .padding(top = 8.dp),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_live),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error,
-            )
-        }
         ConfettiOverlay(
             isActive = !isTest && state.awaitingAdvance && state.lastWasCorrect == true,
             modifier = Modifier.fillMaxSize(),
         )
-        Column(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .displayCutoutPadding(),
+        ) {
             QuizTopBar(
                 progress = progress,
                 current = state.index + 1,
@@ -203,7 +156,6 @@ fun QuizScreen(
                     correct = state.lastWasCorrect == true,
                     combo = state.comboStreak,
                     onContinue = { vm.advance() },
-                    funFact = funFactLine,
                 )
             } else {
                 TextButton(

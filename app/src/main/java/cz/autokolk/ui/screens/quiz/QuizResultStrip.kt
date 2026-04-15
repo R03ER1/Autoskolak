@@ -5,13 +5,17 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -27,19 +31,23 @@ fun QuizResultStrip(
     combo: Int,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
-    funFact: String? = null,
 ) {
+    // Držíme tón z posledního zobrazeného výsledku po dobu exit animace (stav VM už mezitím může být vymazaný).
+    var toneCorrect by remember { mutableStateOf(false) }
+    LaunchedEffect(visible, correct) {
+        if (visible) toneCorrect = correct
+    }
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically { it },
         exit = slideOutVertically { it },
     ) {
-        Column(
+        Row(
             modifier = modifier
                 .fillMaxWidth()
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = if (correct) {
+                        colors = if (toneCorrect) {
                             listOf(SuccessGreen, SuccessGreen.copy(alpha = 0.85f))
                         } else {
                             listOf(ErrorRed, ErrorRed.copy(alpha = 0.85f))
@@ -47,26 +55,15 @@ fun QuizResultStrip(
                     ),
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = if (correct) "Správně! 🔥×$combo" else "Špatně",
-                    color = TextPrimary,
-                )
-                Button(onClick = onContinue) {
-                    Text("Dál")
-                }
-            }
-            if (!correct && !funFact.isNullOrBlank()) {
-                Text(
-                    text = funFact,
-                    color = TextPrimary.copy(alpha = 0.9f),
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+            Text(
+                text = if (toneCorrect) "Správně! 🔥×$combo" else "Špatně",
+                color = TextPrimary,
+            )
+            Button(onClick = onContinue) {
+                Text("Dál")
             }
         }
     }
