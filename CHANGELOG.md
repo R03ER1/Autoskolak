@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.46] - 2026-04-15
+- Fixed: `AnswerButton` — částice po správné odpovědi přes `drawBehind` místo `Canvas` nad tlačítkem (zabrání crashi / blokování klepnutí při animaci burst).
+
 ## [2.0.45] - 2026-04-15
 - Fáze 6 (Quiz Experience): `AnimatedBackground`, životy a combo v `QuizTopBar`, časovač testu (barvy, pulz, zvuk pod 10 s), `QuizPowerUpRow` (placeholder nápověd), `FloatingReward` po správné odpovědi, výběr odpovědi s prodlevou a vibracemi, částice u správně, `QuizResultStrip` s emoji, fun facts a vysvětlením, overlay „došly životy“ s rewarded reklamou (`QuizNoLivesOverlay`), video v `QuizMedia` přes `VideoAssetFileCache`.
 - Body za lekci: sdílený výpočet `LessonPoints` (stejná pravidla jako `ResultsActivity`), připsání v `QuizViewModel` + argumenty `Route.Results` (`firstOfDay`, `pointsAwarded`).

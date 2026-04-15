@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.46] - 2026-04-15
+- Oprava: tlačítko odpovědi v kvízu — animace částic neblokuje klepnutí a neměla by shazovat aplikaci.
+
 ## [2.0.45] - 2026-04-15
 - Fáze 6 (Quiz Experience): kompletnější Compose kvíz (top bar, média včetně videa, výsledkový pás, životy + reklama, odměny, zvuk odpočtu testu), výsledková obrazovka a fullscreen série po první lekci dne.
 - Body za lekci stejně jako dříve v klasických výsledcích; nové assety: zajímavosti o provozu + Lottie.

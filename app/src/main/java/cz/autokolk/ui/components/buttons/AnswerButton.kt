@@ -31,7 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -109,7 +109,7 @@ fun AnswerButton(
         label = "answerBurst",
     )
 
-    Box(modifier) {
+    Box(modifier.fillMaxWidth()) {
         Box(
             Modifier
                 .fillMaxWidth()
@@ -117,16 +117,7 @@ fun AnswerButton(
                 .scale(scale)
                 .clip(AutokolkShapes.medium)
                 .background(bgBrush)
-                .border(AutokolkTokens.GlassBorderWidth, borderColor, AutokolkShapes.medium)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(),
-                    enabled = enabled,
-                    role = Role.Button,
-                    onClick = onClick,
-                )
-                .drawWithContent {
-                    drawContent()
+                .drawBehind {
                     if (burstT > 0.02f) {
                         val t = burstT
                         val cx = size.width * 0.5f
@@ -146,42 +137,50 @@ fun AnswerButton(
                         }
                     }
                 }
+                .border(AutokolkTokens.GlassBorderWidth, borderColor, AutokolkShapes.medium)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(),
+                    enabled = enabled,
+                    role = Role.Button,
+                    onClick = onClick,
+                )
                 .padding(horizontal = 14.dp, vertical = 12.dp),
         ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(
-                        when (state) {
-                            AnswerState.CORRECT -> Color.White.copy(alpha = 0.25f)
-                            AnswerState.WRONG -> Color.White.copy(alpha = 0.25f)
-                            AnswerState.SELECTED -> AccentCyan.copy(alpha = 0.2f)
-                            AnswerState.DEFAULT -> GlassWhite.copy(alpha = 0.15f)
-                        },
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                when (state) {
-                    AnswerState.CORRECT -> Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(22.dp))
-                    AnswerState.WRONG -> Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(22.dp))
-                    else -> Text(
-                        label,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                    )
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(
+                            when (state) {
+                                AnswerState.CORRECT -> Color.White.copy(alpha = 0.25f)
+                                AnswerState.WRONG -> Color.White.copy(alpha = 0.25f)
+                                AnswerState.SELECTED -> AccentCyan.copy(alpha = 0.2f)
+                                AnswerState.DEFAULT -> GlassWhite.copy(alpha = 0.15f)
+                            },
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (state) {
+                        AnswerState.CORRECT -> Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(22.dp))
+                        AnswerState.WRONG -> Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(22.dp))
+                        else -> Text(
+                            label,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                        )
+                    }
                 }
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = TextPrimary,
+                    modifier = Modifier.weight(1f),
+                )
             }
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyLarge,
-                color = TextPrimary,
-                modifier = Modifier.weight(1f),
-            )
-        }
         }
     }
 }
