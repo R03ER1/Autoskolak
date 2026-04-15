@@ -16,8 +16,8 @@ android {
         applicationId = "cz.autokolk"
         minSdk = 24
         targetSdk = 35
-        versionCode = 41
-        versionName = "2.0.52"
+        versionCode = 42
+        versionName = "2.0.53"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -124,20 +124,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    // WorkManager for background scheduling (use 2.8.1 for broad compatibility)
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    // Play Feature Delivery for dynamic feature modules
-    implementation("com.google.android.play:feature-delivery:2.1.0")
-    // Material Components for View system (not Compose)
-    implementation("com.google.android.material:material:1.12.0")
-    // Gson for JSON parsing
-    implementation("com.google.code.gson:gson:2.10.1")
-    // Apache Commons CSV for CSV parsing
-    implementation("org.apache.commons:commons-csv:1.10.0")
-    // Google Mobile Ads SDK (AdMob)
-    implementation("com.google.android.gms:play-services-ads:23.5.0")
-    // User Messaging Platform (GDPR consent form before personalized ads)
-    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.play.feature.delivery)
+    implementation(libs.google.material)
+    implementation(libs.gson)
+    implementation(libs.commons.csv)
+    implementation(libs.play.services.ads)
+    implementation(libs.user.messaging.platform)
 
     // Jetpack Compose
     implementation(platform(libs.androidx.compose.bom))

@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.53] - 2026-04-15
+- Aktualizace závislostí: Kotlin 2.2.21, KSP 2.2.21-2.0.5, AndroidX (core-ktx 1.18, lifecycle 2.10, activity-compose 1.13, WorkManager 2.11.2, Room 2.8.4, testy junit/espresso), Material 1.13, Gson, Commons CSV, Play Services Ads a UMP přes `libs.versions.toml`; WorkManager sjednocen z katalogu místo natvrdo 2.8.1.
+
 ## [2.0.52] - 2026-04-15
 - Fáze 9 (Procvičování): Compose `PracticeScreen` + `PracticeViewModel` (grid kategorií, filtry Všechny / Nenaučené / Chybné / Správně, podkategorie, „Tvoje chyby“, vyhledávání v CSV, náhled v `ModalBottomSheet` + start kvízu).
 - Trasa `Route.PracticeQuiz` a rozšířené `Route.Results` (návrat na procvičování, „Zkusit znovu“ s replay argumenty); `QuizViewModel` / `QuizScreen` podporují `QuizSession.Practice` (bez životů, `savePracticeAnswer`, mince po každých 5 zobrazených otázkách, streak při dokončení).
