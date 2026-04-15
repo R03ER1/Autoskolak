@@ -234,7 +234,10 @@ class LessonProgress(private val context: Context) {
         return Pair(correct, wrong)
     }
 
-    fun getQuestionsForCategory(category: String): List<Question> {
+    /**
+     * @param subcategoryFilter normalizovaný kód podkategorie (např. "neh", "C"); null / prázdné / "ALL" = celá kategorie
+     */
+    fun getQuestionsForCategory(category: String, subcategoryFilter: String? = null): List<Question> {
         return try {
             val inputStream = context.assets.open("Questions.csv")
             val reader = BufferedReader(InputStreamReader(inputStream))
@@ -256,10 +259,15 @@ class LessonProgress(private val context: Context) {
             }
 
             val target = category.trim().lowercase()
+            val subFilter = subcategoryFilter?.trim()?.takeIf {
+                it.isNotEmpty() && !it.equals("ALL", ignoreCase = true)
+            }
             val questions = csvParser.records.drop(1)
                 .filter { rec ->
-                    val (cat, _) = normalizeCategory(rec[1], rec[2])
-                    cat.equals(target, ignoreCase = true)
+                    val (cat, sub) = normalizeCategory(rec[1], rec[2])
+                    if (!cat.equals(target, ignoreCase = true)) return@filter false
+                    if (subFilter == null) return@filter true
+                    sub.equals(subFilter, ignoreCase = true)
                 }
                 .sortedBy { it[0].toInt() }
                 .map { record ->
@@ -336,6 +344,68 @@ class LessonProgress(private val context: Context) {
                         imagePath = if (hasImage) resolveImagePath(questionNumber) else null,
                         videoPath = if (hasVideo) "videos/$questionNumber.mp4" else null,
                         funFact = DrivingFunFacts.pickForQuestionId(context, record[0]),
+                    ),
+                )
+            }
+            csvParser.close()
+            reader.close()
+            out
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    data class QuestionSearchHit(
+        val id: String,
+        val categoryCode: String,
+        val subcategoryCode: String,
+        val questionText: String,
+        val imagePath: String?,
+    )
+
+    /** Jednoduché fulltext vyhledávání v textu otázky (CSV sloupec otázky). */
+    fun searchQuestions(query: String, limit: Int = 40): List<QuestionSearchHit> {
+        val q = query.trim().lowercase()
+        if (q.length < 2) return emptyList()
+        return try {
+            val inputStream = context.assets.open("Questions.csv")
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val csvParser = CSVParser(reader, CSVFormat.DEFAULT
+                .withDelimiter(';')
+                .withQuote('"')
+                .withIgnoreEmptyLines(true)
+                .withTrim(),
+            )
+
+            fun normalizeCategory(rawCategory: String, rawSub: String): Pair<String, String> {
+                val catTrim = rawCategory.trim()
+                return when (catTrim.lowercase()) {
+                    "c" -> "cdt" to "C"
+                    "d" -> "cdt" to "D"
+                    "t" -> "cdt" to "T"
+                    else -> catTrim to rawSub.trim()
+                }
+            }
+
+            val out = mutableListOf<QuestionSearchHit>()
+            for (record in csvParser.records.drop(1)) {
+                if (out.size >= limit) break
+                if (record.size() < 5) continue
+                val text = record[4].lowercase()
+                if (!text.contains(q)) continue
+                val (cat, sub) = normalizeCategory(record[1], record[2])
+                val qid = record[0].trim()
+                val questionNumber = record[0].padStart(4, '0')
+                val notes = if (record.size() > 9) record[9] else ""
+                val hasImage = notes.contains("obrázek", ignoreCase = true)
+                out.add(
+                    QuestionSearchHit(
+                        id = qid,
+                        categoryCode = cat,
+                        subcategoryCode = sub,
+                        questionText = record[4],
+                        imagePath = if (hasImage) resolveImagePath(questionNumber) else null,
                     ),
                 )
             }

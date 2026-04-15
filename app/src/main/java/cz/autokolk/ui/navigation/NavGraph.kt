@@ -17,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
+import android.net.Uri
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import cz.autokolk.ui.screens.alex.AlexDeathScreen
 import cz.autokolk.ui.screens.alex.AlexScreen
 import cz.autokolk.ui.screens.home.HomeScreen
+import cz.autokolk.ui.screens.practice.PracticeScreen
 import cz.autokolk.ui.screens.quiz.QuizScreen
 import cz.autokolk.ui.screens.reading.ReadingLessonComposeScreen
 import cz.autokolk.ui.screens.results.ResultsComposeScreen
@@ -138,7 +140,7 @@ fun AutokolkNavGraph(
             popEnterTransition = { tabEnter() },
             popExitTransition = { tabExit() },
         ) {
-            PlaceholderScreen("Procvičování")
+            PracticeScreen(navController = navController)
         }
 
         composable(
@@ -171,6 +173,35 @@ fun AutokolkNavGraph(
         }
 
         composable(
+            route = Route.PracticeQuiz(
+                categoryKey = "x",
+                practiceMode = 0,
+                subcategoryKey = Route.PracticeQuiz.ALL_SUB,
+                focusQuestionId = Route.PracticeQuiz.FOCUS_NONE,
+            ).route,
+            arguments = Route.PracticeQuiz.arguments,
+        ) { entry ->
+            val a = entry.arguments!!
+            val cat = Uri.decode(a.getString(Route.ARG_PRACTICE_CAT).orEmpty())
+            val mode = a.getInt(Route.ARG_PRACTICE_MODE)
+            val sub = Uri.decode(a.getString(Route.ARG_PRACTICE_SUB).orEmpty())
+                .ifBlank { Route.PracticeQuiz.ALL_SUB }
+            val focus = Uri.decode(a.getString(Route.ARG_PRACTICE_FOCUS).orEmpty())
+                .ifBlank { Route.PracticeQuiz.FOCUS_NONE }
+            QuizScreen(
+                navController = navController,
+                lessonId = -1,
+                isTest = false,
+                categoryId = -1,
+                isReview = false,
+                practiceCategoryKey = cat,
+                practiceMode = mode,
+                practiceSubcategoryKey = sub,
+                practiceFocusQuestionId = focus,
+            )
+        }
+
+        composable(
             route = Route.ReadingLesson(lessonId = 0).route,
             arguments = Route.ReadingLesson.arguments,
         ) { entry ->
@@ -183,7 +214,18 @@ fun AutokolkNavGraph(
         }
 
         composable(
-            route = Route.Results(lessonId = 0, score = 0, total = 0, firstOfDay = false, pointsAwarded = 0).route,
+            route = Route.Results(
+                lessonId = 0,
+                score = 0,
+                total = 0,
+                firstOfDay = false,
+                pointsAwarded = 0,
+                fromPractice = false,
+                replayCategoryEncoded = Route.Results.NO_REPLAY,
+                replayPracticeMode = 0,
+                replaySubEncoded = Route.Results.NO_REPLAY,
+                replayFocusEncoded = Route.Results.NO_REPLAY,
+            ).route,
             arguments = Route.Results.arguments,
             enterTransition = { modalEnter() },
             exitTransition = { modalExit() },
@@ -198,6 +240,11 @@ fun AutokolkNavGraph(
                 total = args.getInt(Route.ARG_TOTAL),
                 firstOfDay = args.getInt(Route.ARG_FIRST_OF_DAY) != 0,
                 pointsAwarded = args.getInt(Route.ARG_POINTS_AWARDED),
+                fromPractice = args.getInt(Route.ARG_FROM_PRACTICE) != 0,
+                replayCategoryEncoded = args.getString(Route.ARG_REPLAY_CATEGORY_ENC) ?: Route.Results.NO_REPLAY,
+                replayPracticeMode = args.getInt(Route.ARG_REPLAY_MODE),
+                replaySubEncoded = args.getString(Route.ARG_REPLAY_SUB_ENC) ?: Route.Results.NO_REPLAY,
+                replayFocusEncoded = args.getString(Route.ARG_REPLAY_FOCUS_ENC) ?: Route.Results.NO_REPLAY,
             )
         }
 

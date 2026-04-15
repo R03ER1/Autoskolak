@@ -34,12 +34,22 @@ data class QuizUiState(
     val showQuitDialog: Boolean = false,
     /** Před odkrytím správně/špatně (lesson mód). */
     val pendingAnswerKey: String? = null,
-    val hearts: Int = 0,
+    val hearts: Int? = null,
     val showNoLivesOverlay: Boolean = false,
     val showCoinPopup: Boolean = false,
-    /** Zobrazené „+N“ u odměny (parita: +1 za správně jako vizuální feedback). */
+    /** Zobrazené „+N“ u odměny. */
     val coinPopupAmount: Int = 1,
 )
+
+sealed class QuizSession {
+    data class Lesson(val lessonId: Int, val isReview: Boolean) : QuizSession()
+    data class Practice(
+        val categoryKey: String,
+        val practiceMode: Int,
+        val subcategoryKey: String,
+        val focusQuestionId: String,
+    ) : QuizSession()
+}
 
 sealed class QuizFinish {
     data class Lesson(
@@ -50,13 +60,22 @@ sealed class QuizFinish {
         val firstOfDay: Boolean,
         val pointsAwarded: Int,
     ) : QuizFinish()
+
+    data class Practice(
+        val score: Int,
+        val total: Int,
+        val pointsAwarded: Int,
+        val firstOfDay: Boolean,
+        val replayCategory: String,
+        val replayPracticeMode: Int,
+        val replaySubKey: String,
+        val replayFocusQuestionId: String,
+    ) : QuizFinish()
 }
 
 class QuizViewModel(
     application: Application,
-    private val lessonId: Int,
-    @Suppress("UNUSED_PARAMETER") private val categoryId: Int,
-    private val isReview: Boolean,
+    private val session: QuizSession,
 ) : AndroidViewModel(application) {
 
     private val lessonProgress = LessonProgress(application)
@@ -70,9 +89,19 @@ class QuizViewModel(
     private var revealJob: Job? = null
     private var hasCompleted: Boolean = false
 
+    private val practiceSeenFlags = mutableListOf<Boolean>()
+    private var practiceAwardedBuckets: Int = 0
+    private var practiceBucketPointsTotal: Int = 0
+
     init {
-        loadQuestions()
-        refreshHearts()
+        when (session) {
+            is QuizSession.Lesson -> loadLessonQuestions(session)
+            is QuizSession.Practice -> loadPracticeQuestions(session)
+        }
+        refreshHeartsForSession()
+        if (session is QuizSession.Practice) {
+            onPracticeQuestionDisplayed(0)
+        }
     }
 
     fun clearFinish() {
@@ -101,8 +130,11 @@ class QuizViewModel(
         }
     }
 
-    private fun refreshHearts() {
-        _state.update { it.copy(hearts = lessonProgress.getCurrentHearts()) }
+    private fun refreshHeartsForSession() {
+        when (session) {
+            is QuizSession.Lesson -> _state.update { it.copy(hearts = lessonProgress.getCurrentHearts()) }
+            is QuizSession.Practice -> _state.update { it.copy(hearts = null) }
+        }
     }
 
     override fun onCleared() {
@@ -110,12 +142,51 @@ class QuizViewModel(
         super.onCleared()
     }
 
-    private fun loadQuestions() {
+    private fun loadLessonQuestions(s: QuizSession.Lesson) {
         val qs = when {
-            lessonId > 0 -> lessonProgress.getQuestionsForLesson(lessonId)
+            s.lessonId > 0 -> lessonProgress.getQuestionsForLesson(s.lessonId)
             else -> emptyList()
         }
         _state.value = QuizUiState(questions = qs, hearts = lessonProgress.getCurrentHearts())
+    }
+
+    private fun loadPracticeQuestions(s: QuizSession.Practice) {
+        val qs = PracticeQuestionList.build(
+            lessonProgress = lessonProgress,
+            categoryKey = s.categoryKey,
+            practiceMode = s.practiceMode,
+            subcategoryFilter = s.subcategoryKey,
+            focusQuestionId = s.focusQuestionId,
+        )
+        practiceSeenFlags.clear()
+        practiceSeenFlags.addAll(List(qs.size) { false })
+        practiceAwardedBuckets = 0
+        practiceBucketPointsTotal = 0
+        _state.value = QuizUiState(questions = qs, hearts = null)
+    }
+
+    private fun onPracticeQuestionDisplayed(index: Int) {
+        if (session !is QuizSession.Practice) return
+        if (index !in practiceSeenFlags.indices) return
+        if (practiceSeenFlags[index]) return
+        practiceSeenFlags[index] = true
+        val seenCount = practiceSeenFlags.count { it }
+        val buckets = seenCount / 5
+        if (buckets > practiceAwardedBuckets) {
+            val delta = buckets - practiceAwardedBuckets
+            practiceAwardedBuckets = buckets
+            practiceBucketPointsTotal += delta
+            try {
+                lessonProgress.addPoints(delta)
+            } catch (_: Throwable) {
+            }
+            _state.update {
+                it.copy(
+                    showCoinPopup = true,
+                    coinPopupAmount = delta.coerceAtLeast(1),
+                )
+            }
+        }
     }
 
     fun selectAnswer(key: String) {
@@ -148,21 +219,33 @@ class QuizViewModel(
             AchievementsManager(getApplication()).onAnswer(correct)
         } catch (_: Throwable) {
         }
-        if (!isReview && lessonId > 0 && !lessonProgress.hasInfiniteLives()) {
-            if (!correct) {
-                val consumed = lessonProgress.consumeHeart()
-                if (consumed) {
-                    try {
-                        HeartRefillJobService.scheduleNext(getApplication(), lessonProgress)
-                    } catch (_: Throwable) {
+
+        when (session) {
+            is QuizSession.Practice -> {
+                lessonProgress.savePracticeAnswer(session.categoryKey, q.id, correct)
+            }
+            is QuizSession.Lesson -> {
+                if (!session.isReview && session.lessonId > 0 && !lessonProgress.hasInfiniteLives()) {
+                    if (!correct) {
+                        val consumed = lessonProgress.consumeHeart()
+                        if (consumed) {
+                            try {
+                                HeartRefillJobService.scheduleNext(getApplication(), lessonProgress)
+                            } catch (_: Throwable) {
+                            }
+                        }
                     }
                 }
             }
         }
+
         val newCombo = if (correct) s.comboStreak + 1 else 0
         val heartsNow = lessonProgress.getCurrentHearts()
+        val isLesson = session is QuizSession.Lesson
+        val lessonSession = session as? QuizSession.Lesson
         val outOfLives =
-            !isReview && lessonId > 0 &&
+            isLesson && lessonSession != null &&
+                !lessonSession.isReview && lessonSession.lessonId > 0 &&
                 !lessonProgress.hasInfiniteLives() &&
                 !correct &&
                 heartsNow <= 0
@@ -179,9 +262,9 @@ class QuizViewModel(
                 lastWasCorrect = correct,
                 comboStreak = newCombo,
                 shakeToken = if (!correct) it.shakeToken + 1 else it.shakeToken,
-                hearts = heartsNow,
-                showCoinPopup = correct,
-                coinPopupAmount = 1,
+                hearts = if (isLesson) heartsNow else null,
+                showCoinPopup = correct && isLesson,
+                coinPopupAmount = if (correct && isLesson) 1 else it.coinPopupAmount,
                 showNoLivesOverlay = outOfLives,
             )
         }
@@ -193,16 +276,20 @@ class QuizViewModel(
         if (!s.awaitingAdvance) return
         val last = s.questions.lastIndex
         if (s.index >= last) {
-            completeLessonMode()
+            completeSession()
             return
         }
+        val next = s.index + 1
         _state.update {
             it.copy(
-                index = it.index + 1,
+                index = next,
                 awaitingAdvance = false,
                 lastWasCorrect = null,
                 showCoinPopup = false,
             )
+        }
+        if (session is QuizSession.Practice) {
+            onPracticeQuestionDisplayed(next)
         }
     }
 
@@ -216,18 +303,25 @@ class QuizViewModel(
 
     fun confirmQuit() {
         _state.update { it.copy(showQuitDialog = false) }
-        completeLessonMode()
+        completeSession()
     }
 
-    private fun completeLessonMode() {
+    private fun completeSession() {
         if (hasCompleted) return
-        if (lessonId <= 0) {
+        when (session) {
+            is QuizSession.Lesson -> completeLesson(session)
+            is QuizSession.Practice -> completePractice(session)
+        }
+    }
+
+    private fun completeLesson(session: QuizSession.Lesson) {
+        if (session.lessonId <= 0) {
             hasCompleted = true
             _finish.value = QuizFinish.Lesson(
                 lessonId = -1,
                 score = 0,
                 total = 0,
-                isReview = isReview,
+                isReview = session.isReview,
                 firstOfDay = false,
                 pointsAwarded = 0,
             )
@@ -236,20 +330,20 @@ class QuizViewModel(
         val qs = _state.value.questions
         val correctAnswers = qs.count { normalizeAnswerKey(it.userAnswer) == resolveCorrectKey(it) }
         val totalQuestions = qs.size
-        if (!isReview) {
+        if (!session.isReview) {
             val incorrectIds = qs.mapNotNull { q ->
                 if (normalizeAnswerKey(q.userAnswer) != resolveCorrectKey(q)) q.id else null
             }.toSet()
-            lessonProgress.saveLessonProgress(lessonId, incorrectIds)
+            lessonProgress.saveLessonProgress(session.lessonId, incorrectIds)
         } else {
-            val currentState = lessonProgress.getLessonState(lessonId)
+            val currentState = lessonProgress.getLessonState(session.lessonId)
             val remaining = currentState.incorrectQuestionIds.toMutableSet()
             qs.forEach { q ->
                 if (normalizeAnswerKey(q.userAnswer) == resolveCorrectKey(q)) {
                     remaining.remove(q.id)
                 }
             }
-            lessonProgress.saveLessonProgress(lessonId, remaining)
+            lessonProgress.saveLessonProgress(session.lessonId, remaining)
         }
         val firstOfDay = try {
             lessonProgress.updateStreakOnLessonCompleted()
@@ -259,7 +353,7 @@ class QuizViewModel(
         val pointsAwarded = LessonPoints.computeLessonPointsAwarded(
             isPractice = false,
             isRandom = false,
-            isReviewMode = isReview,
+            isReviewMode = session.isReview,
             correctAnswers = correctAnswers,
             totalQuestions = totalQuestions,
         )
@@ -271,12 +365,34 @@ class QuizViewModel(
         }
         hasCompleted = true
         _finish.value = QuizFinish.Lesson(
-            lessonId = lessonId,
+            lessonId = session.lessonId,
             score = correctAnswers,
             total = totalQuestions,
-            isReview = isReview,
+            isReview = session.isReview,
             firstOfDay = firstOfDay,
             pointsAwarded = pointsAwarded,
+        )
+    }
+
+    private fun completePractice(session: QuizSession.Practice) {
+        val qs = _state.value.questions
+        val correctAnswers = qs.count { normalizeAnswerKey(it.userAnswer) == resolveCorrectKey(it) }
+        val totalQuestions = qs.size
+        val firstOfDay = try {
+            lessonProgress.updateStreakOnLessonCompleted()
+        } catch (_: Throwable) {
+            false
+        }
+        hasCompleted = true
+        _finish.value = QuizFinish.Practice(
+            score = correctAnswers,
+            total = totalQuestions,
+            pointsAwarded = practiceBucketPointsTotal,
+            firstOfDay = firstOfDay,
+            replayCategory = session.categoryKey,
+            replayPracticeMode = session.practiceMode,
+            replaySubKey = session.subcategoryKey,
+            replayFocusQuestionId = session.focusQuestionId,
         )
     }
 

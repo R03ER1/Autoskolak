@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.52] - 2026-04-15
+- Fáze 9 (Procvičování): Compose `PracticeScreen` + `PracticeViewModel` (grid kategorií, filtry Všechny / Nenaučené / Chybné / Správně, podkategorie, „Tvoje chyby“, vyhledávání v CSV, náhled v `ModalBottomSheet` + start kvízu).
+- Trasa `Route.PracticeQuiz` a rozšířené `Route.Results` (návrat na procvičování, „Zkusit znovu“ s replay argumenty); `QuizViewModel` / `QuizScreen` podporují `QuizSession.Practice` (bez životů, `savePracticeAnswer`, mince po každých 5 zobrazených otázkách, streak při dokončení).
+- `LessonProgress`: `getQuestionsForCategory` s volitelnou podkategorií, `searchQuestions`; `PracticeQuestionList` sdílí logiku výběru otázek s legacy praxí.
+
 ## [2.0.51] - 2026-04-15
 - Zkouška (Compose): oficiální složení 25 otázek / 50 bodů (Def+Prav, Znak, Bez, Res, Voz, Souv, Med) jako u klasické zkoušky; řádek s kategorií a bodováním pod progress barem.
 - Test: viditelná okamžitá volba odpovědi (mapa odpovědí ve stavu); „Dokončit test“ i s nevyplněnými otázkami; skóre a zápis pokusu podle vah otázek (ne průměr z počtu správně).

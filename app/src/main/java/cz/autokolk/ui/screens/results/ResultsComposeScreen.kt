@@ -1,5 +1,6 @@
 package cz.autokolk.ui.screens.results
 
+import android.net.Uri
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.progress.RingProgress
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.navigation.navigateToTab
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.SuccessGreen
@@ -53,6 +55,11 @@ fun ResultsComposeScreen(
     total: Int,
     firstOfDay: Boolean,
     pointsAwarded: Int,
+    fromPractice: Boolean = false,
+    replayCategoryEncoded: String = Route.Results.NO_REPLAY,
+    replayPracticeMode: Int = 0,
+    replaySubEncoded: String = Route.Results.NO_REPLAY,
+    replayFocusEncoded: String = Route.Results.NO_REPLAY,
 ) {
     val isTest = lessonId < 0
     val percentage = if (total > 0) (score * 100 / total) else 0
@@ -76,6 +83,24 @@ fun ResultsComposeScreen(
         countUp(pointsAwarded) { displayPoints = it }
     }
 
+    val headline = when {
+        isTest -> "Výsledek testu"
+        fromPractice -> "Procvičování dokončeno"
+        passed -> "Výborně!"
+        else -> "Zkus to znovu!"
+    }
+
+    val replayCategory = Uri.decode(replayCategoryEncoded)
+    val replaySub = when (replaySubEncoded) {
+        Route.Results.NO_REPLAY -> Route.PracticeQuiz.ALL_SUB
+        else -> Uri.decode(replaySubEncoded)
+    }
+    val replayFocus = when (replayFocusEncoded) {
+        Route.Results.NO_REPLAY -> Route.PracticeQuiz.FOCUS_NONE
+        else -> Uri.decode(replayFocusEncoded)
+    }
+    val hasReplay = fromPractice && replayCategory != Route.Results.NO_REPLAY
+
     Box(Modifier.fillMaxSize().systemBarsPadding()) {
         ConfettiOverlay(isActive = percentage == 100 && total > 0, modifier = Modifier.fillMaxSize())
         Column(
@@ -86,7 +111,7 @@ fun ResultsComposeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = if (isTest) "Výsledek testu" else if (passed) "Výborně!" else "Zkus to znovu!",
+                text = headline,
                 style = MaterialTheme.typography.headlineMedium,
                 color = TextPrimary,
             )
@@ -129,18 +154,40 @@ fun ResultsComposeScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
             } else {
+                val primaryLabel = if (fromPractice) "Zpět na procvičování" else "Zpět na cestu"
                 PrimaryGradientButton(
-                    text = "Zpět na cestu",
+                    text = primaryLabel,
                     onClick = {
-                        navController.navigate(Route.Home.route) {
-                            popUpTo(Route.Home.route) { inclusive = true }
+                        if (fromPractice) {
+                            navController.navigateToTab(Route.Practice)
+                        } else {
+                            navController.navigate(Route.Home.route) {
+                                popUpTo(Route.Home.route) { inclusive = true }
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
             Spacer(Modifier.height(12.dp))
-            if (!isTest && lessonId > 0) {
+            if (hasReplay) {
+                TextButton(
+                    onClick = {
+                        navController.navigate(
+                            Route.PracticeQuiz(
+                                categoryKey = replayCategory,
+                                practiceMode = replayPracticeMode,
+                                subcategoryKey = replaySub,
+                                focusQuestionId = replayFocus,
+                            ).buildPath(),
+                        ) {
+                            popUpTo(Route.Practice.route) { inclusive = false }
+                        }
+                    },
+                ) {
+                    Text("Zkusit znovu", color = AccentCyan)
+                }
+            } else if (!isTest && lessonId > 0) {
                 TextButton(
                     onClick = {
                         navController.navigate(

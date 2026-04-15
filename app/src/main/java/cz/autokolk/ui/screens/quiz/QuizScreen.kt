@@ -55,22 +55,46 @@ fun QuizScreen(
     isTest: Boolean,
     categoryId: Int,
     isReview: Boolean,
+    practiceCategoryKey: String? = null,
+    practiceMode: Int = 0,
+    practiceSubcategoryKey: String = Route.PracticeQuiz.ALL_SUB,
+    practiceFocusQuestionId: String = Route.PracticeQuiz.FOCUS_NONE,
 ) {
     if (isTest) {
         TestQuizSession(navController)
         return
     }
 
+    val isPractice = !practiceCategoryKey.isNullOrBlank()
     val context = LocalContext.current
     val application = context.applicationContext as Application
     val lessonProgress = remember { LessonProgress(application) }
+    val session: QuizSession = remember(lessonId, isReview, practiceCategoryKey, practiceMode, practiceSubcategoryKey, practiceFocusQuestionId) {
+        if (isPractice) {
+            QuizSession.Practice(
+                categoryKey = practiceCategoryKey!!,
+                practiceMode = practiceMode,
+                subcategoryKey = practiceSubcategoryKey,
+                focusQuestionId = practiceFocusQuestionId,
+            )
+        } else {
+            QuizSession.Lesson(lessonId = lessonId, isReview = isReview)
+        }
+    }
     val vm: QuizViewModel = viewModel(
-        factory = remember(lessonId, categoryId, isReview) {
-            QuizViewModelFactory(application, lessonId, categoryId, isReview)
+        factory = remember(session) {
+            QuizViewModelFactory(application, session)
         },
     )
     val state by vm.state.collectAsStateWithLifecycle()
     val finish by vm.finish.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isPractice, state.questions) {
+        if (isPractice && state.questions.isEmpty()) {
+            Toast.makeText(context, "Žádné otázky k procvičení.", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+        }
+    }
 
     val shake = remember { Animatable(0f) }
     LaunchedEffect(state.shakeToken) {
@@ -99,6 +123,28 @@ fun QuizScreen(
                 }
                 vm.clearFinish()
             }
+            is QuizFinish.Practice -> {
+                val encCat = Route.Results.encodeReplayPart(f.replayCategory)
+                val encSub = Route.Results.encodeReplayPart(f.replaySubKey)
+                val encFocus = Route.Results.encodeReplayPart(f.replayFocusQuestionId)
+                navController.navigate(
+                    Route.Results(
+                        lessonId = 0,
+                        score = f.score,
+                        total = f.total,
+                        firstOfDay = f.firstOfDay,
+                        pointsAwarded = f.pointsAwarded,
+                        fromPractice = true,
+                        replayCategoryEncoded = encCat,
+                        replayPracticeMode = f.replayPracticeMode,
+                        replaySubEncoded = encSub,
+                        replayFocusEncoded = encFocus,
+                    ).buildPath(),
+                ) {
+                    popUpTo(Route.Practice.route) { inclusive = false }
+                }
+                vm.clearFinish()
+            }
             null -> {}
         }
     }
@@ -121,7 +167,7 @@ fun QuizScreen(
                 .graphicsLayer { translationX = shake.value },
         ) {
             ConfettiOverlay(
-                isActive = state.awaitingAdvance && state.lastWasCorrect == true && state.comboStreak >= 10,
+                isActive = !isPractice && state.awaitingAdvance && state.lastWasCorrect == true && state.comboStreak >= 10,
                 modifier = Modifier.fillMaxSize(),
             )
 
@@ -148,7 +194,7 @@ fun QuizScreen(
                     testRemainingMs = null,
                     hearts = state.hearts,
                     comboStreak = state.comboStreak,
-                    showCombo = true,
+                    showCombo = !isPractice,
                     onClose = { vm.requestQuit() },
                 )
                 Spacer(Modifier.height(6.dp))
@@ -209,11 +255,17 @@ fun QuizScreen(
     }
 
     if (state.showQuitDialog) {
+        val title = if (isPractice) "Ukončit procvičování?" else "Ukončit lekci?"
+        val text = if (isPractice) {
+            "Session se ukončí a zobrazí se přehled výsledků."
+        } else {
+            "Tvůj postup v této session se ukončí a výsledek se uloží."
+        }
         AlertDialog(
             onDismissRequest = { vm.dismissQuitDialog() },
             containerColor = DarkSurfaceVariant,
-            title = { Text("Ukončit lekci?") },
-            text = { Text("Tvůj postup v této session se ukončí a výsledek se uloží.", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+            title = { Text(title) },
+            text = { Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
                 TextButton(onClick = { vm.confirmQuit() }) {
                     Text("Ukončit", color = MaterialTheme.colorScheme.error)
@@ -230,12 +282,10 @@ fun QuizScreen(
 
 private class QuizViewModelFactory(
     private val application: Application,
-    private val lessonId: Int,
-    private val categoryId: Int,
-    private val isReview: Boolean,
+    private val session: QuizSession,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return QuizViewModel(application, lessonId, categoryId, isReview) as T
+        return QuizViewModel(application, session) as T
     }
 }

@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.52] - 2026-04-15
+- Nová záložka Procvičování v Compose: kategorie v mřížce, filtry, podkategorie, tvoje chyby, hledání otázek a list výsledků s detailem v listu (sheet) a tlačítkem Procvičit.
+- Procvičovací kvíz bez životů, body za každých pět nově zobrazených otázek jako dřív; po dokončení přehled výsledků a návrat na Procvičování.
+
 ## [2.0.51] - 2026-04-15
 - Zkouška má stejné rozložení otázek a bodů jako u skutečné zkoušky; nahoře pod ukazatelem postupu je napsaná aktuální skupina.
 - V průběhu testu hned vidíš označenou odpověď; test můžeš kdykoli dokončit i bez vyplnění všeho.
