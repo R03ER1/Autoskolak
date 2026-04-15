@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.components.progress.RingProgress
+import cz.autokolk.ui.theme.AccentBlue
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.DarkSurfaceVariant
@@ -36,7 +37,7 @@ enum class LessonNodeState {
 @Composable
 fun LessonNode(
     iconFileName: String,
-    sectionColor: Color,
+    @Suppress("UNUSED_PARAMETER") sectionColor: Color,
     state: LessonNodeState,
     ringProgress: Float,
     onClick: () -> Unit,
@@ -87,10 +88,11 @@ fun LessonNode(
                 modifier = Modifier
                     .size(size + 8.dp)
                     .background(
-                        brush = Brush.radialGradient(
+                        brush = Brush.linearGradient(
                             colors = listOf(
-                                sectionColor.copy(alpha = 0.95f),
-                                sectionColor.copy(alpha = 0.55f),
+                                AccentCyan.copy(alpha = 0.95f),
+                                AccentTeal.copy(alpha = 0.82f),
+                                AccentBlue.copy(alpha = 0.62f),
                             ),
                         ),
                         shape = CircleShape,

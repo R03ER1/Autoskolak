@@ -47,6 +47,8 @@ fun AutokolkApp() {
     val showBars = currentRoute in tabRoutes
     val onHomeTab = currentRoute == Route.Home.route
 
+    var homeScrollToCurrentSignal by remember { mutableIntStateOf(0) }
+
     val context = LocalContext.current
     val lessonProgress = remember { LessonProgress(context) }
 
@@ -102,7 +104,13 @@ fun AutokolkApp() {
                     ) {
                         AutokolkBottomBar(
                             currentRoute = currentRoute ?: "",
-                            onNavigate = { route -> navController.navigateToTab(route) },
+                            onNavigate = { route ->
+                                if (route == Route.Home && currentRoute == Route.Home.route) {
+                                    homeScrollToCurrentSignal++
+                                } else {
+                                    navController.navigateToTab(route)
+                                }
+                            },
                         )
                     }
                 }
@@ -134,6 +142,7 @@ fun AutokolkApp() {
                     AutokolkNavGraph(
                         navController = navController,
                         onHomeLessonBoundsChanged = { r -> tutorialLessonRectState.value = r },
+                        homeScrollToCurrentSignal = homeScrollToCurrentSignal,
                     )
                 }
             }

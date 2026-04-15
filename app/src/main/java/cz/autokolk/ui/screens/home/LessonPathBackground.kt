@@ -13,17 +13,18 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.GlassWhite
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sin
 
 /**
- * Pozadí s křivkou (kubické Bezierovy segmenty) skrz měřené středy uzlů,
- * s fallbackem na syntetickou sinusoidu pro ještě nevykreslené položky LazyColumn.
- * Čárkovaná trať = celá cesta; plný tah = část cesty podle [progressFraction] (PathMeasure).
+ * Pozadí s křivkou (kubické Bezierovy segmenty) jen přes **měřené** středy uzlů
+ * (LazyColumn položky mimo obraz se nekomponují — žádná syntetická sinusoida přes celou výšku).
+ * Výkres je oříznut na viewport, aby úseky mimo obrazovka netáhly čáru přes celou plochu.
+ * Plný tah = část cesty podle [progressFraction] (PathMeasure).
  */
 @Composable
 fun LessonPathBackground(
@@ -43,48 +44,45 @@ fun LessonPathBackground(
         val n = lessonOrder.size
         if (n < 2) return@Canvas
 
-        val amp = w * 0.22f
-        val points = List(n) { i ->
-            val id = lessonOrder[i]
-            measuredCenters[id] ?: run {
-                val t = i.toFloat() / (n - 1).coerceAtLeast(1)
-                val y = t * h * 0.92f + h * 0.04f
-                val x = w * 0.5f + amp * sin(i / 4.5).toFloat()
-                Offset(x, y)
-            }
+        val points = ArrayList<Offset>(n)
+        for (id in lessonOrder) {
+            measuredCenters[id]?.let { points.add(it) }
         }
+        if (points.size < 2) return@Canvas
 
         val path = buildSmoothPathThrough(points)
 
-        drawPath(
-            path = path,
-            color = trackColor,
-            style = Stroke(
-                width = 5f,
-                cap = StrokeCap.Round,
-                pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength, gapLength), 0f),
-            ),
-        )
-
-        pathMeasure.setPath(path, false)
-        val len = pathMeasure.length
-        if (len > 0f && pf > 0f) {
-            val progressPath = Path()
-            val endDist = max(0.001f, len * min(1f, pf * 1.02f))
-            pathMeasure.getSegment(0f, endDist, progressPath, true)
-            val gradEnd = min(1f, pf * 1.05f)
+        clipRect(0f, 0f, w, h) {
             drawPath(
-                path = progressPath,
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        AccentCyan.copy(alpha = 0.15f + 0.55f * gradEnd),
-                        AccentTeal.copy(alpha = 0.1f + 0.45f * gradEnd),
-                    ),
-                    start = Offset(0f, h * (1f - gradEnd)),
-                    end = Offset(w, h * gradEnd),
+                path = path,
+                color = trackColor,
+                style = Stroke(
+                    width = 5f,
+                    cap = StrokeCap.Round,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashLength, gapLength), 0f),
                 ),
-                style = Stroke(width = 10f, cap = StrokeCap.Round),
             )
+
+            pathMeasure.setPath(path, false)
+            val len = pathMeasure.length
+            if (len > 0f && pf > 0f) {
+                val progressPath = Path()
+                val endDist = max(0.001f, len * min(1f, pf * 1.02f))
+                pathMeasure.getSegment(0f, endDist, progressPath, true)
+                val gradEnd = min(1f, pf * 1.05f)
+                drawPath(
+                    path = progressPath,
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            AccentCyan.copy(alpha = 0.15f + 0.55f * gradEnd),
+                            AccentTeal.copy(alpha = 0.1f + 0.45f * gradEnd),
+                        ),
+                        start = Offset(0f, h * (1f - gradEnd)),
+                        end = Offset(w, h * gradEnd),
+                    ),
+                    style = Stroke(width = 10f, cap = StrokeCap.Round),
+                )
+            }
         }
     }
 }

@@ -57,6 +57,7 @@ fun AutokolkNavGraph(
     navController: NavHostController,
     startDestination: String = Route.Splash.route,
     onHomeLessonBoundsChanged: (Rect) -> Unit = {},
+    homeScrollToCurrentSignal: Int = 0,
 ) {
     NavHost(
         navController = navController,
@@ -91,6 +92,7 @@ fun AutokolkNavGraph(
             HomeScreen(
                 navController = navController,
                 onCurrentLessonNodeBoundsChanged = onHomeLessonBoundsChanged,
+                scrollToCurrentLessonSignal = homeScrollToCurrentSignal,
             )
         }
 

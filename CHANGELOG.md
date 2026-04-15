@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.43] - 2026-04-15
+- Home: křivka pozadí jen z měřených uzlů (bez syntetiky přes celou výšku) + ořez výkresu na viewport; opakované klepnutí na „Domů“ znovu posune seznam k aktuální lekci.
+- Home: uzly lekcí (CURRENT/LOCKED) — modrozelený gradient z palety (`AccentCyan` / `AccentTeal` / `AccentBlue`) místo duhy podle sekce.
+
 ## [2.0.42] - 2026-04-15
 - Fáze 5 (Home / lesson path): měřené pozice uzlů pro křivku pozadí (`LessonPathBackground` + `PathMeasure`), animovaný scroll na aktuální lekci, sekční hlavičky v `GlassCard` s `AnimatedProgressBar`.
 - Multi-step spotlight tutoriál na Home (`HomeTutorialSpotlightOverlay`), zápis do `TutorialManager` pro náhodné události.

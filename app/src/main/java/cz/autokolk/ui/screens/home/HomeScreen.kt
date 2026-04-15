@@ -49,6 +49,7 @@ import kotlinx.coroutines.delay
 fun HomeScreen(
     navController: NavHostController,
     onCurrentLessonNodeBoundsChanged: ((Rect) -> Unit)? = null,
+    scrollToCurrentLessonSignal: Int = 0,
 ) {
     val vm: HomeViewModel = viewModel()
     val rows by vm.pathRows.collectAsStateWithLifecycle()
@@ -93,13 +94,22 @@ fun HomeScreen(
 
     val scrollOffsetPx = remember(density) { with(density) { (-200).dp.roundToPx() } }
 
-    LaunchedEffect(currentLessonIndex, rows.size) {
-        if (currentLessonIndex < 0) return@LaunchedEffect
+    suspend fun scrollToCurrentLesson() {
+        if (currentLessonIndex < 0) return
         delay(48)
         listState.animateScrollToItem(
             index = currentLessonIndex,
             scrollOffset = scrollOffsetPx,
         )
+    }
+
+    LaunchedEffect(currentLessonIndex, rows.size) {
+        scrollToCurrentLesson()
+    }
+
+    LaunchedEffect(scrollToCurrentLessonSignal) {
+        if (scrollToCurrentLessonSignal == 0) return@LaunchedEffect
+        scrollToCurrentLesson()
     }
 
     Box(
