@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.32] - 2026-04-15
+- Added: Extended design token system (`Tokens.kt`) — new token categories: Opacity (7 levels), Content Padding (5 sizes), extended Animation durations (12 presets from 50ms to 10s), Spring & interaction presets (damping, press scale), Border widths, additional component Sizes (hit target, avatar, media heights), Canvas/Stroke constants.
+
 ## [2.0.31] - 2026-04-15
 - Added: Shape definitions (`Shape.kt`) — Material3 `Shapes` with glassmorphism-friendly corner radii (8/12/16/24/32 dp), plus custom `PillShape`, `BottomSheetShape` and `LessonNodeShape` for specific UI elements.
 

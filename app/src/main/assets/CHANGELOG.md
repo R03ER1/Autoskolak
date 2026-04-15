@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.32] - 2026-04-15
+- Novinka: Rozšířený design token systém (`Tokens.kt`) — nové kategorie tokenů: Opacity (7 úrovní průhlednosti), Content Padding (5 velikostí), rozšířené Animation durations (12 presetů od 50ms do 10s), Spring & interaction presety (damping, press scale), Border widths, další velikosti komponent (hit target, avatar, media heights), Canvas/Stroke konstanty.
+
 ## [2.0.31] - 2026-04-15
 - Novinka: Definice tvarů (`Shape.kt`) — Material3 `Shapes` s glassmorphism zaoblením (8/12/16/24/32 dp), plus vlastní `PillShape`, `BottomSheetShape` a `LessonNodeShape` pro specifické UI prvky.
 
