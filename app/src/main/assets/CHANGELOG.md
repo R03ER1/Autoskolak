@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.30] - 2026-04-15
+- Novinka: Kompletní typografie s fontem Quicksand (`Type.kt`) — 5 váhových řezů (Light/Regular/Medium/SemiBold/Bold), všech 15 textových stylů Material3 s explicitním řádkováním a prokládáním písmen. Dostupné přes `MaterialTheme.typography`.
+
 ## [2.0.29] - 2026-04-15
 - Novinka: Compose MaterialTheme integrace — `darkColorScheme` / `lightColorScheme` namapované z Color.kt tokenů, `ThemeMode` enum (Light/Dark/Systémový) s uložením preference do `SharedPreferences`, `CompositionLocalProvider` pro propagaci režimu. Placeholder `Type.kt` a `Shape.kt` pro kroky 16–17.
 

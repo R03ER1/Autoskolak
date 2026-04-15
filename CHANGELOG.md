@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.30] - 2026-04-15
+- Added: Complete Quicksand typography system (`Type.kt`) — `FontFamily` with 5 weights (Light/Regular/Medium/SemiBold/Bold), all 15 Material3 `Typography` slots defined with explicit `lineHeight` and `letterSpacing` values. Available via `MaterialTheme.typography`.
+
 ## [2.0.29] - 2026-04-15
 - Added: Compose MaterialTheme integration — `darkColorScheme` / `lightColorScheme` mapped from Color.kt tokens, `ThemeMode` enum (Light/Dark/System) with `SharedPreferences`-backed `ThemePreferences`, `CompositionLocalProvider` for theme mode propagation. Placeholder `Type.kt` and `Shape.kt` for steps 16–17.
 

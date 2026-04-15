@@ -44,7 +44,7 @@
 | 13 | Definice barevné palety (Dark mode) | 2 | ✅ |
 | 14 | Definice barevné palety (Light mode) | 2 | ✅ |
 | 15 | Compose ColorScheme a MaterialTheme | 2 | ✅ |
-| 16 | Definice typografie | 2 | ⬜ |
+| 16 | Definice typografie | 2 | ✅ |
 | 17 | Definice tvarů (Shapes) | 2 | ⬜ |
 | 18 | Rozšířený design token systém | 2 | ⬜ |
 | 19 | GlassCard composable | 2 | ⬜ |
