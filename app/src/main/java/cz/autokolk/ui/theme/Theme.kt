@@ -7,52 +7,13 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-
-// ---------------------------------------------------------------------------
-// Material 3 color schemes
-// ---------------------------------------------------------------------------
-
-private val DarkColors = darkColorScheme(
-    primary = AccentCyan,
-    secondary = AccentTeal,
-    tertiary = AccentBlue,
-    background = DarkBackground,
-    surface = DarkSurface,
-    surfaceVariant = DarkSurfaceVariant,
-    onPrimary = DarkBackground,
-    onSecondary = DarkBackground,
-    onTertiary = DarkBackground,
-    onBackground = TextPrimary,
-    onSurface = TextPrimary,
-    onSurfaceVariant = TextSecondary,
-    error = ErrorRed,
-    onError = TextPrimary,
-)
-
-private val LightColors = lightColorScheme(
-    primary = LightAccentCyan,
-    secondary = LightAccentTeal,
-    tertiary = LightAccentBlue,
-    background = LightBackground,
-    surface = LightSurface,
-    surfaceVariant = LightSurfaceVariant,
-    onPrimary = LightSurface,
-    onSecondary = LightSurface,
-    onTertiary = LightSurface,
-    onBackground = LightTextPrimary,
-    onSurface = LightTextPrimary,
-    onSurfaceVariant = LightTextSecondary,
-    error = ErrorRed,
-    onError = LightSurface,
-)
+import cz.autokolk.LessonProgress
 
 // ---------------------------------------------------------------------------
 // Dark-mode preference (persisted in SharedPreferences)
@@ -101,6 +62,7 @@ val LocalThemeController = staticCompositionLocalOf<ThemeController?> { null }
 @Composable
 fun AutokolkTheme(
     themeMode: ThemeMode? = null,
+    visualStyle: GameVisualStyle? = null,
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
@@ -113,7 +75,14 @@ fun AutokolkTheme(
         ThemeMode.SYSTEM -> systemDark
     }
 
-    val colorScheme = if (isDark) DarkColors else LightColors
+    val resolvedVisual = visualStyle
+        ?: GameVisualStyle.fromStorageId(
+            LessonProgress(context.applicationContext).getActiveVisualStyleStorageId(),
+        )
+
+    val colorScheme = colorSchemeForVisualStyle(resolvedVisual, isDark)
+    val typography = typographyForVisualStyle(resolvedVisual)
+    val shapes = shapesForVisualStyle(resolvedVisual)
 
     val activity = LocalContext.current as? ComponentActivity
     SideEffect {
@@ -132,8 +101,8 @@ fun AutokolkTheme(
     CompositionLocalProvider(LocalIsDarkTheme provides isDark) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = AutokolkTypography,
-            shapes = AutokolkShapes,
+            typography = typography,
+            shapes = shapes,
             content = content,
         )
     }

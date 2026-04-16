@@ -37,6 +37,10 @@ data class AlexState(
     val snackMessage: String? = null,
     /** Koruna za streak milník 30 dní. */
     val showStreakCrown: Boolean = false,
+    /** Placeholdery doplňků z obchodu (grafika později). */
+    val showHatVisual: Boolean = false,
+    val showScarfVisual: Boolean = false,
+    val partyBackgroundEnabled: Boolean = false,
 )
 
 class AlexViewModel(application: Application) : AndroidViewModel(application) {
@@ -58,7 +62,9 @@ class AlexViewModel(application: Application) : AndroidViewModel(application) {
             key == "lion_name" ||
             key == "total_points" ||
             key == "total_xp_v1" ||
-            key.startsWith("accessory_")
+            key == "active_visual_style" ||
+            key.startsWith("accessory_") ||
+            key.startsWith("visual_style_")
         ) {
             refreshState()
         }
@@ -90,6 +96,10 @@ class AlexViewModel(application: Application) : AndroidViewModel(application) {
                 isFrozen = hungerManager.isFrozenNow(),
                 coins = lessonProgress.getTotalPoints(),
                 showStreakCrown = lessonProgress.hasStreak30CrownUnlocked(),
+                showHatVisual = lessonProgress.hasHat() && lessonProgress.isHatEnabled(),
+                showScarfVisual = lessonProgress.hasScarf() && lessonProgress.isScarfEnabled(),
+                partyBackgroundEnabled = lessonProgress.hasPartyBackground() &&
+                    lessonProgress.isPartyBackgroundEnabled(),
             )
         }
     }

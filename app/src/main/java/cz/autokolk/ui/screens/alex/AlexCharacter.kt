@@ -12,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,6 +42,8 @@ fun AlexCharacter(
     mood: AlexMood,
     hasSunglassesVisual: Boolean,
     showStreakCrown: Boolean = false,
+    showHatVisual: Boolean = false,
+    showScarfVisual: Boolean = false,
     modifier: Modifier = Modifier,
     bounceTrigger: Long = 0L,
     heartParticlesTrigger: Long = 0L,
@@ -96,7 +99,25 @@ fun AlexCharacter(
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .offset(y = (-12).dp),
+                    .offset(y = (-14).dp),
+            )
+        }
+        if (showHatVisual) {
+            Text(
+                "🧢",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = if (showStreakCrown) 6.dp else (-14).dp),
+            )
+        }
+        if (showScarfVisual) {
+            Text(
+                "🧣",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 4.dp),
             )
         }
         if (showHeart) {

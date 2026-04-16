@@ -30,6 +30,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import cz.autokolk.LessonProgress
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AutokolkTheme
@@ -53,7 +54,10 @@ object AchievementUnlockOverlay {
         val composeView = ComposeView(activity).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
             setContent {
-                AutokolkTheme(themeMode = readThemeMode(activity)) {
+                AutokolkTheme(
+                    themeMode = readThemeMode(activity),
+                    visualStyle = LessonProgress(activity).getActiveVisualStyle(),
+                ) {
                     AchievementUnlockContent(
                         achievementName = achievementName,
                         valueLine = valueLine,

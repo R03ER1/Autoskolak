@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -160,11 +161,29 @@ fun AlexScreen(
             )
 
             Spacer(Modifier.height(24.dp))
-            Box(contentAlignment = Alignment.Center) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(260.dp)) {
+                if (state.partyBackgroundEnabled) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
+                                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.12f),
+                                        Color.Transparent,
+                                    ),
+                                ),
+                                shape = CircleShape,
+                            ),
+                    )
+                }
                 AlexCharacter(
                     mood = state.mood,
                     hasSunglassesVisual = state.hasSunglassesVisual,
                     showStreakCrown = state.showStreakCrown,
+                    showHatVisual = state.showHatVisual,
+                    showScarfVisual = state.showScarfVisual,
                     modifier = Modifier.size(250.dp),
                     bounceTrigger = state.bounceTrigger,
                     heartParticlesTrigger = state.heartParticlesTrigger,
@@ -216,6 +235,10 @@ fun AlexScreen(
                 state = state,
                 viewModel = viewModel,
                 onDismiss = { viewModel.closeShop() },
+                onOpenCentralShop = {
+                    viewModel.closeShop()
+                    navController.navigate(Route.CoinShop.route)
+                },
             )
         }
     }

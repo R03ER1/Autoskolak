@@ -166,7 +166,7 @@
 | 135 | Gamifikace — seasonal events | 11 | ✅ |
 | 136 | Gamifikace — avatar customization | 11 | ✅ |
 | 137 | Gamifikace — social sharing (text / systém) | 11 | ✅ |
-| 138 | Coin shop — rozšíření (themes, kosmetika UI, Alex) | 11 | ⬜ |
+| 138 | Coin shop — rozšíření (themes, kosmetika UI, Alex) | 11 | ✅ |
 | 139 | Dvojitý XP boost (reklama, 30 min) | 11 | ✅ |
 | 140 | Týdenní souhrn (in-app přehled + push) | 11 | ⬜ |
 | 141 | Milestones / odznaky na lesson path (po sekcích) | 11 | ⬜ |

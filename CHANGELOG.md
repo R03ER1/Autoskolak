@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.60] - 2026-04-16
+- Fáze 11 krok 138: centrální obchod — tři motivy aplikace (Klasický zdarma, Neon mřížka, Západ slunce) s vlastními barvami Material 3, úpravou typografie a tvarů karet; nákup a přepnutí motivu za mince v obchodě. Alex: nové sloty čepice, šála a párty pozadí (emoji placeholdery, zapnutí/vypnutí po koupi), brýle přesunuty do stejného obchodu; list Alex „Obchod“ odkazuje na hlavní obchod. `PrimaryGradientButton` respektuje aktivní barevné schéma.
+
 ## [2.0.59] - 2026-04-16
 - Oslavy milníků streaku (7 / 30 / 100 / 365 dní): celoobrazovkový overlay s konfety, zvukem a textem; na výsledku lekce po level-up overlay; při návratu do aplikace se zobrazí i zůstal-li pending v úložišti. `AutokolkApp` neodčítá pending na trasách kvízu a výsledku, aby se nekolidovalo s výsledkovou obrazovkou.
 

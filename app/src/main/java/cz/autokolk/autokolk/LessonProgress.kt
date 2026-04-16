@@ -12,6 +12,7 @@ import java.io.InputStreamReader
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
+import cz.autokolk.ui.theme.GameVisualStyle
 
 import cz.autokolk.BuildConfig
 
@@ -95,6 +96,10 @@ class LessonProgress(private val context: Context) {
 
         /** XP navíc při otevření mystery boxu — musí odpovídat [openMysteryBox]. */
         private const val MYSTERY_BOX_BONUS_XP = 8
+
+        private const val KEY_ACTIVE_VISUAL_STYLE = "active_visual_style"
+        private const val KEY_VISUAL_NEON_OWNED = "visual_style_neon_grid_owned"
+        private const val KEY_VISUAL_SUNSET_OWNED = "visual_style_sunset_warm_owned"
     }
 
     /** Zbývající točení bonusovým kolem dnes (max. 3). */
@@ -159,6 +164,120 @@ class LessonProgress(private val context: Context) {
         if (!hasSunglasses()) return
         prefs.edit().putBoolean("accessory_sunglasses_enabled", enabled).apply()
     }
+
+    // region Shop — visual themes (Material colors / typography / shapes)
+
+    fun getActiveVisualStyleStorageId(): String =
+        prefs.getString(KEY_ACTIVE_VISUAL_STYLE, GameVisualStyle.CLASSIC.storageId)
+            ?: GameVisualStyle.CLASSIC.storageId
+
+    fun getActiveVisualStyle(): GameVisualStyle =
+        GameVisualStyle.fromStorageId(getActiveVisualStyleStorageId())
+
+    fun isVisualStyleOwned(style: GameVisualStyle): Boolean {
+        if (style.isFree()) return true
+        return when (style) {
+            GameVisualStyle.NEON_GRID -> prefs.getBoolean(KEY_VISUAL_NEON_OWNED, false)
+            GameVisualStyle.SUNSET_WARM -> prefs.getBoolean(KEY_VISUAL_SUNSET_OWNED, false)
+            else -> false
+        }
+    }
+
+    /** Nastaví aktivní motiv, pokud je vlastněný (nebo zdarma). */
+    fun setActiveVisualStyleIfOwned(style: GameVisualStyle): Boolean {
+        if (!isVisualStyleOwned(style)) return false
+        prefs.edit().putString(KEY_ACTIVE_VISUAL_STYLE, style.storageId).apply()
+        return true
+    }
+
+    /**
+     * Koupě placeného motivu. Při úspěchu nastaví vlastnictví; aktivní motiv nemění (uživatel si vybere).
+     * @return true při úspěchu nebo již vlastněno
+     */
+    fun buyVisualStyleIfAffordable(style: GameVisualStyle): Boolean {
+        if (style.isFree()) return true
+        if (isVisualStyleOwned(style)) return true
+        val price = style.priceCoins ?: return true
+        if (!spendPoints(price)) return false
+        when (style) {
+            GameVisualStyle.NEON_GRID -> prefs.edit().putBoolean(KEY_VISUAL_NEON_OWNED, true).apply()
+            GameVisualStyle.SUNSET_WARM -> prefs.edit().putBoolean(KEY_VISUAL_SUNSET_OWNED, true).apply()
+            else -> Unit
+        }
+        return true
+    }
+
+    // endregion
+
+    // region Alex shop accessories (sloty — grafiku lze doplnit později)
+
+    fun hasPartyBackground(): Boolean = prefs.getBoolean("accessory_party_bg", false)
+
+    fun buyPartyBackgroundIfAffordable(cost: Int): Boolean {
+        if (hasPartyBackground()) return true
+        if (!spendPoints(cost)) return false
+        prefs.edit()
+            .putBoolean("accessory_party_bg", true)
+            .putBoolean("accessory_party_bg_enabled", true)
+            .apply()
+        return true
+    }
+
+    fun isPartyBackgroundEnabled(): Boolean {
+        if (!hasPartyBackground()) return false
+        return prefs.getBoolean("accessory_party_bg_enabled", true)
+    }
+
+    fun setPartyBackgroundEnabled(enabled: Boolean) {
+        if (!hasPartyBackground()) return
+        prefs.edit().putBoolean("accessory_party_bg_enabled", enabled).apply()
+    }
+
+    fun hasHat(): Boolean = prefs.getBoolean("accessory_hat", false)
+
+    fun buyHatIfAffordable(cost: Int): Boolean {
+        if (hasHat()) return true
+        if (!spendPoints(cost)) return false
+        prefs.edit()
+            .putBoolean("accessory_hat", true)
+            .putBoolean("accessory_hat_enabled", true)
+            .apply()
+        return true
+    }
+
+    fun isHatEnabled(): Boolean {
+        if (!hasHat()) return false
+        return prefs.getBoolean("accessory_hat_enabled", true)
+    }
+
+    fun setHatEnabled(enabled: Boolean) {
+        if (!hasHat()) return
+        prefs.edit().putBoolean("accessory_hat_enabled", enabled).apply()
+    }
+
+    fun hasScarf(): Boolean = prefs.getBoolean("accessory_scarf", false)
+
+    fun buyScarfIfAffordable(cost: Int): Boolean {
+        if (hasScarf()) return true
+        if (!spendPoints(cost)) return false
+        prefs.edit()
+            .putBoolean("accessory_scarf", true)
+            .putBoolean("accessory_scarf_enabled", true)
+            .apply()
+        return true
+    }
+
+    fun isScarfEnabled(): Boolean {
+        if (!hasScarf()) return false
+        return prefs.getBoolean("accessory_scarf_enabled", true)
+    }
+
+    fun setScarfEnabled(enabled: Boolean) {
+        if (!hasScarf()) return
+        prefs.edit().putBoolean("accessory_scarf_enabled", enabled).apply()
+    }
+
+    // endregion
 
     fun getLionName(): String = prefs.getString("lion_name", "Alex") ?: "Alex"
 

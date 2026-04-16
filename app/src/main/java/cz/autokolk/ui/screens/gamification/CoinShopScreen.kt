@@ -3,6 +3,7 @@ package cz.autokolk.ui.screens.gamification
 import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,9 +33,16 @@ import androidx.navigation.NavHostController
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
+import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.sheets.RewardedAdHelper
+import cz.autokolk.ui.theme.GameVisualStyle
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
+
+private const val PRICE_SUNGLASSES = 1000
+private const val PRICE_HAT = 650
+private const val PRICE_SCARF = 550
+private const val PRICE_PARTY_BG = 450
 
 @Composable
 fun CoinShopScreen(navController: NavHostController) {
@@ -46,6 +55,8 @@ fun CoinShopScreen(navController: NavHostController) {
     var shopRefresh by remember { mutableIntStateOf(0) }
     val wheelLeft = remember(shopRefresh, lp) { lp.getBonusWheelRollsRemainingToday() }
     val boxLeft = remember(shopRefresh, lp) { lp.getMysteryBoxOpensRemainingToday() }
+    val coins = remember(shopRefresh, lp) { lp.getTotalPoints() }
+    val activeVisual = remember(shopRefresh, lp) { lp.getActiveVisualStyle() }
 
     if (showWheelDialog) {
         BonusWheelDialog(
@@ -66,6 +77,10 @@ fun CoinShopScreen(navController: NavHostController) {
         )
     }
 
+    fun bump() {
+        shopRefresh++
+    }
+
     AnimatedBackground(Modifier.fillMaxSize()) {
         Column(
             Modifier
@@ -78,11 +93,138 @@ fun CoinShopScreen(navController: NavHostController) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zpět", tint = TextPrimary)
             }
             Text("Obchod a bonusy", style = MaterialTheme.typography.headlineSmall, color = TextPrimary)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "Tvoje mince: $coins",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
             Spacer(Modifier.height(8.dp))
             snack?.let {
                 Text(it, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(8.dp))
             }
+
+            Text(
+                "Motivy aplikace",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary,
+                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+            )
+            Text(
+                "Barvy, typografie a tvary karet v celé aplikaci (Compose). Jeden motiv je zdarma.",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+            )
+            Spacer(Modifier.height(8.dp))
+            GameVisualStyle.entries.forEach { style ->
+                VisualThemeShopCard(
+                    style = style,
+                    owned = lp.isVisualStyleOwned(style),
+                    active = activeVisual == style,
+                    coins = coins,
+                    onBuy = {
+                        if (lp.buyVisualStyleIfAffordable(style)) {
+                            snack = "Motiv zakoupen — klepni na „Aktivovat“."
+                            bump()
+                        } else {
+                            snack = "Nedostatek mincí."
+                        }
+                    },
+                    onActivate = {
+                        if (lp.setActiveVisualStyleIfOwned(style)) {
+                            snack = "Motiv aktivní."
+                            bump()
+                        }
+                    },
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+
+            Text(
+                "Doplňky pro Alexe",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary,
+                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+            )
+            Text(
+                "Ikony jsou zatím placeholdery — později nahradíš obrázky.",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+            )
+            Spacer(Modifier.height(8.dp))
+
+            AlexAccessoryShopCard(
+                title = "Sluneční brýle",
+                detail = "Stávající vzhled Alexe.",
+                price = PRICE_SUNGLASSES,
+                owned = lp.hasSunglasses(),
+                enabledVisual = lp.isSunglassesEnabled(),
+                coins = coins,
+                onBuy = {
+                    if (lp.buySunglassesIfAffordable(PRICE_SUNGLASSES)) {
+                        snack = "Brýle tvoje!"
+                        bump()
+                    } else snack = "Nedostatek mincí."
+                },
+                onToggle = { lp.setSunglassesEnabled(it); bump() },
+            )
+            Spacer(Modifier.height(8.dp))
+            AlexAccessoryShopCard(
+                title = "Čepice",
+                detail = "Slot na čepici (placeholder 🧢).",
+                price = PRICE_HAT,
+                owned = lp.hasHat(),
+                enabledVisual = lp.isHatEnabled(),
+                coins = coins,
+                onBuy = {
+                    if (lp.buyHatIfAffordable(PRICE_HAT)) {
+                        snack = "Čepice zakoupena."
+                        bump()
+                    } else snack = "Nedostatek mincí."
+                },
+                onToggle = { lp.setHatEnabled(it); bump() },
+            )
+            Spacer(Modifier.height(8.dp))
+            AlexAccessoryShopCard(
+                title = "Šála",
+                detail = "Slot na šálu (placeholder 🧣).",
+                price = PRICE_SCARF,
+                owned = lp.hasScarf(),
+                enabledVisual = lp.isScarfEnabled(),
+                coins = coins,
+                onBuy = {
+                    if (lp.buyScarfIfAffordable(PRICE_SCARF)) {
+                        snack = "Šála zakoupena."
+                        bump()
+                    } else snack = "Nedostatek mincí."
+                },
+                onToggle = { lp.setScarfEnabled(it); bump() },
+            )
+            Spacer(Modifier.height(8.dp))
+            AlexAccessoryShopCard(
+                title = "Párty pozadí",
+                detail = "Jemný kruh za Alexem na jeho stránce.",
+                price = PRICE_PARTY_BG,
+                owned = lp.hasPartyBackground(),
+                enabledVisual = lp.isPartyBackgroundEnabled(),
+                coins = coins,
+                onBuy = {
+                    if (lp.buyPartyBackgroundIfAffordable(PRICE_PARTY_BG)) {
+                        snack = "Pozadí zakoupeno."
+                        bump()
+                    } else snack = "Nedostatek mincí."
+                },
+                onToggle = { lp.setPartyBackgroundEnabled(it); bump() },
+            )
+
+            Spacer(Modifier.height(16.dp))
+            Text(
+                "Bonusy",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary,
+            )
+            Spacer(Modifier.height(8.dp))
             PrimaryGradientButton(
                 text = "2× XP na 30 min (reklama)",
                 onClick = {
@@ -142,6 +284,80 @@ fun CoinShopScreen(navController: NavHostController) {
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary,
             )
+        }
+    }
+}
+
+@Composable
+private fun VisualThemeShopCard(
+    style: GameVisualStyle,
+    owned: Boolean,
+    active: Boolean,
+    coins: Int,
+    onBuy: () -> Unit,
+    onActivate: () -> Unit,
+) {
+    GlassCard(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
+        Column(Modifier.padding(16.dp)) {
+            Text(style.titleCs, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+            Spacer(Modifier.height(4.dp))
+            Text(style.subtitleCs, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+            Spacer(Modifier.height(10.dp))
+            when {
+                active -> Text("Právě aktivní", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
+                !owned -> {
+                    val price = style.priceCoins
+                    if (price == null) {
+                        PrimaryGradientButton("Aktivovat (zdarma)", onClick = onActivate, modifier = Modifier.fillMaxWidth())
+                    } else {
+                        Text("$price mincí", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                        Spacer(Modifier.height(6.dp))
+                        PrimaryGradientButton(
+                            text = "Koupit",
+                            onClick = onBuy,
+                            enabled = coins >= price,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
+                else -> PrimaryGradientButton("Aktivovat", onClick = onActivate, modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
+@Composable
+private fun AlexAccessoryShopCard(
+    title: String,
+    detail: String,
+    price: Int,
+    owned: Boolean,
+    enabledVisual: Boolean,
+    coins: Int,
+    onBuy: () -> Unit,
+    onToggle: (Boolean) -> Unit,
+) {
+    GlassCard(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
+        Column(Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+            Spacer(Modifier.height(4.dp))
+            Text(detail, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+            Spacer(Modifier.height(10.dp))
+            if (owned) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Zobrazení", color = TextSecondary, modifier = Modifier.weight(1f))
+                    Switch(checked = enabledVisual, onCheckedChange = onToggle)
+                }
+            } else {
+                Text("$price mincí", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(8.dp))
+                PrimaryGradientButton(
+                    text = "Koupit",
+                    onClick = onBuy,
+                    enabled = coins >= price,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

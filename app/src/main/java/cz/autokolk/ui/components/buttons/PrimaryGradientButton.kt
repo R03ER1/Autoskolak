@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -38,9 +39,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.AccentTeal
-import cz.autokolk.ui.theme.DarkBackground
 import cz.autokolk.ui.theme.PillShape
 
 /**
@@ -79,17 +77,21 @@ fun PrimaryGradientButton(
         label = "primaryGradientShimmerPhase",
     )
 
+    val primary = MaterialTheme.colorScheme.primary
+    val secondary = MaterialTheme.colorScheme.secondary
+    val onGradient = MaterialTheme.colorScheme.onPrimary
+
     Box(
         modifier = modifier
             .scale(scale)
             .shadow(
                 elevation = elevation,
                 shape = PillShape,
-                ambientColor = AccentCyan.copy(alpha = 0.3f),
-                spotColor = AccentTeal.copy(alpha = 0.3f),
+                ambientColor = primary.copy(alpha = 0.3f),
+                spotColor = secondary.copy(alpha = 0.3f),
             )
             .clip(PillShape)
-            .background(Brush.horizontalGradient(listOf(AccentCyan, AccentTeal)))
+            .background(Brush.horizontalGradient(listOf(primary, secondary)))
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
@@ -136,13 +138,13 @@ fun PrimaryGradientButton(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = DarkBackground,
+                        tint = onGradient,
                     )
                     Spacer(Modifier.width(8.dp))
                 }
                 Text(
                     text = text,
-                    color = DarkBackground,
+                    color = onGradient,
                     fontWeight = FontWeight.Bold,
                 )
             }
