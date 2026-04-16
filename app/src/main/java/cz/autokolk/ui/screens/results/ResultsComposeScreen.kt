@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import cz.autokolk.LessonProgress
 import cz.autokolk.LevelUpPending
 import cz.autokolk.ui.components.feedback.LevelUpOverlay
+import cz.autokolk.ui.components.feedback.StreakMilestoneOverlay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,9 +70,13 @@ fun ResultsComposeScreen(
     val context = LocalContext.current
     val lessonProgress = remember { LessonProgress(context) }
     var levelUpPending by remember { mutableStateOf<LevelUpPending?>(null) }
+    var streakMilestonePending by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     LaunchedEffect(Unit) {
         levelUpPending = lessonProgress.consumePendingLevelUp()
+        if (levelUpPending == null) {
+            streakMilestonePending = lessonProgress.consumePendingStreakCelebration()
+        }
     }
 
     val isTest = lessonId < 0
@@ -217,7 +222,18 @@ fun ResultsComposeScreen(
         levelUpPending?.let { pending ->
             LevelUpOverlay(
                 pending = pending,
-                onDismiss = { levelUpPending = null },
+                onDismiss = {
+                    levelUpPending = null
+                    streakMilestonePending = lessonProgress.consumePendingStreakCelebration()
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+        streakMilestonePending?.let { (days, bonusCoins) ->
+            StreakMilestoneOverlay(
+                days = days,
+                bonusCoins = bonusCoins,
+                onDismiss = { streakMilestonePending = null },
                 modifier = Modifier.fillMaxSize(),
             )
         }

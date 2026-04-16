@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.59] - 2026-04-16
+- Oslavy milníků streaku: overlay po splnění milníku, po level-up na výsledku lekce, při znovuotevření app pokud pending zůstal. Bez kolize s kvízem a výsledkovou obrazovkou.
+
 ## [2.0.58] - 2026-04-15
 - Nastavení (jen debug build): sekce „Debug — obchod“ — otevření bonusového kola a mystery boxu, skok do obchodu, reset denních limitů kola/boxu pro testování.
 

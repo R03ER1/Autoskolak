@@ -27,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.feedback.HomeTutorialSpotlightOverlay
+import cz.autokolk.ui.components.feedback.StreakMilestoneOverlay
 import cz.autokolk.ui.components.security.BiometricLockHost
 import cz.autokolk.ui.components.navigation.AutokolkBottomBar
 import cz.autokolk.ui.components.navigation.AutokolkTopBar
@@ -81,6 +82,7 @@ fun AutokolkApp(
     var streakSheetVisible by remember { mutableStateOf(false) }
     var heartsSheetVisible by remember { mutableStateOf(false) }
     var coinsSheetVisible by remember { mutableStateOf(false) }
+    var streakMilestoneOverlay by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     val tutorialTopRectState = remember { mutableStateOf<Rect?>(null) }
     val tutorialBottomRectState = remember { mutableStateOf<Rect?>(null) }
@@ -93,6 +95,20 @@ fun AutokolkApp(
         if (!onHomeTab) {
             tutorialLessonRectState.value = null
         }
+    }
+
+    LaunchedEffect(currentRoute) {
+        val route = currentRoute ?: return@LaunchedEffect
+        // Výsledková obrazovka pending nastaví po dokončení lekce; neodčítat dřív než se otevře.
+        if (
+            route.startsWith("results/") ||
+            route.startsWith("quiz/") ||
+            route.startsWith("practice_quiz/")
+        ) {
+            return@LaunchedEffect
+        }
+        val pending = lessonProgress.consumePendingStreakCelebration() ?: return@LaunchedEffect
+        streakMilestoneOverlay = pending
     }
 
     LaunchedEffect(initialOpenTab) {
@@ -222,6 +238,18 @@ fun AutokolkApp(
             lessonProgress = lessonProgress,
             onStatsRefresh = { refreshStats() },
         )
+
+        streakMilestoneOverlay?.let { (days, bonusCoins) ->
+            StreakMilestoneOverlay(
+                days = days,
+                bonusCoins = bonusCoins,
+                onDismiss = {
+                    streakMilestoneOverlay = null
+                    refreshStats()
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
 
         BiometricLockHost()
     }
