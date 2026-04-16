@@ -19,9 +19,9 @@
 - [Fáze 8: Test / Zkouška](#fáze-8-test--zkouška) (kroky 98–106)
 - [Fáze 9: Practice / Procvičování](#fáze-9-practice--procvičování) (kroky 107–114)
 - [Fáze 10: Settings a systémové obrazovky](#fáze-10-settings-a-systémové-obrazovky) (kroky 115–122)
-- [Fáze 11: Gamifikace a engagement](#fáze-11-gamifikace-a-engagement) (kroky 123–137)
-- [Fáze 12: Zvuky a haptika](#fáze-12-zvuky-a-haptika) (kroky 138–145)
-- [Fáze 13: Finální polish a performance](#fáze-13-finální-polish-a-performance) (kroky 146–158)
+- [Fáze 11: Gamifikace a engagement](#fáze-11-gamifikace-a-engagement) (kroky 123–144)
+- [Fáze 12: Zvuky a haptika](#fáze-12-zvuky-a-haptika) (kroky 145–152)
+- [Fáze 13: Finální polish a performance](#fáze-13-finální-polish-a-performance) (kroky 153–165)
 
 ---
 
@@ -165,28 +165,35 @@
 | 134 | Gamifikace — combo multiplier | 11 | ✅ |
 | 135 | Gamifikace — seasonal events | 11 | ✅ |
 | 136 | Gamifikace — avatar customization | 11 | ✅ |
-| 137 | Gamifikace — social sharing | 11 | ✅ |
-| 138 | Zvukové soubory | 12 | ⬜ |
-| 139 | SoundManager implementace | 12 | ⬜ |
-| 140 | Haptic patterns | 12 | ⬜ |
-| 141 | Integrace zvuků do quiz flow | 12 | ⬜ |
-| 142 | Integrace zvuků do Alex | 12 | ⬜ |
-| 143 | Integrace zvuků do navigace | 12 | ⬜ |
-| 144 | Settings: zvuky a vibrace toggle | 12 | ⬜ |
-| 145 | Testování zvuků a haptic feedback | 12 | ⬜ |
-| 146 | Odstranění starých Activity souborů | 13 | ⬜ |
-| 147 | Odstranění starých XML layoutů | 13 | ⬜ |
-| 148 | Odstranění starých stylů a témat | 13 | ⬜ |
-| 149 | Performance audit — recomposition | 13 | ⬜ |
-| 150 | Performance audit — animace | 13 | ⬜ |
-| 151 | Performance audit — image loading | 13 | ⬜ |
-| 152 | Accessibility audit | 13 | ⬜ |
-| 153 | Reduced motion support | 13 | ⬜ |
-| 154 | Tablet / landscape support (základní) | 13 | ⬜ |
-| 155 | ProGuard / R8 pravidla pro nové knihovny | 13 | ⬜ |
-| 156 | App size audit | 13 | ⬜ |
-| 157 | Migrace ad logiky do Compose | 13 | ⬜ |
-| 158 | Finální QA a release checklist | 13 | ⬜ |
+| 137 | Gamifikace — social sharing (text / systém) | 11 | ✅ |
+| 138 | Coin shop — rozšíření (themes, kosmetika UI, Alex) | 11 | ⬜ |
+| 139 | Dvojitý XP boost (reklama, 30 min) | 11 | ✅ |
+| 140 | Týdenní souhrn (in-app přehled + push) | 11 | ⬜ |
+| 141 | Milestones / odznaky na lesson path (po sekcích) | 11 | ⬜ |
+| 142 | Revize — spaced repetition (chybné otázky) | 11 | ⬜ |
+| 143 | Social sharing — obrázek (streak / výsledek) | 11 | ⬜ |
+| 144 | Widget (home screen — streak, denní výzvy) | 11 | ✅ |
+| 145 | Zvukové soubory | 12 | ⬜ |
+| 146 | SoundManager implementace | 12 | ⬜ |
+| 147 | Haptic patterns | 12 | ⬜ |
+| 148 | Integrace zvuků do quiz flow | 12 | ⬜ |
+| 149 | Integrace zvuků do Alex | 12 | ⬜ |
+| 150 | Integrace zvuků do navigace | 12 | ⬜ |
+| 151 | Settings: zvuky a vibrace toggle | 12 | ⬜ |
+| 152 | Testování zvuků a haptic feedback | 12 | ⬜ |
+| 153 | Odstranění starých Activity souborů | 13 | ⬜ |
+| 154 | Odstranění starých XML layoutů | 13 | ⬜ |
+| 155 | Odstranění starých stylů a témat | 13 | ⬜ |
+| 156 | Performance audit — recomposition | 13 | ⬜ |
+| 157 | Performance audit — animace | 13 | ⬜ |
+| 158 | Performance audit — image loading | 13 | ⬜ |
+| 159 | Accessibility audit | 13 | ⬜ |
+| 160 | Reduced motion support | 13 | ⬜ |
+| 161 | Tablet / landscape support (základní) | 13 | ⬜ |
+| 162 | ProGuard / R8 pravidla pro nové knihovny | 13 | ⬜ |
+| 163 | App size audit | 13 | ⬜ |
+| 164 | Migrace ad logiky do Compose | 13 | ⬜ |
+| 165 | Finální QA a release checklist | 13 | ⬜ |
 
 ---
 
@@ -3667,6 +3674,8 @@ Tyto kroky zahrnují:
 
 ## Fáze 11: Gamifikace a engagement
 
+> **Poznámka:** Fáze 11 zahrnuje **dva dříve oddělené výčty** — základní gamifikační prvky (kroky 123–130), doplňkové herní mechaniky z přehledové tabulky (131–137) a rozšíření z původního spodního plánu (138–144). V tabulce na začátku dokumentu i níže jsou nyní **všechny** tyto úkoly; kroky 138–144 dříve kolízovaly s číslováním fáze 12 — po sloučení je fáze 12 přečíslována na **145–152** a fáze 13 na **153–165**.
+
 ### Krok 123 — XP / leveling systém
 
 **Soubory:** Nový `app/src/main/java/cz/autokolk/data/XpSystem.kt`
@@ -3815,21 +3824,165 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 131–137 — Další gamifikace kroky
+### Krok 131 — Gamifikace — bonus wheel
 
-- **Krok 131:** Coin shop (cosmetics pro UI — themes, Alex outfity).
-- **Krok 132:** "Dvojitý XP" boost (za reklamu, 30 minut 2× body).
-- **Krok 133:** Weekly summary screen (push notifikace + in-app přehled týdne).
-- **Krok 134:** Progress milestones na lesson path (badges po sekcích).
-- **Krok 135:** "Revize" systém — spaced repetition pro chybné otázky.
-- **Krok 136:** Social sharing (sdílet streak/výsledek jako obrázek).
-- **Krok 137:** Widget na homescreen (streak, denní challenge progress).
+**Soubory:** `BonusWheelDialog.kt`, `LessonProgress.rollBonusWheel()`, případně `CoinShopScreen`
+
+1. Denní limit rolí, odměny v mincích, pity pro slabé výsledky.
+2. UI: dialog s animací / feedback po zatočení.
+3. Propojení s herní ekonomikou (mince z lekcí).
+
+**Výstup:** Náhodná odměna pro návrat do aplikace.
+
+---
+
+### Krok 132 — Gamifikace — mystery box
+
+**Soubory:** `MysteryBoxDialog.kt`, `LessonProgress.openMysteryBox()`
+
+1. Limit otevření denně, kombinace mincí + bonus XP.
+2. Pity / rozumný rozptyl odměn.
+
+**Výstup:** Druhý denní „loot“ zdroj vedle bonus kola.
+
+---
+
+### Krok 133 — Gamifikace — daily login bonus
+
+**Soubory:** `LessonProgress.grantDailyLoginIfNeeded()`, `HomeViewModel`
+
+1. Jednou denně při otevření Home: malý bonus XP + mince.
+2. Idempotence podle kalendářního dne.
+
+**Výstup:** Denní návykový trigger.
+
+---
+
+### Krok 134 — Gamifikace — combo multiplier
+
+**Soubory:** `QuizViewModel` (combo streak), `LessonProgress.addXp(..., sessionComboMultiplier)`
+
+1. Za delší sérii správných odpovědí v lekci vyšší násobič XP (např. 5+ / 10+).
+2. Vizuální feedback v horní liště / result strip (combo text).
+
+**Výstup:** Odměna za soustředění v lekci.
+
+---
+
+### Krok 135 — Gamifikace — seasonal events
+
+**Soubory:** `SeasonalEvents.kt`, banner na Home (`SeasonalBanner`)
+
+1. Časově omezené hlášky / téma (svátky, prázdniny).
+2. Jednoduchý mechanismus zapnutí bez backendu.
+
+**Výstup:** Občasná variabilita obsahu na Home.
+
+---
+
+### Krok 136 — Gamifikace — avatar customization
+
+**Soubory:** `AlexScreen`, `ShopSheet`, `AlexViewModel`, prefs doplňků
+
+1. Kosmetika pro Alexe (např. brýle, koruna za streak milestone).
+2. Pojmenování lva, zobrazení v profilu / nastavení.
+3. Volitelné rozšíření: další outfity za mince.
+
+**Výstup:** Osobní vazba k mazlíčkovi.
+
+---
+
+### Krok 137 — Gamifikace — social sharing (text / systém)
+
+**Soubory:** např. `CoinShopScreen`, `Intent.ACTION_SEND`
+
+1. Sdílení textu (streak, výzva) přes systémový share sheet.
+2. Lokalizovatelný text šablony.
+
+**Výstup:** Organický marketing bez obrázků (viz také krok 143).
+
+---
+
+### Krok 138 — Coin shop — rozšíření (themes, kosmetika UI, Alex)
+
+**Soubory:** `CoinShopScreen`, `ShopSheet`, téma aplikace
+
+1. Sjednotit / rozšířit obchod za mince: Alex doplňky, případně budoucí **barevné motivy UI** (ne jen systémový dark/light).
+2. Jasná cenovka a stav „vlastněno / zapnuto“.
+
+**Výstup:** Mince mají dlouhodobý význam mimo jednorázové power-upy.
+
+---
+
+### Krok 139 — Dvojitý XP boost (reklama, 30 min)
+
+**Soubory:** `LessonProgress.activateDoubleXpForMinutes()`, `RewardedAdHelper`, `CoinsSheet` / `CoinShopScreen`
+
+1. Po shlédnutí reklamy aktivovat 2× XP na 30 minut (stackování podle pravidel).
+2. Indikátor zbývajícího času (např. v sheetu mincí / XP).
+
+**Výstup:** Monetizace + zrychlení progresu.
+
+---
+
+### Krok 140 — Týdenní souhrn (in-app přehled + push)
+
+**Soubory:** nová obrazovka nebo sekce, `WorkManager` / notifikace
+
+1. **In-app:** přehled minulého týdne (XP, lekce, streak) — doplnit k existujícímu grafu XP za 7 dní.
+2. **Push (volitelné):** jednou týdně shrnutí + deep link do aplikace.
+
+**Výstup:** Reflexe pokroku a důvod vrátit se po týdnu.
+
+---
+
+### Krok 141 — Milestones / odznaky na lesson path (po sekcích)
+
+**Soubory:** `HomePathListBuilder`, `HomeScreen`, komponenty uzlů
+
+1. Nad rámec sekčních hlaviček: **odznaky** za dokončení celé sekce / kategorie na cestě.
+2. Animace odemčení, přehled v profilu nebo na Home.
+
+**Výstup:** Jasné mezníky v dlouhé cestě kurzem.
+
+---
+
+### Krok 142 — Revize — spaced repetition (chybné otázky)
+
+**Soubory:** `ReviseMistakesScreen`, `LessonProgress`, případně fronta otázek
+
+1. Nad rámec „procvič chyby“: intervalové opakování (např. 1 d / 3 d / 7 d) podle omylů.
+2. Notifikace nebo připomínka v Home („dnes reviduj 5 otázek“).
+
+**Výstup:** Delší zapamatování než jednorázové procvičení.
+
+---
+
+### Krok 143 — Social sharing — obrázek (streak / výsledek)
+
+**Soubory:** generování bitmapy / `Canvas`, share `Intent` s `EXTRA_STREAM`
+
+1. Vizuální karta (streak, skóre testu, level) exportovat jako PNG.
+2. Sdílet přes stejný systémový dialog jako u textu.
+
+**Výstup:** Sdílení vhodné pro sociální sítě.
+
+---
+
+### Krok 144 — Widget (home screen — streak, denní výzvy)
+
+**Soubory:** `StreakWidgetProvider`, `res/xml/widget_*.xml`, manifest
+
+1. Widget zobrazuje streak a postup denních výzev (např. X/3).
+2. Periodická aktualizace po změně stavu.
+
+**Výstup:** Viditelnost aplikace z plochy zařízení.
 
 ---
 
 ## Fáze 12: Zvuky a haptika
 
-### Krok 138 — Zvukové soubory
+### Krok 145 — Zvukové soubory
 
 **Soubory:** `app/src/main/res/raw/`
 
@@ -3850,7 +4003,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 139 — SoundManager implementace
+### Krok 146 — SoundManager implementace
 
 **Soubory:** `app/src/main/java/cz/autokolk/audio/SoundManager.kt`
 
@@ -3883,7 +4036,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 140 — Haptic patterns
+### Krok 147 — Haptic patterns
 
 **Soubory:** `app/src/main/java/cz/autokolk/ui/util/HapticFeedback.kt`
 
@@ -3908,7 +4061,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 141 — Integrace zvuků do quiz flow
+### Krok 148 — Integrace zvuků do quiz flow
 
 **Soubory:** `QuizScreen.kt`, `QuizViewModel.kt`
 
@@ -3924,7 +4077,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 142 — Integrace zvuků do Alex
+### Krok 149 — Integrace zvuků do Alex
 
 **Soubory:** `AlexScreen.kt`
 
@@ -3936,7 +4089,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 143 — Integrace zvuků do navigace
+### Krok 150 — Integrace zvuků do navigace
 
 **Soubory:** `AutokolkBottomBar.kt`, sheets
 
@@ -3948,7 +4101,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 144 — Settings: zvuky a vibrace toggle
+### Krok 151 — Settings: zvuky a vibrace toggle
 
 **Soubory:** `SettingsScreen.kt`
 
@@ -3960,7 +4113,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 145 — Testování zvuků a haptic feedback
+### Krok 152 — Testování zvuků a haptic feedback
 
 **Soubory:** —
 
@@ -3976,7 +4129,7 @@ Tyto kroky zahrnují:
 
 ## Fáze 13: Finální polish a performance
 
-### Krok 146 — Odstranění starých Activity souborů
+### Krok 153 — Odstranění starých Activity souborů
 
 **Soubory:** Všechny `*Activity.kt` a `*Fragment.kt` v `cz/autokolk/autokolk/`
 
@@ -3991,7 +4144,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 147 — Odstranění starých XML layoutů
+### Krok 154 — Odstranění starých XML layoutů
 
 **Soubory:** `app/src/main/res/layout/`
 
@@ -4002,7 +4155,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 148 — Odstranění starých stylů a témat
+### Krok 155 — Odstranění starých stylů a témat
 
 **Soubory:** `res/values/themes.xml`, `styles.xml`, `colors.xml`
 
@@ -4014,7 +4167,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 149 — Performance audit — recomposition
+### Krok 156 — Performance audit — recomposition
 
 **Soubory:** Compose screens
 
@@ -4030,7 +4183,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 150 — Performance audit — animace
+### Krok 157 — Performance audit — animace
 
 **Soubory:** Animační kód
 
@@ -4048,7 +4201,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 151 — Performance audit — image loading
+### Krok 158 — Performance audit — image loading
 
 **Soubory:** Coil konfigurace
 
@@ -4067,7 +4220,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 152 — Accessibility audit
+### Krok 159 — Accessibility audit
 
 **Soubory:** Všechny Compose screens
 
@@ -4082,7 +4235,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 153 — Reduced motion support
+### Krok 160 — Reduced motion support
 
 **Soubory:** Theme/Animation utility
 
@@ -4105,7 +4258,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 154 — Tablet / landscape support (základní)
+### Krok 161 — Tablet / landscape support (základní)
 
 **Soubory:** Compose screens
 
@@ -4125,7 +4278,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 155 — ProGuard / R8 pravidla pro nové knihovny
+### Krok 162 — ProGuard / R8 pravidla pro nové knihovny
 
 **Soubory:** `proguard-rules.pro`
 
@@ -4140,7 +4293,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 156 — App size audit
+### Krok 163 — App size audit
 
 **Soubory:** Build output
 
@@ -4158,7 +4311,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 157 — Migrace ad logiky do Compose
+### Krok 164 — Migrace ad logiky do Compose
 
 **Soubory:** Ad wrappers
 
@@ -4177,7 +4330,7 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 158 — Finální QA a release checklist
+### Krok 165 — Finální QA a release checklist
 
 **Soubory:** —
 
@@ -4212,10 +4365,10 @@ Tyto kroky zahrnují:
 | 8. Test | 98–106 | Test hub, timer, výsledky, detaily, statistiky |
 | 9. Practice | 107–114 | Kategorie grid, filtry, procvičovací mód |
 | 10. Settings | 115–122 | Nastavení, achievements, changelog, splash |
-| 11. Gamifikace | 123–137 | XP/leveling, challenges, power-ups, milestones |
-| 12. Zvuky | 138–145 | Sound files, SoundManager, haptic, integrace |
-| 13. Polish | 146–158 | Cleanup, performance, accessibility, release |
+| 11. Gamifikace | 123–144 | XP/leveling, challenges, power-ups, shop, widget, SRS, sdílení |
+| 12. Zvuky | 145–152 | Sound files, SoundManager, haptic, integrace |
+| 13. Polish | 153–165 | Cleanup, performance, accessibility, release |
 
-**Celkový počet kroků: 158**
+**Celkový počet kroků: 165**
 
 > Každý krok je navržen jako samostatná implementační jednotka (1–4 hodiny práce). Kroky v rámci fáze jsou sekvenční, fáze 1–3 musí předcházet ostatním. Fáze 4–10 mohou být částečně paralelizovány, ale doporučený postup je sekvenční dle priorit (UX flow → gamifikace → vizuální polish → animace → performance).
