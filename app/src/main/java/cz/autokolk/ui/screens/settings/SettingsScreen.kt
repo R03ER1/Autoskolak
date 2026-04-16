@@ -2,6 +2,7 @@ package cz.autokolk.ui.screens.settings
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,8 @@ import cz.autokolk.ui.components.settings.SettingsProfileCard
 import cz.autokolk.ui.components.settings.SwitchSetting
 import cz.autokolk.ui.components.settings.ThemeModeSegmentedRow
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.screens.gamification.BonusWheelDialog
+import cz.autokolk.ui.screens.gamification.MysteryBoxDialog
 import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
 import cz.autokolk.ui.settings.AppSettingsStore
 import cz.autokolk.ui.theme.LocalThemeController
@@ -65,6 +68,9 @@ fun SettingsScreen(navController: NavHostController) {
     var dailyGoal by remember { mutableIntStateOf(onboardingPrefs.dailyGoal) }
     var showDailyGoalDialog by remember { mutableStateOf(false) }
     var showClearDialog by remember { mutableStateOf(false) }
+    var showDebugWheel by remember { mutableStateOf(false) }
+    var showDebugBox by remember { mutableStateOf(false) }
+    val debugLessonProgress = remember { LessonProgress(context) }
 
     val dailyGoalText = remember(dailyGoal) {
         dailyGoalChoices.find { it.first == dailyGoal }?.second ?: "denní cíl"
@@ -199,6 +205,33 @@ fun SettingsScreen(navController: NavHostController) {
                 }
             }
 
+            if (BuildConfig.DEBUG) {
+                item {
+                    SettingsGroup("Debug — obchod (před vydáním smaž)") {
+                        ClickableSetting(
+                            title = "Resetovat denní limity kola a boxu",
+                            subtitle = "Po vyčerpání točení / otevření",
+                            onClick = {
+                                debugLessonProgress.debugResetDailyWheelAndBoxLimits()
+                                Toast.makeText(context, "Limity kola a boxu resetovány", Toast.LENGTH_SHORT).show()
+                            },
+                        )
+                        ClickableSetting(
+                            title = "Otevřít bonusové kolo",
+                            onClick = { showDebugWheel = true },
+                        )
+                        ClickableSetting(
+                            title = "Otevřít mystery box",
+                            onClick = { showDebugBox = true },
+                        )
+                        ClickableSetting(
+                            title = "Otevřít obchod a bonusy",
+                            onClick = { navController.navigate(Route.CoinShop.route) },
+                        )
+                    }
+                }
+            }
+
             item {
                 SettingsGroup("Nebezpečná zóna", isDanger = true) {
                     ClickableSetting(
@@ -269,6 +302,19 @@ fun SettingsScreen(navController: NavHostController) {
                     Text("Zrušit")
                 }
             },
+        )
+    }
+
+    if (BuildConfig.DEBUG && showDebugWheel) {
+        BonusWheelDialog(
+            lessonProgress = debugLessonProgress,
+            onDismiss = { showDebugWheel = false },
+        )
+    }
+    if (BuildConfig.DEBUG && showDebugBox) {
+        MysteryBoxDialog(
+            lessonProgress = debugLessonProgress,
+            onDismiss = { showDebugBox = false },
         )
     }
 }

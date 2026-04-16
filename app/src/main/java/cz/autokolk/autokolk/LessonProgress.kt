@@ -13,6 +13,8 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
 
+import cz.autokolk.BuildConfig
+
 data class LessonState(
     val lessonNumber: Int,
     val completed: Boolean = false,
@@ -114,6 +116,22 @@ class LessonProgress(private val context: Context) {
     }
 
     fun getMysteryBoxBonusXp(): Int = MYSTERY_BOX_BONUS_XP
+
+    /**
+     * Pouze debug buildy: smaže denní počítadla bonusového kola a mystery boxu (včetně pity),
+     * aby šly znovu otestovat. V release je no-op.
+     */
+    fun debugResetDailyWheelAndBoxLimits() {
+        if (!BuildConfig.DEBUG) return
+        prefs.edit()
+            .remove(KEY_WHEEL_DAY)
+            .remove(KEY_WHEEL_COUNT_DAY)
+            .remove(KEY_WHEEL_PITY)
+            .remove(KEY_BOX_DAY)
+            .remove(KEY_BOX_COUNT_DAY)
+            .remove(KEY_BOX_PITY)
+            .apply()
+    }
 
     // --- Accessories ownership flags ---
     fun hasSunglasses(): Boolean {

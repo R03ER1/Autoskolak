@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.58] - 2026-04-15
+- Nastavení (jen debug build): sekce „Debug — obchod“ — otevření bonusového kola a mystery boxu, skok do obchodu, reset denních limitů kola/boxu pro testování.
+
 ## [2.0.57] - 2026-04-15
 - Obchod a bonusy: animované bonusové kolo a mystery box (výsledek až po animaci, zvuk a haptika), přehled zbývajících pokusů na obrazovce obchodu; `LessonProgress` rozšířen o počty zbývajících točení/otevření a jednotný bonus XP u krabičky.
 
