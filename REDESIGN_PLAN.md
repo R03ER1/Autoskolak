@@ -135,37 +135,37 @@
 | 104 | Test stats | 8 | ✅ |
 | 105 | Test attempt ViewModel | 8 | ✅ |
 | 106 | Test history | 8 | ✅ |
-| 107 | Practice screen scaffold | 9 | ⬜ |
-| 108 | Category card | 9 | ⬜ |
-| 109 | Practice subcategories | 9 | ⬜ |
-| 110 | Practice filters | 9 | ⬜ |
-| 111 | Practice quiz mode | 9 | ⬜ |
-| 112 | Practice ViewModel | 9 | ⬜ |
-| 113 | Practice stats | 9 | ⬜ |
-| 114 | Practice search | 9 | ⬜ |
-| 115 | Settings screen | 10 | ⬜ |
-| 116 | Settings komponenty (Switch, Clickable) | 10 | ⬜ |
-| 117 | Dark/light mode přepínač | 10 | ⬜ |
-| 118 | Achievements screen (Compose) | 10 | ⬜ |
-| 119 | Achievement unlock animace | 10 | ⬜ |
-| 120 | Changelog screen (Compose) | 10 | ⬜ |
-| 121 | Splash screen (Compose) | 10 | ⬜ |
-| 122 | Loading states pro DFM | 10 | ⬜ |
-| 123 | XP / leveling systém | 11 | ⬜ |
-| 124 | Level-up celebration | 11 | ⬜ |
-| 125 | Daily challenges | 11 | ⬜ |
-| 126 | Streak freeze mechanika | 11 | ⬜ |
-| 127 | Streak milestones | 11 | ⬜ |
-| 128 | Power-ups implementace | 11 | ⬜ |
-| 129 | Weekly leaderboard (lokální) | 11 | ⬜ |
-| 130 | Achievement unlock triggers | 11 | ⬜ |
-| 131 | Gamifikace — bonus wheel | 11 | ⬜ |
-| 132 | Gamifikace — mystery box | 11 | ⬜ |
-| 133 | Gamifikace — daily login bonus | 11 | ⬜ |
-| 134 | Gamifikace — combo multiplier | 11 | ⬜ |
-| 135 | Gamifikace — seasonal events | 11 | ⬜ |
-| 136 | Gamifikace — avatar customization | 11 | ⬜ |
-| 137 | Gamifikace — social sharing | 11 | ⬜ |
+| 107 | Practice screen scaffold | 9 | ✅ |
+| 108 | Category card | 9 | ✅ |
+| 109 | Practice subcategories | 9 | ✅ |
+| 110 | Practice filters | 9 | ✅ |
+| 111 | Practice quiz mode | 9 | ✅ |
+| 112 | Practice ViewModel | 9 | ✅ |
+| 113 | Practice stats | 9 | ✅ |
+| 114 | Practice search | 9 | ✅ |
+| 115 | Settings screen | 10 | ✅ |
+| 116 | Settings komponenty (Switch, Clickable) | 10 | ✅ |
+| 117 | Dark/light mode přepínač | 10 | ✅ |
+| 118 | Achievements screen (Compose) | 10 | ✅ |
+| 119 | Achievement unlock animace | 10 | ✅ |
+| 120 | Changelog screen (Compose) | 10 | ✅ |
+| 121 | Splash screen (Compose) | 10 | ✅ |
+| 122 | Loading states pro DFM | 10 | ✅ |
+| 123 | XP / leveling systém | 11 | ✅ |
+| 124 | Level-up celebration | 11 | ✅ |
+| 125 | Daily challenges | 11 | ✅ |
+| 126 | Streak freeze mechanika | 11 | ✅ |
+| 127 | Streak milestones | 11 | ✅ |
+| 128 | Power-ups implementace | 11 | ✅ |
+| 129 | Weekly leaderboard (lokální) | 11 | ✅ |
+| 130 | Achievement unlock triggers | 11 | ✅ |
+| 131 | Gamifikace — bonus wheel | 11 | ✅ |
+| 132 | Gamifikace — mystery box | 11 | ✅ |
+| 133 | Gamifikace — daily login bonus | 11 | ✅ |
+| 134 | Gamifikace — combo multiplier | 11 | ✅ |
+| 135 | Gamifikace — seasonal events | 11 | ✅ |
+| 136 | Gamifikace — avatar customization | 11 | ✅ |
+| 137 | Gamifikace — social sharing | 11 | ✅ |
 | 138 | Zvukové soubory | 12 | ⬜ |
 | 139 | SoundManager implementace | 12 | ⬜ |
 | 140 | Haptic patterns | 12 | ⬜ |
