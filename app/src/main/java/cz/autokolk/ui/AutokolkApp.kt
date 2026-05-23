@@ -135,6 +135,17 @@ fun AutokolkApp(
                         delay(50)
                     }
                 }
+                ComposeNavIntent.OPEN_TAB_WEEKLY_XP -> {
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Home)
+                            navController.navigate(Route.WeeklyXp.route)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
+                    }
+                }
             }
         } finally {
             onConsumeInitialTab()

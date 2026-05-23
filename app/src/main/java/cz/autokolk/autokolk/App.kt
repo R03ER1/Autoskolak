@@ -4,6 +4,7 @@ import android.app.Application
 import com.google.android.gms.ads.MobileAds
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.data.test.TestAttemptRepository
+import cz.autokolk.work.WeeklySummaryWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,6 +20,7 @@ class App : Application() {
         SoundManager.init(this)
         val lp = LessonProgress(this)
         HeartRefillJobService.scheduleNext(this, lp)
+        WeeklySummaryWorker.schedule(this)
         appScope.launch(Dispatchers.IO) {
             TestAttemptRepository.getInstance(this@App).migrateLegacyScoresIfNeeded()
         }

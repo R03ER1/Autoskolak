@@ -1,5 +1,6 @@
 package cz.autokolk.ui.screens.gamification
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,11 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cz.autokolk.LessonProgress
+import cz.autokolk.R
 import cz.autokolk.XpSystem
 import cz.autokolk.ui.components.animation.AnimatedBackground
+import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.TextPrimary
@@ -45,8 +49,14 @@ fun WeeklyXpScreen(navController: NavHostController) {
     val sum7 = last7.sum()
     val prev7 = remember { lp.getXpPrevious7DaysSum() }
     val best = remember { lp.getWeeklyXpPersonalBest() }
+    val lessons7 = remember { lp.getLessonsCompletedLast7Days() }
+    val activeDays = remember { lp.getActiveDaysLast7() }
+    val streak = remember { lp.getCurrentStreak() }
     val delta = sum7 - prev7
     val maxBar = (last7.maxOrNull() ?: 1).coerceAtLeast(1)
+    val shareChooser = stringResource(R.string.weekly_summary_share_chooser)
+    val shareTemplate = stringResource(R.string.weekly_summary_share_template, sum7, lessons7, streak)
+    val shareAction = stringResource(R.string.weekly_summary_share_action)
 
     AnimatedBackground(Modifier.fillMaxSize()) {
         Column(
@@ -65,7 +75,7 @@ fun WeeklyXpScreen(navController: NavHostController) {
                     )
                 }
                 Text(
-                    text = "Týdenní XP",
+                    text = "Týdenní souhrn",
                     style = MaterialTheme.typography.headlineSmall,
                     color = TextPrimary,
                 )
@@ -89,8 +99,17 @@ fun WeeklyXpScreen(navController: NavHostController) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextSecondary,
                     )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            GlassCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Souhrn týdne", style = MaterialTheme.typography.titleMedium, color = TextPrimary)
                     Spacer(Modifier.height(8.dp))
-                    Text("Osobní rekord (7d): $best XP", style = MaterialTheme.typography.bodySmall, color = AccentCyan)
+                    SummaryRow(label = "Lekcí dokončeno", value = "$lessons7")
+                    SummaryRow(label = "Aktivních dní", value = "$activeDays / 7")
+                    SummaryRow(label = "Aktuální streak", value = "$streak dní")
+                    SummaryRow(label = "Osobní rekord (7d)", value = "$best XP", valueColor = AccentCyan)
                 }
             }
             Spacer(Modifier.height(16.dp))
@@ -125,6 +144,18 @@ fun WeeklyXpScreen(navController: NavHostController) {
                     }
                 }
             }
+            Spacer(Modifier.height(20.dp))
+            PrimaryGradientButton(
+                text = shareAction,
+                onClick = {
+                    val send = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, shareTemplate)
+                    }
+                    context.startActivity(Intent.createChooser(send, shareChooser))
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
             Spacer(Modifier.height(24.dp))
             val totalXp = lp.getTotalXp()
             val lv = XpSystem.levelForTotalXp(totalXp)
@@ -134,5 +165,31 @@ fun WeeklyXpScreen(navController: NavHostController) {
                 color = TextSecondary,
             )
         }
+    }
+}
+
+@Composable
+private fun SummaryRow(
+    label: String,
+    value: String,
+    valueColor: androidx.compose.ui.graphics.Color = TextPrimary,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextSecondary,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            color = valueColor,
+        )
     }
 }

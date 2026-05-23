@@ -9,4 +9,7 @@ object ComposeNavIntent {
 
     /** Otevřít záložku Nastavení (např. z legacy Home). */
     const val OPEN_TAB_SETTINGS = "settings"
+
+    /** Hodnota extra: otevřít týdenní souhrn (z notifikace WeeklySummaryWorker). */
+    const val OPEN_TAB_WEEKLY_XP = "weekly_xp"
 }

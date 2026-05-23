@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.61] - 2026-05-23
+- Fáze 11 krok 140: týdenní souhrn — rozšířený `WeeklyXpScreen` o kartu „Souhrn týdne“ (lekce dokončeno, aktivních dní X/7, aktuální streak, osobní rekord) a tlačítko „Sdílet týdenní výsledek“ přes systémový share. Přidán periodický `WeeklySummaryWorker` (WorkManager, neděle 18:00, idempotentní `KEEP`), nový notifikační kanál „Týdenní souhrn“ a deep-link `OPEN_TAB_WEEKLY_XP` z notifikace přímo na obrazovku. `LessonProgress` nově sleduje počet dokončených lekcí za den (`lessons_per_day`, forward-only).
+
 ## [2.0.60] - 2026-04-16
 - Fáze 11 krok 138: centrální obchod — tři motivy aplikace (Klasický zdarma, Neon mřížka, Západ slunce) s vlastními barvami Material 3, úpravou typografie a tvarů karet; nákup a přepnutí motivu za mince v obchodě. Alex: nové sloty čepice, šála a párty pozadí (emoji placeholdery, zapnutí/vypnutí po koupi), brýle přesunuty do stejného obchodu; list Alex „Obchod“ odkazuje na hlavní obchod. `PrimaryGradientButton` respektuje aktivní barevné schéma.
 

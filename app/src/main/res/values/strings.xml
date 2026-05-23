@@ -26,6 +26,13 @@
     <string name="hunger_notification_body_5">%1$s je na pokraji! 🚨 Zachraň ho!</string>
     <string name="hunger_notification_action_feed">Nakrmit</string>
     <string name="hunger_notification_channel_name">Hlad lva</string>
+    <string name="weekly_summary_channel_name">Týdenní souhrn</string>
+    <string name="weekly_summary_title">Týdenní souhrn</string>
+    <string name="weekly_summary_body">Tento týden: %1$d XP, %2$d lekcí, %3$d/7 aktivních dní · streak %4$d dní</string>
+    <string name="weekly_summary_body_no_streak">Tento týden: %1$d XP, %2$d lekcí, %3$d/7 aktivních dní</string>
+    <string name="weekly_summary_share_template">Tento týden v Autoškolákovi: %1$d XP, %2$d lekcí, streak %3$d dní 🚗</string>
+    <string name="weekly_summary_share_action">Sdílet týdenní výsledek</string>
+    <string name="weekly_summary_share_chooser">Sdílet týdenní souhrn</string>
     <string name="nav_home">Domů</string>
     <string name="nav_alex">Alex</string>
     <string name="nav_test">Test</string>

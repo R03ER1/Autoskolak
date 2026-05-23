@@ -75,6 +75,7 @@ class LessonProgress(private val context: Context) {
 
         private const val KEY_TOTAL_XP = "total_xp_v1"
         private const val KEY_XP_BY_DAY_JSON = "xp_by_day_json"
+        private const val KEY_LESSONS_BY_DAY_JSON = "lessons_by_day_json"
         private const val KEY_DOUBLE_XP_UNTIL_MS = "double_xp_until_ms"
         private const val KEY_PENDING_LEVEL_UP = "pending_level_up_level"
         private const val KEY_PENDING_LEVEL_TITLE = "pending_level_up_title"
@@ -821,6 +822,7 @@ class LessonProgress(private val context: Context) {
 		fun saveLessonProgress(lessonNumber: Int, incorrectQuestionIds: Set<String>) {
         val states = getAllLessonStates().toMutableList()
         val existingIndex = states.indexOfFirst { it.lessonNumber == lessonNumber }
+        val wasAlreadyCompleted = existingIndex != -1 && states[existingIndex].completed
         val newState = LessonState(lessonNumber, true, incorrectQuestionIds)
         
         if (existingIndex != -1) {
@@ -834,6 +836,10 @@ class LessonProgress(private val context: Context) {
 			// Advance the next-lesson pointer following the Home screen displayed order
 			val desiredNext = getNextIncompleteAfter(lessonNumber)
 			prefs.edit().putInt("next_lesson", desiredNext).apply()
+
+        if (!wasAlreadyCompleted) {
+            recordLessonForDay()
+        }
     }
 
     fun getLessonState(lessonNumber: Int): LessonState {
@@ -1425,6 +1431,43 @@ class LessonProgress(private val context: Context) {
             emptyMap()
         }
     }
+
+    // -------------------- Lessons completed per day (forward-only) --------------------
+    private fun readLessonsByDayMap(): Map<String, Int> {
+        val json = prefs.getString(KEY_LESSONS_BY_DAY_JSON, null) ?: return emptyMap()
+        return try {
+            val type = object : TypeToken<MutableMap<String, Int>>() {}.type
+            gson.fromJson<MutableMap<String, Int>>(json, type) ?: emptyMap()
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    private fun recordLessonForDay() {
+        val today = todayString()
+        val map = readLessonsByDayMap().toMutableMap()
+        map[today] = (map[today] ?: 0) + 1
+        val cutoffCal = java.util.Calendar.getInstance()
+        cutoffCal.add(java.util.Calendar.DATE, -21)
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val cutoff = sdf.format(cutoffCal.time)
+        map.keys.filter { it < cutoff }.forEach { map.remove(it) }
+        prefs.edit().putString(KEY_LESSONS_BY_DAY_JSON, gson.toJson(map)).apply()
+    }
+
+    fun getLessonsCompletedLast7Days(): Int {
+        val map = readLessonsByDayMap()
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        var sum = 0
+        for (offset in 6 downTo 0) {
+            val c = java.util.Calendar.getInstance()
+            c.add(java.util.Calendar.DATE, -offset)
+            sum += map[sdf.format(c.time)] ?: 0
+        }
+        return sum
+    }
+
+    fun getActiveDaysLast7(): Int = getStreakHistory().count { it }
 
     private fun checkStreakMilestones(streak: Int) {
         val claimed = prefs.getStringSet(KEY_STREAK_MILESTONE_CLAIMED, emptySet())?.toMutableSet() ?: mutableSetOf()
