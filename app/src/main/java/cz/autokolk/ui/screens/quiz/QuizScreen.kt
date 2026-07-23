@@ -40,6 +40,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import cz.autokolk.InterstitialAdController
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.animation.ConfettiOverlay
@@ -93,6 +94,14 @@ fun QuizScreen(
         if (isPractice && state.questions.isEmpty()) {
             Toast.makeText(context, "Žádné otázky k procvičení.", Toast.LENGTH_SHORT).show()
             navController.popBackStack()
+        }
+    }
+
+    // Nachystaj interstitial reklamu dopředu, aby ji ResultsComposeScreen mohl okamžitě
+    // ukázat na primárním CTA. Pro procvičování / test se reklama nepoužívá.
+    LaunchedEffect(isPractice, lessonId) {
+        if (!isPractice && lessonId > 0) {
+            InterstitialAdController.preload(application)
         }
     }
 

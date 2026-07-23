@@ -1,5 +1,6 @@
 package cz.autokolk.ui.screens.results
 
+import android.app.Activity
 import android.net.Uri
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import cz.autokolk.InterstitialAdController
 import cz.autokolk.LessonProgress
 import cz.autokolk.LevelUpPending
 import cz.autokolk.ui.components.feedback.LevelUpOverlay
@@ -68,6 +70,7 @@ fun ResultsComposeScreen(
     replayFocusEncoded: String = Route.Results.NO_REPLAY,
 ) {
     val context = LocalContext.current
+    val activity = context as? Activity
     val lessonProgress = remember { LessonProgress(context) }
     var levelUpPending by remember { mutableStateOf<LevelUpPending?>(null) }
     var streakMilestonePending by remember { mutableStateOf<Pair<Int, Int>?>(null) }
@@ -173,15 +176,27 @@ fun ResultsComposeScreen(
                 )
             } else {
                 val primaryLabel = if (fromPractice) "Zpět na procvičování" else "Zpět na cestu"
+                // Interstitial ad se pokusí zobrazit jen při běžném ukončení lekce
+                // (ne test / procvičování / firstOfDay-streak flow). Controller sám
+                // rozhodne podle počítadla; když se reklama nezobrazí, navigace proběhne
+                // synchronně.
+                val gateAdOnCta = !fromPractice && !isTest && lessonId > 0
                 PrimaryGradientButton(
                     text = primaryLabel,
                     onClick = {
-                        if (fromPractice) {
-                            navController.navigateToTab(Route.Practice)
-                        } else {
-                            navController.navigate(Route.Home.route) {
-                                popUpTo(Route.Home.route) { inclusive = true }
+                        val proceed: () -> Unit = {
+                            if (fromPractice) {
+                                navController.navigateToTab(Route.Practice)
+                            } else {
+                                navController.navigate(Route.Home.route) {
+                                    popUpTo(Route.Home.route) { inclusive = true }
+                                }
                             }
+                        }
+                        if (gateAdOnCta) {
+                            InterstitialAdController.maybeShowInterstitial(activity) { proceed() }
+                        } else {
+                            proceed()
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

@@ -1,5 +1,6 @@
 package cz.autokolk.ui.screens.settings
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -28,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cz.autokolk.BuildConfig
 import cz.autokolk.HungerManager
+import cz.autokolk.InterstitialAdController
+import cz.autokolk.LessonInterstitialAds
 import cz.autokolk.LessonProgress
 import cz.autokolk.AchievementsManager
 import cz.autokolk.ui.components.animation.AnimatedBackground
@@ -227,6 +230,40 @@ fun SettingsScreen(navController: NavHostController) {
                         ClickableSetting(
                             title = "Otevřít obchod a bonusy",
                             onClick = { navController.navigate(Route.CoinShop.route) },
+                        )
+                    }
+                }
+                item {
+                    SettingsGroup("Debug — reklamy (před vydáním smaž)") {
+                        // Hodnoty jsou snapshot při otevření obrazovky (debug info; nemusí být live).
+                        val adsTotal = InterstitialAdController.totalLessonsCompleted(context)
+                        val adsSince = InterstitialAdController.completedLessonsSinceAd(context)
+                        ClickableSetting(
+                            title = "Vynutit interstitial reklamu",
+                            subtitle = "Zobrazí předpřipravenou reklamu ihned (jinak přeskočí)",
+                            onClick = {
+                                LessonInterstitialAds.preload(context)
+                                val activity = context as? Activity
+                                InterstitialAdController.maybeShowInterstitial(activity, debugForce = true) {
+                                    Toast.makeText(
+                                        context,
+                                        "Reklama dokončena / přeskočena",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
+                            },
+                        )
+                        ClickableSetting(
+                            title = "Reset počítadla reklam",
+                            subtitle = "total=$adsTotal, sinceAd=$adsSince — reset jen sinceAd",
+                            onClick = {
+                                InterstitialAdController.resetSinceAd(context)
+                                Toast.makeText(
+                                    context,
+                                    "Počítadlo reklam vynulováno",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            },
                         )
                     }
                 }

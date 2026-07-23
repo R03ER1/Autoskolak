@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.autokolk.AchievementsManager
 import cz.autokolk.HeartRefillJobService
+import cz.autokolk.InterstitialAdController
 import cz.autokolk.LessonPoints
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
@@ -428,6 +429,12 @@ class QuizViewModel(
                 firstEverLessonComplete = wasFirstEverComplete && !session.isReview,
                 perfectLesson = perfect && !session.isReview,
             )
+        } catch (_: Throwable) {
+        }
+        // Interstitial reklamy: každá skutečná lekce (i review) zvedá počítadlo. Rozhodnutí
+        // o zobrazení pak přebírá InterstitialAdController v ResultsComposeScreen.
+        try {
+            InterstitialAdController.onLessonCompleted(getApplication())
         } catch (_: Throwable) {
         }
         hasCompleted = true
