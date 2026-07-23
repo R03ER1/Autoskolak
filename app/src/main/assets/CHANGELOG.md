@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.67] - 2026-07-23
+- Nové odznaky/milníky na cestě lekcí za dokončené sekce (trofej s malou animací při odemčení).
+- Sdílení týdenního souhrnu je nyní jako vizuální obrázek (streak + statistiky), ne jen text.
+
 ## [2.0.66] - 2026-07-23
 - Legacy cleanup: odstraněna nepoužívaná `LoadingActivity` (nahradila ji `ComposeMainActivity` jako launcher) a mrtvá view třída `CurvyPathView`.
 - Smazáno 11 osiřelých XML layoutů z doby před přechodem na Compose (staré Alex fragmenty, achievementy, changelog atd.), na které už nic neodkazovalo.

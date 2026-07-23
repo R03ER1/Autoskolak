@@ -2,8 +2,8 @@
 
 > **Verze plánu:** 1.1  
 > **Datum:** 2026-07-23 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.0.66  
-> **Postup:** **148 / 165 kroků hotových (~90 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 153–154 částečně hotové (viz poznámka níže), zbývá dodělat zbytek fáze 13 (krok 155 styly/témata, performance/a11y, release checklist) a kroky 41, 141, 142 (plné SRS), 143.  
+> **Aktuální verze aplikace:** 2.0.67  
+> **Postup:** **150 / 165 kroků hotových (~91 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path) a 143 (sdílení PNG karty) hotové, kroky 153–154 částečně hotové (viz poznámka níže), zbývá dodělat zbytek fáze 13 (krok 155 styly/témata, performance/a11y, release checklist) a kroky 41, 142 (plné SRS).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -170,9 +170,9 @@
 | 138 | Coin shop — rozšíření (themes, kosmetika UI, Alex) | 11 | ✅ |
 | 139 | Dvojitý XP boost (reklama, 30 min) | 11 | ✅ |
 | 140 | Týdenní souhrn (in-app přehled + push) | 11 | ✅ |
-| 141 | Milestones / odznaky na lesson path (po sekcích) | 11 | ⬜ |
+| 141 | Milestones / odznaky na lesson path (po sekcích) | 11 | ✅ |
 | 142 | Revize — spaced repetition (chybné otázky) | 11 | ⬜ (pouze oprava textu v Nastavení, plné SRS odloženo) |
-| 143 | Social sharing — obrázek (streak / výsledek) | 11 | ⬜ |
+| 143 | Social sharing — obrázek (streak / výsledek) | 11 | ✅ |
 | 144 | Widget (home screen — streak, denní výzvy) | 11 | ✅ |
 | 145 | Zvukové soubory | 12 | ✅ |
 | 146 | SoundManager implementace | 12 | ✅ |
