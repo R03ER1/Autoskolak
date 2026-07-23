@@ -48,8 +48,6 @@ import cz.autokolk.ui.components.animation.FloatingReward
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.lessonHeroTransitionKey
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.DarkSurfaceVariant
-
 @Composable
 fun QuizScreen(
     navController: NavHostController,
@@ -296,7 +294,6 @@ fun QuizScreen(
         }
         AlertDialog(
             onDismissRequest = { vm.dismissQuitDialog() },
-            containerColor = DarkSurfaceVariant,
             title = { Text(title) },
             text = { Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
