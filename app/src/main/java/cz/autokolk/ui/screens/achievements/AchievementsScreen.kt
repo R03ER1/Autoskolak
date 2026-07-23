@@ -36,9 +36,6 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.GlassFill
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun AchievementsScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostController) {
@@ -59,6 +56,7 @@ fun AchievementsScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostContr
                 Text(
                     "Úspěchy",
                     style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
@@ -86,7 +84,11 @@ private fun AchievementCard(achievement: AchievementRowUi) {
                 Modifier
                     .size(48.dp)
                     .background(
-                        if (achievement.unlocked) AccentCyan.copy(alpha = 0.2f) else GlassFill,
+                        if (achievement.unlocked) {
+                            AccentCyan.copy(alpha = 0.2f)
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                        },
                         CircleShape,
                     ),
                 contentAlignment = Alignment.Center,
@@ -94,13 +96,13 @@ private fun AchievementCard(achievement: AchievementRowUi) {
                 Icon(
                     if (achievement.unlocked) Icons.Default.Star else Icons.Default.Lock,
                     contentDescription = null,
-                    tint = if (achievement.unlocked) AccentCyan else TextSecondary,
+                    tint = if (achievement.unlocked) AccentCyan else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(achievement.title, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-                Text(achievement.description, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text(achievement.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text(achievement.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (!achievement.unlocked) {
                     AnimatedProgressBar(
                         progress = achievement.progress,

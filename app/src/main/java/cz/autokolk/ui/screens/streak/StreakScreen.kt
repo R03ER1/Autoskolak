@@ -31,7 +31,6 @@ import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 import cz.autokolk.ui.util.HapticFeedback
 
@@ -72,7 +71,7 @@ fun StreakScreen(navController: NavHostController) {
                 Text(
                     text = "dní v řadě! 🔥",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(40.dp))
                 PrimaryGradientButton(

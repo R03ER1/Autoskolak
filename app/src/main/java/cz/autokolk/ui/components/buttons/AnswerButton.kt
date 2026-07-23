@@ -45,12 +45,9 @@ import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AutokolkShapes
 import cz.autokolk.ui.theme.AutokolkTokens
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.GlassFill
-import cz.autokolk.ui.theme.GlassWhite
 import cz.autokolk.ui.theme.SuccessGreen
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextTertiary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.glassPalette
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -83,13 +80,18 @@ fun AnswerButton(
         }
     }
 
+    // Glass tón (fill/border) je theme-aware — v tmavém režimu bílé "sklo", ve světlém tmavší.
+    // Barvy pro CORRECT/WRONG/SELECTED zůstávají fixní brand barvy (dobrý kontrast v obou režimech).
+    val palette = glassPalette()
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+
     val borderColor by animateColorAsState(
         when (state) {
             AnswerState.CORRECT -> SuccessGreen
             AnswerState.WRONG -> ErrorRed
             AnswerState.SELECTED -> AccentCyan
-            AnswerState.ELIMINATED -> TextTertiary
-            AnswerState.DEFAULT -> GlassWhite
+            AnswerState.ELIMINATED -> onSurfaceVariant.copy(alpha = 0.5f)
+            AnswerState.DEFAULT -> palette.borderStart
         },
         label = "answerBorder",
     )
@@ -103,8 +105,10 @@ fun AnswerButton(
     val bgBrush = when (state) {
         AnswerState.CORRECT -> Brush.horizontalGradient(listOf(SuccessGreen.copy(0.85f), SuccessGreen))
         AnswerState.WRONG -> Brush.horizontalGradient(listOf(ErrorRed.copy(0.85f), ErrorRed))
-        AnswerState.ELIMINATED -> Brush.linearGradient(listOf(GlassFill.copy(0.35f), GlassFill.copy(0.1f)))
-        else -> Brush.linearGradient(listOf(GlassFill, GlassFill.copy(alpha = 0.02f)))
+        AnswerState.ELIMINATED -> Brush.linearGradient(
+            listOf(onSurfaceVariant.copy(alpha = 0.10f), onSurfaceVariant.copy(alpha = 0.03f)),
+        )
+        else -> Brush.linearGradient(listOf(palette.fillStart, palette.fillEnd))
     }
 
     val burstTarget = if (state == AnswerState.CORRECT) 1f else 0f
@@ -162,8 +166,8 @@ fun AnswerButton(
                                 AnswerState.CORRECT -> Color.White.copy(alpha = 0.25f)
                                 AnswerState.WRONG -> Color.White.copy(alpha = 0.25f)
                                 AnswerState.SELECTED -> AccentCyan.copy(alpha = 0.2f)
-                                AnswerState.ELIMINATED -> TextTertiary.copy(alpha = 0.25f)
-                                AnswerState.DEFAULT -> GlassWhite.copy(alpha = 0.15f)
+                                AnswerState.ELIMINATED -> onSurfaceVariant.copy(alpha = 0.15f)
+                                AnswerState.DEFAULT -> palette.borderStart.copy(alpha = 0.6f)
                             },
                         ),
                     contentAlignment = Alignment.Center,
@@ -175,7 +179,7 @@ fun AnswerButton(
                             label,
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -183,7 +187,11 @@ fun AnswerButton(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TextPrimary.copy(alpha = if (state == AnswerState.ELIMINATED) 0.45f else 1f),
+                    color = when (state) {
+                        AnswerState.CORRECT, AnswerState.WRONG -> Color.White
+                        AnswerState.ELIMINATED -> onSurfaceVariant.copy(alpha = 0.6f)
+                        else -> MaterialTheme.colorScheme.onSurface
+                    },
                     textDecoration = if (state == AnswerState.ELIMINATED) TextDecoration.LineThrough else null,
                     modifier = Modifier.weight(1f),
                 )

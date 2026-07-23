@@ -15,11 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.PillShape
-import cz.autokolk.ui.theme.TextSecondary
+import cz.autokolk.ui.theme.glassPalette
 
 @Composable
 fun QuizPowerUpRow(
@@ -57,7 +55,7 @@ fun QuizPowerUpRow(
         Text(
             text = "1 akce / otázku",
             style = MaterialTheme.typography.labelSmall,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 4.dp),
         )
     }
@@ -70,14 +68,15 @@ private fun PowerUpPill(
     onClick: () -> Unit,
     enabled: Boolean,
 ) {
+    val palette = glassPalette()
     Surface(
         onClick = onClick,
         enabled = enabled,
         shape = PillShape,
-        color = GlassFill.copy(alpha = 0.35f),
+        color = palette.fillStart,
         border = androidx.compose.foundation.BorderStroke(
             1.dp,
-            Color.White.copy(alpha = 0.12f),
+            palette.borderStart,
         ),
     ) {
         Row(
@@ -85,8 +84,8 @@ private fun PowerUpPill(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Icon(icon, contentDescription = null, tint = TextSecondary, modifier = Modifier.padding(2.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, color = TextSecondary)
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(2.dp))
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

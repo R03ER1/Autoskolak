@@ -48,11 +48,9 @@ import cz.autokolk.ui.components.progress.RingProgress
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.navigateToTab
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.SuccessGreen
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.glassPalette
 import kotlinx.coroutines.delay
 
 @Composable
@@ -134,7 +132,7 @@ fun ResultsComposeScreen(
             Text(
                 text = headline,
                 style = MaterialTheme.typography.headlineMedium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(16.dp))
             LottieAnimation(
@@ -147,16 +145,16 @@ fun ResultsComposeScreen(
                 progress = ringProgress.value,
                 size = 132.dp,
                 strokeWidth = 10.dp,
-                trackColor = GlassFill.copy(alpha = 0.35f),
+                trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 gradient = listOf(if (passed) SuccessGreen else AccentCyan),
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "${(ringProgress.value * 100f).toInt().coerceIn(0, 100)}",
                         style = MaterialTheme.typography.displaySmall,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
-                    Text("%", style = MaterialTheme.typography.titleMedium, color = TextSecondary)
+                    Text("%", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Spacer(Modifier.height(28.dp))
@@ -258,11 +256,11 @@ fun ResultsComposeScreen(
 @Composable
 private fun StatChip(label: String, value: String, color: Color) {
     Surface(
-        color = GlassFill.copy(alpha = 0.25f),
+        color = glassPalette().fillStart,
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = TextSecondary)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(value, style = MaterialTheme.typography.titleMedium, color = color, fontWeight = FontWeight.Bold)
         }
     }

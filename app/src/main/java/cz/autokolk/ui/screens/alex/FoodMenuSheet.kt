@@ -32,8 +32,6 @@ import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.SuccessGreen
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +58,7 @@ fun FoodMenuSheet(
                 Text(
                     "Nakrmit ${state.lionName}",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
@@ -115,7 +113,7 @@ private fun FoodItemRow(
             }
             Spacer(Modifier.size(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(food.displayName, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+                Text(food.displayName, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                 Text(
                     hungerLabel,
                     style = MaterialTheme.typography.bodySmall,

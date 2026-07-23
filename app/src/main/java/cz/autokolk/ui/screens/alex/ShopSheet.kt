@@ -17,8 +17,6 @@ import androidx.compose.ui.unit.dp
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,13 +43,13 @@ fun ShopSheet(
             Text(
                 "Obchod",
                 style = MaterialTheme.typography.headlineMedium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp),
             )
             Text(
                 "Doplňky pro ${state.lionName}, motivy aplikace a bonusy jsou na jednom místě.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
             GlassCard(Modifier.fillMaxWidth()) {
@@ -59,13 +57,13 @@ fun ShopSheet(
                     Text(
                         "Centrální obchod",
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "Koupíš tam brýle, nové sloty (čepice, šála, párty pozadí) i barevné motivy.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(12.dp))
                     PrimaryGradientButton(
