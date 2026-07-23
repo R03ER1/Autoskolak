@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.63] - 2026-07-23
+- Fáze 12 krok 164: interstitial reklamy integrovány do Compose flow — reklama se pokusí zobrazit na primárním CTA („Zpět na cestu") v `ResultsComposeScreen` po dokončení lekce, mimo procvičování / test / firstOfDay streak. Reklama je předem předpřipravena při vstupu do lekce (`QuizScreen`) přes `LessonInterstitialAds.preload`, takže se zobrazí okamžitě.
+- Zavedeno pravidlo „reklama po každé 3. dokončené lekci" s grace window: prvních 3 dokončených lekcí je bez reklam. Sjednocené počítadlo `InterstitialAdController` (SharedPreferences) sdílí Compose flow i legacy `ResultsActivity` / `MainActivity`.
+- Když v okamžiku CTA není reklama nachystaná, navigace není blokovaná — reklama se přeskočí a počítadlo se resetuje (nebudujeme frontu reklam).
+- Debug sekce v Nastavení: „Vynutit interstitial reklamu" a „Reset počítadla reklam" (jen `BuildConfig.DEBUG`).
+- Log breadcrumby s prefixem `[Ads]` (tag `InterstitialAd`) pro filtrování v `logcat`.
+
 ## [2.0.62] - 2026-07-23
 - Fáze 12: zvuky napříč aplikací — placeholder OGG/WAV zvuky v `res/raw` (procedurálně generované ze skriptu `scripts/generate_placeholder_sounds.py`), rozšířený `SoundManager` o eventy `COMBO`, `WHOOSH`, `ACHIEVEMENT`, `WHEEL_TICK`, `WHEEL_WIN` a napojení: kvíz (správně/špatně/combo/countdown v posledních 5 s testu), spodní navigace (jemné klepnutí), spodní sheety (svištění při otevření), Alex (krmení + interakce), overlay úspěchů a level-upu, bonusové kolo (tikot + výherní jingle), mystery box (výherní jingle), milník streaku.
 - Sjednocena haptická odezva přes centrální `ui/util/HapticFeedback.kt` — sémantické API `onCorrect/onWrong/onCombo/onTap/onCountdown/onAchievement/onMilestone` volatelné jak z Compose (View), tak z ViewModelů (Context). Odstraněny ad-hoc `Vibrator`/`vibrate()` volání v `QuizViewModel`, `TestViewModel`, `StreakScreen` a `AchievementUnlockOverlay`.

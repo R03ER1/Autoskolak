@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.63] - 2026-07-23
+- Interstitial reklamy integrovány do nového Compose flow (Results, po dokončení lekce).
+- Reklama se zobrazuje po každé 3. dokončené lekci — prvních 3 lekce jsou bez reklam.
+- Sjednoceno mezi novým Compose flow a legacy Activity vrstvou, aby pravidlo platilo všude.
+- Když reklama není včas nachystaná, navigace není blokovaná — přeskočíme a nabijeme další.
+
 ## [2.0.62] - 2026-07-23
 - Fáze 12: zvuky napříč aplikací (kvíz, spodní navigace, sheety, Alex, achievementy, level-up, kolo štěstí, mystery box, milníky streaku).
 - Sjednocena haptická odezva přes centrální `HapticFeedback` — jednotné chování v UI i ViewModelech.
