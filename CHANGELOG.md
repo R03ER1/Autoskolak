@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.62] - 2026-07-23
+- Fáze 12: zvuky napříč aplikací — placeholder OGG/WAV zvuky v `res/raw` (procedurálně generované ze skriptu `scripts/generate_placeholder_sounds.py`), rozšířený `SoundManager` o eventy `COMBO`, `WHOOSH`, `ACHIEVEMENT`, `WHEEL_TICK`, `WHEEL_WIN` a napojení: kvíz (správně/špatně/combo/countdown v posledních 5 s testu), spodní navigace (jemné klepnutí), spodní sheety (svištění při otevření), Alex (krmení + interakce), overlay úspěchů a level-upu, bonusové kolo (tikot + výherní jingle), mystery box (výherní jingle), milník streaku.
+- Sjednocena haptická odezva přes centrální `ui/util/HapticFeedback.kt` — sémantické API `onCorrect/onWrong/onCombo/onTap/onCountdown/onAchievement/onMilestone` volatelné jak z Compose (View), tak z ViewModelů (Context). Odstraněny ad-hoc `Vibrator`/`vibrate()` volání v `QuizViewModel`, `TestViewModel`, `StreakScreen` a `AchievementUnlockOverlay`.
+- `SoundManager` i `HapticFeedback` respektují přepínače „Zvuky" a „Vibrace" v `AppSettingsStore` na každém volání.
+- Opraven zavádějící podtitulek u „Revize chyb" v Nastavení („Spaced repetition — tvoje chyby" → „Procvič otázky, ve kterých jsi chyboval").
+
 ## [2.0.61] - 2026-05-23
 - Fáze 11 krok 140: týdenní souhrn — rozšířený `WeeklyXpScreen` o kartu „Souhrn týdne“ (lekce dokončeno, aktivních dní X/7, aktuální streak, osobní rekord) a tlačítko „Sdílet týdenní výsledek“ přes systémový share. Přidán periodický `WeeklySummaryWorker` (WorkManager, neděle 18:00, idempotentní `KEEP`), nový notifikační kanál „Týdenní souhrn“ a deep-link `OPEN_TAB_WEEKLY_XP` z notifikace přímo na obrazovku. `LessonProgress` nově sleduje počet dokončených lekcí za den (`lessons_per_day`, forward-only).
 

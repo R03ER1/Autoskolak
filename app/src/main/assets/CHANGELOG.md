@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.62] - 2026-07-23
+- Fáze 12: zvuky napříč aplikací (kvíz, spodní navigace, sheety, Alex, achievementy, level-up, kolo štěstí, mystery box, milníky streaku).
+- Sjednocena haptická odezva přes centrální `HapticFeedback` — jednotné chování v UI i ViewModelech.
+- Přepínače „Zvuky" a „Vibrace" v Nastavení se respektují všude.
+- Opraven zavádějící podtitulek u „Revize chyb" — text už neslibuje spaced repetition.
+
 ## [2.0.61] - 2026-05-23
 - Fáze 11 krok 140: týdenní souhrn — rozšířený `WeeklyXpScreen` o kartu „Souhrn týdne“ (lekce dokončeno, aktivních dní X/7, aktuální streak, osobní rekord) a tlačítko „Sdílet týdenní výsledek“ přes systémový share. Přidán periodický `WeeklySummaryWorker` (WorkManager, neděle 18:00, idempotentní `KEEP`), nový notifikační kanál „Týdenní souhrn“ a deep-link `OPEN_TAB_WEEKLY_XP` z notifikace přímo na obrazovku. `LessonProgress` nově sleduje počet dokončených lekcí za den (`lessons_per_day`, forward-only).
 
