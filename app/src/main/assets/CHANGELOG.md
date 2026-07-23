@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.64] - 2026-07-23
+- Debug buildy nyní používají oficiální Google test AdMob ID (produkční ID zůstávají v release buildu).
+- Sjednocení rewarded ad unit ID do jedné konstanty (`BuildConfig.ADMOB_REWARDED_ID`).
+- Interstitial ID stejně tak čte z `BuildConfig.ADMOB_INTERSTITIAL_ID`.
+- Po startu se v logcatu (tag `InterstitialAd`) objeví `[Ads] using TEST/PROD ad unit IDs`.
+
 ## [2.0.63] - 2026-07-23
 - Interstitial reklamy integrovány do nového Compose flow (Results, po dokončení lekce).
 - Reklama se zobrazuje po každé 3. dokončené lekci — prvních 3 lekce jsou bez reklam.

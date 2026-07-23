@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.64] - 2026-07-23
+- Debug buildy nyní používají oficiální Google test AdMob ID (produkční ID zůstávají v release buildu) — zdroj pravdy je `app/build.gradle.kts` (`buildConfigField` pro `ADMOB_INTERSTITIAL_ID` a `ADMOB_REWARDED_ID`).
+- Sjednocení rewarded ad unit ID do jedné konstanty (`BuildConfig.ADMOB_REWARDED_ID`) — `HeartsRewardAds` i `RewardedAdHelper` čtou z jednoho místa, žádné kopírované řetězce.
+- `LessonInterstitialAds.AD_UNIT_ID` také čte z `BuildConfig.ADMOB_INTERSTITIAL_ID`.
+- `App.onCreate()` po `MobileAds.initialize` loguje `[Ads] using TEST/PROD ad unit IDs` s tagem `InterstitialAd` pro rychlou kontrolu v logcatu.
+- AdMob App ID v `AndroidManifest.xml` zůstává produkční (dle Google doporučení).
+
 ## [2.0.63] - 2026-07-23
 - Fáze 12 krok 164: interstitial reklamy integrovány do Compose flow — reklama se pokusí zobrazit na primárním CTA („Zpět na cestu") v `ResultsComposeScreen` po dokončení lekce, mimo procvičování / test / firstOfDay streak. Reklama je předem předpřipravena při vstupu do lekce (`QuizScreen`) přes `LessonInterstitialAds.preload`, takže se zobrazí okamžitě.
 - Zavedeno pravidlo „reklama po každé 3. dokončené lekci" s grace window: prvních 3 dokončených lekcí je bez reklam. Sjednocené počítadlo `InterstitialAdController` (SharedPreferences) sdílí Compose flow i legacy `ResultsActivity` / `MainActivity`.
