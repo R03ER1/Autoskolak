@@ -36,6 +36,7 @@ import androidx.core.view.HapticFeedbackConstantsCompat
 import cz.autokolk.LessonProgress
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
+import cz.autokolk.ui.util.rememberHaptic
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.DarkSurface
 import cz.autokolk.ui.theme.TextPrimary
@@ -49,6 +50,7 @@ fun MysteryBoxDialog(
     onDismiss: () -> Unit,
 ) {
     val view = LocalView.current
+    val haptic = rememberHaptic()
     val scope = rememberCoroutineScope()
     val scale = remember { Animatable(1f) }
     var phase by remember { mutableStateOf(BoxPhase.Idle) }
@@ -169,11 +171,13 @@ fun MysteryBoxDialog(
                                             errorMsg = "Dnes už nemáš žádný box."
                                         } else {
                                             resultCoins = coins
+                                            haptic.onAchievement()
                                             try {
                                                 view.performHapticFeedback(HapticFeedbackConstantsCompat.CONTEXT_CLICK)
                                             } catch (_: Throwable) {
                                             }
-                                            SoundManager.play(SoundManager.Sound.COIN)
+                                            SoundManager.play(SoundManager.Sound.WHEEL_WIN)
+                                            SoundManager.play(SoundManager.Sound.COIN, volume = 0.7f)
                                         }
                                     }
                                 }

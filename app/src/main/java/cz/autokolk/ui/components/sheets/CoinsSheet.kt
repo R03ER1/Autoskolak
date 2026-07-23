@@ -17,6 +17,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cz.autokolk.LessonProgress
 import cz.autokolk.R
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.theme.AccentCyan
@@ -52,6 +54,10 @@ fun CoinsSheet(
     val context = LocalContext.current
     val activity = context as? Activity
     var bonusMsg by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        SoundManager.play(SoundManager.Sound.WHOOSH, volume = 0.6f)
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

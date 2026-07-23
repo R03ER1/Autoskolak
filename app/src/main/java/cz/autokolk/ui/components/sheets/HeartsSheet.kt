@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cz.autokolk.LessonProgress
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.theme.BottomSheetShape
 import cz.autokolk.ui.theme.DarkSurfaceVariant
@@ -56,6 +57,10 @@ fun HeartsSheet(
 
     val activity = LocalContext.current as? Activity
     var adLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        SoundManager.play(SoundManager.Sound.WHOOSH, volume = 0.6f)
+    }
 
     var nextHeartMs by remember { mutableLongStateOf(lessonProgress.millisUntilNextHeart()) }
     LaunchedEffect(lives) {

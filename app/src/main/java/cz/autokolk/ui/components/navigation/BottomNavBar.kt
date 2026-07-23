@@ -31,11 +31,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cz.autokolk.R
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.PillShape
 import cz.autokolk.ui.theme.TextSecondary
+import cz.autokolk.ui.util.rememberHaptic
 
 private data class BottomNavItem(
     val route: Route,
@@ -57,6 +59,7 @@ fun AutokolkBottomBar(
     onNavigate: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptic = rememberHaptic()
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
@@ -73,10 +76,17 @@ fun AutokolkBottomBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             bottomNavItems.forEach { item ->
+                val isSelected = currentRoute == item.route.route
                 BottomNavItemView(
                     item = item,
-                    isSelected = currentRoute == item.route.route,
-                    onClick = { onNavigate(item.route) },
+                    isSelected = isSelected,
+                    onClick = {
+                        if (!isSelected) {
+                            haptic.onTap()
+                            SoundManager.play(SoundManager.Sound.TAP, volume = 0.5f)
+                        }
+                        onNavigate(item.route)
+                    },
                 )
             }
         }

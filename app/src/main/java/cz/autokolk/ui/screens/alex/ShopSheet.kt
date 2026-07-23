@@ -11,8 +11,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.TextPrimary
@@ -27,6 +29,9 @@ fun ShopSheet(
     onOpenCentralShop: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    LaunchedEffect(Unit) {
+        SoundManager.play(SoundManager.Sound.WHOOSH, volume = 0.6f)
+    }
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,

@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.view.HapticFeedbackConstantsCompat
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -32,6 +31,7 @@ import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.util.HapticFeedback
 
 @Composable
 fun StreakMilestoneOverlay(
@@ -44,6 +44,7 @@ fun StreakMilestoneOverlay(
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset("lottie/level_up.json"))
 
     LaunchedEffect(Unit) {
+        HapticFeedback.onMilestone(view.context)
         SoundManager.play(SoundManager.Sound.STREAK)
     }
 
@@ -99,10 +100,7 @@ fun StreakMilestoneOverlay(
             PrimaryGradientButton(
                 text = "Skvělé!",
                 onClick = {
-                    try {
-                        view.performHapticFeedback(HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-                    } catch (_: Throwable) {
-                    }
+                    HapticFeedback.onTap(view)
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),

@@ -101,14 +101,19 @@ class TestViewModel(
         super.onCleared()
     }
 
+    internal fun countdownTick() {
+        HapticFeedback.onCountdown(getApplication())
+        SoundManager.play(SoundManager.Sound.COUNTDOWN)
+    }
+
     private suspend fun runCountdownThenStartTimer() {
         for (v in 3 downTo 1) {
             _state.update { it.copy(countdownShow = v) }
-            countdownTick()
+            this@TestViewModel.countdownTick()
             delay(1000L)
         }
         _state.update { it.copy(countdownShow = 0) }
-        countdownTick()
+        this@TestViewModel.countdownTick()
         delay(800L)
         _state.update {
             it.copy(
@@ -133,7 +138,7 @@ class TestViewModel(
                     val secondsLeft = ((t + 999L) / 1000L).toInt()
                     if (secondsLeft in 1..5 && secondsLeft != lastTickedSecond) {
                         lastTickedSecond = secondsLeft
-                        countdownTick()
+                        this@TestViewModel.countdownTick()
                     }
                 }
                 delay(250L)
@@ -220,10 +225,5 @@ class TestViewModel(
             )
             _navEvent.value = TestNavEvent.ToResults(attemptId)
         }
-    }
-
-    private fun countdownTick() {
-        HapticFeedback.onCountdown(getApplication())
-        SoundManager.play(SoundManager.Sound.COUNTDOWN)
     }
 }

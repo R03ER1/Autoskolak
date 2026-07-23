@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,11 +27,13 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import cz.autokolk.LevelUpPending
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.util.HapticFeedback
 
 @Composable
 fun LevelUpOverlay(
@@ -40,6 +43,11 @@ fun LevelUpOverlay(
 ) {
     val view = LocalView.current
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset("lottie/level_up.json"))
+
+    LaunchedEffect(Unit) {
+        HapticFeedback.onMilestone(view.context)
+        SoundManager.play(SoundManager.Sound.LEVELUP)
+    }
 
     Box(
         modifier

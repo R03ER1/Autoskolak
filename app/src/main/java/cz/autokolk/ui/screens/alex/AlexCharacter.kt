@@ -28,12 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import cz.autokolk.audio.SoundManager
+import cz.autokolk.ui.util.rememberHaptic
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -49,7 +48,7 @@ fun AlexCharacter(
     heartParticlesTrigger: Long = 0L,
 ) {
     val context = LocalContext.current
-    val haptics = LocalHapticFeedback.current
+    val haptic = rememberHaptic()
     val scope = rememberCoroutineScope()
 
     val fileName = remember(mood, hasSunglassesVisual) {
@@ -139,7 +138,7 @@ fun AlexCharacter(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
-                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                haptic.onTap()
                                 SoundManager.play(SoundManager.Sound.ALEX_TAP)
                                 scope.launch {
                                     rotation.animateTo(5f, tween(60))
@@ -148,15 +147,15 @@ fun AlexCharacter(
                                 }
                             },
                             onDoubleTap = {
-                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                SoundManager.play(SoundManager.Sound.TAP)
+                                haptic.medium()
+                                SoundManager.play(SoundManager.Sound.ALEX_TAP)
                                 scope.launch {
                                     rotation.animateTo(360f, tween(600))
                                     rotation.snapTo(0f)
                                 }
                             },
                             onLongPress = {
-                                haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                haptic.success()
                                 SoundManager.play(SoundManager.Sound.ALEX_TAP)
                                 showHeart = true
                                 scope.launch {

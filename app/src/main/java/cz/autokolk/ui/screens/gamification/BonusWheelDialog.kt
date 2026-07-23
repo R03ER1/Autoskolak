@@ -46,6 +46,8 @@ import cz.autokolk.ui.theme.DarkSurface
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.util.rememberHaptic
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -55,6 +57,7 @@ fun BonusWheelDialog(
     onDismiss: () -> Unit,
 ) {
     val view = LocalView.current
+    val haptic = rememberHaptic()
     val scope = rememberCoroutineScope()
     val rotation = remember { Animatable(0f) }
     var isSpinning by remember { mutableStateOf(false) }
@@ -135,10 +138,22 @@ fun BonusWheelDialog(
                             isSpinning = true
                             scope.launch {
                                 val extra = Random.nextFloat() * 360f
-                                rotation.animateTo(
-                                    rotation.value + 360f * 5 + extra,
-                                    animationSpec = tween(2800, easing = FastOutSlowInEasing),
-                                )
+                                val animJob = launch {
+                                    rotation.animateTo(
+                                        rotation.value + 360f * 5 + extra,
+                                        animationSpec = tween(2800, easing = FastOutSlowInEasing),
+                                    )
+                                }
+                                // Tikot podle segmentů — zpomalování s časem imituje realistické kolo.
+                                launch {
+                                    var interval = 60L
+                                    while (animJob.isActive) {
+                                        SoundManager.play(SoundManager.Sound.WHEEL_TICK, volume = 0.7f)
+                                        delay(interval)
+                                        interval = (interval + 15L).coerceAtMost(260L)
+                                    }
+                                }
+                                animJob.join()
                                 val coins = lessonProgress.rollBonusWheel()
                                 isSpinning = false
                                 remaining = lessonProgress.getBonusWheelRollsRemainingToday()
@@ -146,11 +161,13 @@ fun BonusWheelDialog(
                                     errorMsg = "Dnes už nemáš žádné točení."
                                 } else {
                                     resultCoins = coins
+                                    haptic.onAchievement()
                                     try {
                                         view.performHapticFeedback(HapticFeedbackConstantsCompat.CONTEXT_CLICK)
                                     } catch (_: Throwable) {
                                     }
-                                    SoundManager.play(SoundManager.Sound.COIN)
+                                    SoundManager.play(SoundManager.Sound.WHEEL_WIN)
+                                    SoundManager.play(SoundManager.Sound.COIN, volume = 0.7f)
                                 }
                             }
                         },

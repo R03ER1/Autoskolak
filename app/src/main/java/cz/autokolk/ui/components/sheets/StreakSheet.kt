@@ -34,6 +34,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import cz.autokolk.LessonProgress
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.theme.AccentCyan
@@ -60,6 +61,7 @@ fun StreakSheet(
     LaunchedEffect(isVisible) {
         if (isVisible) {
             lessonProgress.consumeFrozenLabelForYesterday()
+            SoundManager.play(SoundManager.Sound.WHOOSH, volume = 0.6f)
         }
     }
 
