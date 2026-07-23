@@ -1,8 +1,9 @@
 # Autoškolák — Kompletní redesign plán
 
-> **Verze plánu:** 1.0  
-> **Datum:** 2026-04-14  
-> **Aktuální verze aplikace:** 2.0.48  
+> **Verze plánu:** 1.1  
+> **Datum:** 2026-07-23 (poslední aktualizace)  
+> **Aktuální verze aplikace:** 2.0.64 (17 commitů od baseline `d1cf05b`)  
+> **Postup:** **148 / 165 kroků hotových (~90 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, zbývá dodělat fázi 13 (legacy cleanup, performance/a11y, release checklist) a kroky 41, 141, 142 (plné SRS), 143.  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -170,17 +171,17 @@
 | 139 | Dvojitý XP boost (reklama, 30 min) | 11 | ✅ |
 | 140 | Týdenní souhrn (in-app přehled + push) | 11 | ✅ |
 | 141 | Milestones / odznaky na lesson path (po sekcích) | 11 | ⬜ |
-| 142 | Revize — spaced repetition (chybné otázky) | 11 | ⬜ |
+| 142 | Revize — spaced repetition (chybné otázky) | 11 | ⬜ (pouze oprava textu v Nastavení, plné SRS odloženo) |
 | 143 | Social sharing — obrázek (streak / výsledek) | 11 | ⬜ |
 | 144 | Widget (home screen — streak, denní výzvy) | 11 | ✅ |
-| 145 | Zvukové soubory | 12 | ⬜ |
-| 146 | SoundManager implementace | 12 | ⬜ |
-| 147 | Haptic patterns | 12 | ⬜ |
-| 148 | Integrace zvuků do quiz flow | 12 | ⬜ |
-| 149 | Integrace zvuků do Alex | 12 | ⬜ |
-| 150 | Integrace zvuků do navigace | 12 | ⬜ |
-| 151 | Settings: zvuky a vibrace toggle | 12 | ⬜ |
-| 152 | Testování zvuků a haptic feedback | 12 | ⬜ |
+| 145 | Zvukové soubory | 12 | ✅ |
+| 146 | SoundManager implementace | 12 | ✅ |
+| 147 | Haptic patterns | 12 | ✅ |
+| 148 | Integrace zvuků do quiz flow | 12 | ✅ |
+| 149 | Integrace zvuků do Alex | 12 | ✅ |
+| 150 | Integrace zvuků do navigace | 12 | ✅ |
+| 151 | Settings: zvuky a vibrace toggle | 12 | ✅ |
+| 152 | Testování zvuků a haptic feedback | 12 | ✅ |
 | 153 | Odstranění starých Activity souborů | 13 | ⬜ |
 | 154 | Odstranění starých XML layoutů | 13 | ⬜ |
 | 155 | Odstranění starých stylů a témat | 13 | ⬜ |
@@ -192,8 +193,31 @@
 | 161 | Tablet / landscape support (základní) | 13 | ⬜ |
 | 162 | ProGuard / R8 pravidla pro nové knihovny | 13 | ⬜ |
 | 163 | App size audit | 13 | ⬜ |
-| 164 | Migrace ad logiky do Compose | 13 | ⬜ |
+| 164 | Migrace ad logiky do Compose | 13 | ✅ |
 | 165 | Finální QA a release checklist | 13 | ⬜ |
+
+---
+
+## Bonus / mimo plán (session 2026-07-23)
+
+Práce, která není přímo číslovanou položkou v tabulce, ale byla dokončena společně s fází 12 a krokem 164:
+
+- Rule `.cursor/rules/version.mdc` aktualizována — nyní ukazuje na `BuildConfig.VERSION_NAME` (Compose Settings) místo legacy `activity_settings.xml`.
+- AGP bumped **9.1.1 → 9.3.1**, KSP **2.2.21-2.0.5 → 2.3.2**, Gradle wrapper **9.3.1 → 9.5.0**.
+- `mediaassets` modul dostal `<application android:hasCode="false" />` v manifestu (kompatibilita s AGP 9.3.1).
+- AdMob ad unit IDs sjednoceny přes `BuildConfig.ADMOB_INTERSTITIAL_ID` / `BuildConfig.ADMOB_REWARDED_ID`; Google testovací IDs v debug buildu, produkční IDs v release.
+- Rewarded ad unit ID de-duplikován (dříve copy-paste v `HeartsRewardAds` i `RewardedAdHelper`).
+- `.gitignore` rozšířen o `.artifacts/`, `.kotlin/`, `.idea/planningMode.xml`.
+- `gradle.properties`: `org.gradle.tooling.parallel=true`.
+- Placeholder audio assety (14 WAV souborů) vygenerovány procedurálně přes `scripts/generate_placeholder_sounds.py`.
+
+## Zbývající práce po 2026-07-23
+
+- **Krok 41** — shared element transitions (TODO poznámky v `NavGraph.kt` / `LessonNode.kt`, řádek v tabulce je ✅ jako „příprava", ale plná implementace ještě chybí).
+- **Krok 141** — milestones / odznaky na lesson path po sekcích.
+- **Krok 142** — plné SRS s intervaly (dnes hotová jen oprava zavádějícího textu „Spaced repetition" v Nastavení, který nyní správně říká „Procvič otázky, ve kterých jsi chyboval").
+- **Krok 143** — sdílení výsledku / streaku jako PNG karta (obrázek, ne jen text).
+- **Fáze 13, kroky 153–163 + 165** — legacy cleanup (částečně: `MainActivity` a `HomeActivity` zatím zůstávají kvůli AdMob / launcher toku), performance & accessibility audit, tablet / landscape support, ProGuard/R8, app size, finální QA + release checklist.
 
 ---
 
