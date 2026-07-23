@@ -43,9 +43,7 @@ import cz.autokolk.ui.components.feedback.RandomEventOverlay
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
-import cz.autokolk.ui.theme.GlassWhite
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
+import cz.autokolk.ui.navigation.lessonHeroTransitionKey
 import cz.autokolk.ui.util.HapticFeedback
 import kotlinx.coroutines.delay
 
@@ -162,7 +160,10 @@ fun HomeScreen(
                         ) {
                             GlassCard(
                                 modifier = Modifier.fillMaxWidth(0.92f),
-                                borderGradient = listOf(row.sectionColor.copy(alpha = 0.55f), GlassWhite.copy(alpha = 0.12f)),
+                                borderGradient = listOf(
+                                    row.sectionColor.copy(alpha = 0.55f),
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                                ),
                             ) {
                                 Column(
                                     Modifier.padding(16.dp),
@@ -171,7 +172,7 @@ fun HomeScreen(
                                     Text(
                                         text = row.title,
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = TextPrimary,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
@@ -179,7 +180,7 @@ fun HomeScreen(
                                     Text(
                                         text = "${row.doneCount}/${row.totalCount} dokončeno",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = TextSecondary,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth(),
                                     )
@@ -188,7 +189,7 @@ fun HomeScreen(
                                         Text(
                                             text = "🏆 Sekce dokončena",
                                             style = MaterialTheme.typography.labelLarge,
-                                            color = TextPrimary,
+                                            color = MaterialTheme.colorScheme.onSurface,
                                         )
                                     }
                                     Spacer(Modifier.height(10.dp))
@@ -241,13 +242,14 @@ fun HomeScreen(
                                         sheetLesson = row.lesson
                                         sheetDisplay = row.displayNumber
                                     },
+                                    transitionKey = lessonHeroTransitionKey(row.lesson.lessonNumber),
                                 )
                             }
                             Spacer(Modifier.width(12.dp))
                             Text(
                                 text = row.subtitle,
                                 style = MaterialTheme.typography.labelMedium,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
@@ -279,7 +281,7 @@ fun HomeScreen(
                         Text(
                             text = "Hotovo!",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 32.dp),

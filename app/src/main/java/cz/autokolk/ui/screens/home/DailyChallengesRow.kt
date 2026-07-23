@@ -18,8 +18,6 @@ import cz.autokolk.DailyChallengeUi
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 
 @Composable
@@ -32,7 +30,7 @@ fun DailyChallengesRow(
         Text(
             text = "Denní výzvy",
             style = MaterialTheme.typography.titleSmall,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
         )
         LazyRow(
@@ -55,7 +53,7 @@ private fun DailyChallengeCard(challenge: DailyChallengeUi) {
             Text(
                 text = challenge.title,
                 style = MaterialTheme.typography.labelLarge,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(6.dp))
             AnimatedProgressBar(
@@ -70,7 +68,7 @@ private fun DailyChallengeCard(challenge: DailyChallengeUi) {
                     else -> "Odměna +${challenge.rewardXp} XP"
                 },
                 style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

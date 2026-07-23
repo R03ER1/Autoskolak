@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.TextPrimary
 
 @Composable
 fun SeasonalBanner(message: String) {
@@ -22,7 +21,7 @@ fun SeasonalBanner(message: String) {
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(14.dp),
         )
     }

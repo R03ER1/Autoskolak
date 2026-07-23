@@ -2,6 +2,7 @@ package cz.autokolk.ui.screens.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
-import cz.autokolk.ui.theme.GlassWhite
 import kotlin.math.max
 import kotlin.math.min
 
@@ -32,7 +32,9 @@ fun LessonPathBackground(
     measuredCenters: Map<Int, Offset>,
     progressFraction: Float,
     modifier: Modifier = Modifier,
-    trackColor: Color = GlassWhite.copy(alpha = 0.28f),
+    // Theme-aware: onSurface (bílá v tmavém, tmavá v světlém režimu) s nízkou alfou,
+    // aby stopa cesty byla vždy viditelná na aktuálním pozadí.
+    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.28f),
     dashLength: Float = 18f,
     gapLength: Float = 12f,
 ) {

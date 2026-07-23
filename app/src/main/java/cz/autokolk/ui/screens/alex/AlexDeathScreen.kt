@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -41,10 +40,7 @@ import cz.autokolk.HungerManager
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.navigation.Route
-import cz.autokolk.ui.theme.DarkBackground
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.math.max
@@ -99,7 +95,7 @@ fun AlexDeathScreen(navController: NavHostController) {
     Box(
         Modifier
             .fillMaxSize()
-            .background(DarkBackground),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center,
     ) {
         ConfettiOverlay(isActive = confetti, modifier = Modifier.fillMaxSize())
@@ -118,7 +114,7 @@ fun AlexDeathScreen(navController: NavHostController) {
             Text(
                 "Podrž prst na tlačítku a vrať svého lva zpět.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(32.dp))
@@ -128,7 +124,7 @@ fun AlexDeathScreen(navController: NavHostController) {
                     bitmap = deadBitmap,
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
-                    colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.85f)),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)),
                     modifier = Modifier
                         .size(220.dp)
                         .rotate(lionRotation.value),
@@ -164,7 +160,7 @@ fun AlexDeathScreen(navController: NavHostController) {
                         } else {
                             "Podrž"
                         },
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }

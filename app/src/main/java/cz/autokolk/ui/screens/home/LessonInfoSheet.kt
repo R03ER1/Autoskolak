@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import cz.autokolk.GlobalLesson
 import cz.autokolk.LessonProgress
 import cz.autokolk.LessonState
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
+import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,14 +38,14 @@ fun LessonInfoSheet(
         Column(Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
             Text(
                 text = titleText,
-                color = TextPrimary,
-                style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = lesson?.let { mapCategoryDisplayName(it.category) } ?: "",
-                color = TextSecondary,
-                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
             )
             val progressLine = when {
                 !lessonState.completed -> ""
@@ -57,15 +56,15 @@ fun LessonInfoSheet(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = progressLine,
-                    color = TextSecondary,
-                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "Lekce #$displayNumber · 10 otázek",
-                color = TextSecondary,
-                style = androidx.compose.material3.MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelMedium,
             )
             Spacer(Modifier.height(20.dp))
             Button(

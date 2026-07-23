@@ -36,8 +36,6 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 import cz.autokolk.ui.util.ShareCardGenerator
 
@@ -71,19 +69,19 @@ fun WeeklyXpScreen(navController: NavHostController) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Zpět",
-                        tint = TextPrimary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
                 Text(
                     text = "Týdenní souhrn",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
             Spacer(Modifier.height(16.dp))
             GlassCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("Posledních 7 dní", style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+                    Text("Posledních 7 dní", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "Součet: $sum7 XP",
@@ -97,14 +95,14 @@ fun WeeklyXpScreen(navController: NavHostController) {
                             else -> "Stejně jako předchozí týden"
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
             Spacer(Modifier.height(12.dp))
             GlassCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("Souhrn týdne", style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+                    Text("Souhrn týdne", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(Modifier.height(8.dp))
                     SummaryRow(label = "Lekcí dokončeno", value = "$lessons7")
                     SummaryRow(label = "Aktivních dní", value = "$activeDays / 7")
@@ -113,7 +111,7 @@ fun WeeklyXpScreen(navController: NavHostController) {
                 }
             }
             Spacer(Modifier.height(16.dp))
-            Text("Denní přehled", style = MaterialTheme.typography.titleSmall, color = TextSecondary)
+            Text("Denní přehled", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(8.dp))
             Row(
                 Modifier
@@ -139,8 +137,8 @@ fun WeeklyXpScreen(navController: NavHostController) {
                                     .background(AccentCyan.copy(alpha = 0.65f), RoundedCornerShape(6.dp)),
                             )
                         }
-                        Text(labels.getOrElse(i) { "" }, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
-                        Text("$v", style = MaterialTheme.typography.labelSmall, color = TextPrimary)
+                        Text(labels.getOrElse(i) { "" }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("$v", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -172,7 +170,7 @@ fun WeeklyXpScreen(navController: NavHostController) {
             Text(
                 "Celkové XP: $totalXp · ${lv.title} (lvl ${lv.level})",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -182,7 +180,7 @@ fun WeeklyXpScreen(navController: NavHostController) {
 private fun SummaryRow(
     label: String,
     value: String,
-    valueColor: androidx.compose.ui.graphics.Color = TextPrimary,
+    valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Row(
         Modifier
@@ -193,7 +191,7 @@ private fun SummaryRow(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f),
         )
         Text(

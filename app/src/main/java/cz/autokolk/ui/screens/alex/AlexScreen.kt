@@ -59,11 +59,8 @@ import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
-import cz.autokolk.ui.theme.DarkBackground
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.SuccessGreen
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 import kotlin.math.roundToInt
 
@@ -110,21 +107,23 @@ fun AlexScreen(
     var renameOpen by remember { mutableStateOf(false) }
     var renameDraft by remember { mutableStateOf(state.lionName) }
 
-    val moodTint = remember(state.mood) {
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val moodTint = remember(state.mood, onSurfaceColor) {
         when (state.mood) {
             AlexMood.Happy -> Color.Transparent
-            AlexMood.Neutral -> Color(0x14FFFFFF)
+            AlexMood.Neutral -> onSurfaceColor.copy(alpha = 0.08f)
             AlexMood.Hungry -> WarningAmber.copy(alpha = 0.08f)
             AlexMood.Starving -> ErrorRed.copy(alpha = 0.10f)
         }
     }
+    val screenBg = MaterialTheme.colorScheme.background
 
     Box(
         Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(DarkBackground, moodTint, DarkBackground),
+                    listOf(screenBg, moodTint, screenBg),
                 ),
             ),
     ) {
@@ -139,7 +138,7 @@ fun AlexScreen(
             Text(
                 state.lionName,
                 style = MaterialTheme.typography.headlineLarge,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -155,7 +154,7 @@ fun AlexScreen(
             Text(
                 state.title,
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -246,12 +245,12 @@ fun AlexScreen(
     if (renameOpen) {
         AlertDialog(
             onDismissRequest = { renameOpen = false },
-            title = { Text("Přejmenovat lva", color = TextPrimary) },
+            title = { Text("Přejmenovat lva", color = MaterialTheme.colorScheme.onSurface) },
             text = {
                 Column {
                     Text(
                         "Tvůj lev se bude jmenovat: $renameDraft",
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(Modifier.height(8.dp))
@@ -328,7 +327,7 @@ private fun AlexActionChip(
 ) {
     Row(
         modifier = Modifier
-            .background(TextPrimary.copy(alpha = 0.08f), RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), RoundedCornerShape(20.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 18.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -340,7 +339,7 @@ private fun AlexActionChip(
             tint = tint,
             modifier = Modifier.size(22.dp),
         )
-        Text(label, style = MaterialTheme.typography.titleSmall, color = TextPrimary)
+        Text(label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -356,7 +355,7 @@ fun HungerBar(percent: Int, isFrozen: Boolean) {
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Sytost", style = MaterialTheme.typography.labelLarge, color = TextPrimary)
+            Text("Sytost", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "$percent%",
                 style = MaterialTheme.typography.labelLarge,
