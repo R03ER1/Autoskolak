@@ -1,6 +1,7 @@
 package cz.autokolk.ui.screens.quiz
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -33,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.components.progress.QuizProgressBar
+import cz.autokolk.ui.navigation.LocalNavAnimatedVisibilityScope
+import cz.autokolk.ui.navigation.LocalSharedTransitionScope
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.PillShape
@@ -41,6 +44,10 @@ import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 import java.util.Locale
 
+// Shared element transition (krok 41): `heroTransitionKey` napojí pilulku s číslem otázky
+// na kolečko lekce (LessonNode) na Home cestě přes SharedTransitionLayout z NavGraph.kt —
+// při vstupu do lekce tak kolečko plynule "doputuje" na místo této pilulky v hlavičce.
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun QuizTopBar(
     progress: Float,
@@ -53,6 +60,7 @@ fun QuizTopBar(
     modifier: Modifier = Modifier,
     showCombo: Boolean = true,
     belowProgress: (@Composable () -> Unit)? = null,
+    heroTransitionKey: String? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth()) {
@@ -98,7 +106,20 @@ fun QuizTopBar(
                         }
                     }
                 }
+                val sharedTransitionScope = LocalSharedTransitionScope.current
+                val visibilityScope = LocalNavAnimatedVisibilityScope.current
+                val heroModifier = if (heroTransitionKey != null && sharedTransitionScope != null && visibilityScope != null) {
+                    with(sharedTransitionScope) {
+                        Modifier.sharedBounds(
+                            sharedContentState = rememberSharedContentState(key = heroTransitionKey),
+                            animatedVisibilityScope = visibilityScope,
+                        )
+                    }
+                } else {
+                    Modifier
+                }
                 Surface(
+                    modifier = heroModifier,
                     shape = PillShape,
                     color = GlassFill.copy(alpha = 0.35f),
                 ) {

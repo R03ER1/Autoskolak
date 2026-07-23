@@ -46,6 +46,7 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.animation.FloatingReward
 import cz.autokolk.ui.navigation.Route
+import cz.autokolk.ui.navigation.lessonHeroTransitionKey
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.DarkSurfaceVariant
 
@@ -205,6 +206,7 @@ fun QuizScreen(
                     comboStreak = state.comboStreak,
                     showCombo = !isPractice,
                     onClose = { vm.requestQuit() },
+                    heroTransitionKey = if (!isPractice && lessonId > 0) lessonHeroTransitionKey(lessonId) else null,
                 )
                 if (!isPractice) {
                     Spacer(Modifier.height(6.dp))

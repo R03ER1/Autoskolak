@@ -1,5 +1,6 @@
 package cz.autokolk.ui.screens.home
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,6 +18,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.components.progress.RingProgress
+import cz.autokolk.ui.navigation.LocalNavAnimatedVisibilityScope
+import cz.autokolk.ui.navigation.LocalSharedTransitionScope
 import cz.autokolk.ui.theme.AccentBlue
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
@@ -32,8 +35,11 @@ enum class LessonNodeState {
     PERFECT,
 }
 
-// TODO: Shared element transition — use sharedElement() modifier to animate
-//  this LessonNode icon into the Quiz header when navigating to a quiz.
+// Shared element transition (krok 41): pokud je uzel obklopen SharedTransitionLayout z NavGraph.kt
+// (LocalSharedTransitionScope/LocalNavAnimatedVisibilityScope), `transitionKey` napojí toto kolečko
+// na "hero" prvek v hlavičce Quiz obrazovky (viz QuizTopBar.kt) — kolečko pak při navigaci plynule
+// morphuje pozici/velikost do hlavičky nové obrazovky místo obyčejného hard-cutu.
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LessonNode(
     iconFileName: String,
@@ -43,6 +49,7 @@ fun LessonNode(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 64.dp,
+    transitionKey: String? = null,
 ) {
     val locked = state == LessonNodeState.LOCKED
     val showRing = state == LessonNodeState.COMPLETED || state == LessonNodeState.PERFECT
@@ -52,8 +59,22 @@ fun LessonNode(
     }
     val assetPath = "images/lesson_icons/$iconFileName"
 
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+    val visibilityScope = LocalNavAnimatedVisibilityScope.current
+    val heroModifier = if (transitionKey != null && sharedTransitionScope != null && visibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                sharedContentState = rememberSharedContentState(key = transitionKey),
+                animatedVisibilityScope = visibilityScope,
+            )
+        }
+    } else {
+        Modifier
+    }
+
     Box(
         modifier = modifier
+            .then(heroModifier)
             .size(size + 24.dp)
             .then(
                 if (state == LessonNodeState.CURRENT) {

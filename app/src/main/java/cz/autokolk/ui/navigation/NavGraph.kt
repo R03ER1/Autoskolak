@@ -2,6 +2,8 @@ package cz.autokolk.ui.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -61,11 +64,13 @@ private fun modalEnter(): EnterTransition =
 private fun modalExit(): ExitTransition =
     fadeOut(tween(DURATION_MODAL)) + slideOutVertically(tween(DURATION_MODAL)) { it / 3 }
 
-// TODO: Shared element transitions (Compose Navigation 2.8+):
-//  - Wrap with SharedTransitionLayout
-//  - LessonNode (Home) → Quiz header icon
-//  - Alex image (Alex page) → Alex image (AlexDeath)
-//  - Achievement card → Achievement detail
+// Shared element transitions (krok 41): celý NavHost je obalený SharedTransitionLayout
+// (viz níže) a LocalSharedTransitionScope/LocalNavAnimatedVisibilityScope (SharedElementTransition.kt)
+// zpřístupňují potřebné scope hluboko ve stromu bez protahování parametrů:
+//  - LessonNode (Home) → Quiz header "hero" prvek (QuizTopBar) — hotovo, klíč lessonHeroTransitionKey()
+//  - Alex image (Alex page) → Alex image (AlexDeath) — mimo scope kroku 41, neřešeno
+//  - Achievement card → Achievement detail — mimo scope kroku 41, neřešeno
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AutokolkNavGraph(
     navController: NavHostController,
@@ -73,6 +78,9 @@ fun AutokolkNavGraph(
     onHomeLessonBoundsChanged: (Rect) -> Unit = {},
     homeScrollToCurrentSignal: Int = 0,
 ) {
+    SharedTransitionLayout {
+    val sharedTransitionScope = this
+    CompositionLocalProvider(LocalSharedTransitionScope provides sharedTransitionScope) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -103,11 +111,14 @@ fun AutokolkNavGraph(
             popEnterTransition = { tabEnter() },
             popExitTransition = { tabExit() },
         ) {
-            HomeScreen(
-                navController = navController,
-                onCurrentLessonNodeBoundsChanged = onHomeLessonBoundsChanged,
-                scrollToCurrentLessonSignal = homeScrollToCurrentSignal,
-            )
+            val visibilityScope = this
+            CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides visibilityScope) {
+                HomeScreen(
+                    navController = navController,
+                    onCurrentLessonNodeBoundsChanged = onHomeLessonBoundsChanged,
+                    scrollToCurrentLessonSignal = homeScrollToCurrentSignal,
+                )
+            }
         }
 
         composable(
@@ -168,14 +179,17 @@ fun AutokolkNavGraph(
             route = Route.Quiz().route,
             arguments = Route.Quiz.arguments,
         ) { entry ->
+            val visibilityScope = this
             val args = entry.arguments!!
-            QuizScreen(
-                navController = navController,
-                lessonId = args.getInt(Route.ARG_LESSON_ID),
-                isTest = args.getBoolean(Route.ARG_IS_TEST),
-                categoryId = args.getInt(Route.ARG_CATEGORY_ID),
-                isReview = args.getBoolean(Route.ARG_IS_REVIEW),
-            )
+            CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides visibilityScope) {
+                QuizScreen(
+                    navController = navController,
+                    lessonId = args.getInt(Route.ARG_LESSON_ID),
+                    isTest = args.getBoolean(Route.ARG_IS_TEST),
+                    categoryId = args.getInt(Route.ARG_CATEGORY_ID),
+                    isReview = args.getBoolean(Route.ARG_IS_REVIEW),
+                )
+            }
         }
 
         composable(
@@ -309,6 +323,8 @@ fun AutokolkNavGraph(
         ) {
             AlexDeathScreen(navController = navController)
         }
+    }
+    }
     }
 }
 
