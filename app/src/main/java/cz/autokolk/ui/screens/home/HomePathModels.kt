@@ -21,5 +21,12 @@ sealed interface HomePathRow {
         val subtitle: String,
     ) : HomePathRow
 
+    /** Milník/odznak vložený na cestu za zcela dokončenou sekci (krok 141). */
+    data class SectionBadge(
+        val sectionKey: String,
+        val sectionTitle: String,
+        val sectionColor: Color,
+    ) : HomePathRow
+
     data object Footer : HomePathRow
 }

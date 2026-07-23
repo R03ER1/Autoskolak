@@ -36,6 +36,23 @@ object HomePathListBuilder {
         var nextBoundary = defCount
         var startedSkoroHotovo = false
 
+        // Odznak (milník) za právě uzavíranou sekci — vloží se do výstupu až
+        // těsně před dalším Header/Footer, tedy skutečně na konec sekce.
+        var pendingBadge: HomePathRow.SectionBadge? = null
+
+        fun scheduleBadge(title: String, sectionColor: Color, done: Int, total: Int) {
+            pendingBadge = if (total > 0 && done >= total) {
+                HomePathRow.SectionBadge(sectionKey = title, sectionTitle = title, sectionColor = sectionColor)
+            } else {
+                null
+            }
+        }
+
+        fun flushPendingBadge(out: MutableList<HomePathRow>) {
+            pendingBadge?.let { out.add(it) }
+            pendingBadge = null
+        }
+
         fun skillBlockStart(groupIndex: Int): Int =
             defCount + nonDefGroups.take(groupIndex).sumOf { it.second }
 
@@ -47,6 +64,7 @@ object HomePathListBuilder {
                 val start = skillBlockStart(0)
                 val total = nonDefGroups[0].second
                 val (done, _) = countCompleted(reordered, lessonProgress, start, start + total)
+                flushPendingBadge(out)
                 out.add(
                     HomePathRow.Header(
                         title = nonDefGroups[0].first,
@@ -55,6 +73,7 @@ object HomePathListBuilder {
                         sectionColor = headerColorSkill(0),
                     ),
                 )
+                scheduleBadge(nonDefGroups[0].first, headerColorSkill(0), done, total)
                 return
             }
             while (currentGroupIndex in 0..nonDefGroups.lastIndex && currentIdx == nextBoundary) {
@@ -64,6 +83,7 @@ object HomePathListBuilder {
                     val start = skillBlockStart(g)
                     val total = nonDefGroups[g].second
                     val (done, _) = countCompleted(reordered, lessonProgress, start, start + total)
+                    flushPendingBadge(out)
                     out.add(
                         HomePathRow.Header(
                             title = nonDefGroups[g].first,
@@ -72,10 +92,12 @@ object HomePathListBuilder {
                             sectionColor = headerColorSkill(g),
                         ),
                     )
+                    scheduleBadge(nonDefGroups[g].first, headerColorSkill(g), done, total)
                     nextBoundary += nonDefGroups[g].second
                 } else if (!startedSkoroHotovo) {
                     val start = skillBlockStart(nonDefGroups.size)
                     val (done, total) = countCompleted(reordered, lessonProgress, start, reordered.size)
+                    flushPendingBadge(out)
                     out.add(
                         HomePathRow.Header(
                             title = "Skoro hotovo!",
@@ -84,6 +106,7 @@ object HomePathListBuilder {
                             sectionColor = headerColorSkoro(),
                         ),
                     )
+                    scheduleBadge("Skoro hotovo!", headerColorSkoro(), done, total)
                     startedSkoroHotovo = true
                     nextBoundary = Int.MAX_VALUE
                 }
@@ -106,6 +129,7 @@ object HomePathListBuilder {
                     sectionColor = headerColorBasic(),
                 ),
             )
+            scheduleBadge("Základní pojmy", headerColorBasic(), done, total)
         }
 
         var globalWaveIndex = 0
@@ -143,6 +167,7 @@ object HomePathListBuilder {
                 globalWaveIndex++
             }
         }
+        flushPendingBadge(out)
         out.add(HomePathRow.Footer)
         return out
     }

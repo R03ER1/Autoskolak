@@ -1668,6 +1668,20 @@ class LessonProgress(private val context: Context) {
 
     // endregion XP
 
+    // region Section badges (milníky na lesson path — krok 141)
+
+    /** Zjistí, zda uživatel už viděl odemčení odznaku za danou sekci (pro animaci/zvuk jen poprvé). */
+    fun isSectionBadgeSeen(sectionKey: String): Boolean {
+        return prefs.getBoolean("section_badge_seen_$sectionKey", false)
+    }
+
+    /** Zaznamená, že odznak za danou sekci už byl uživateli přehrán/zobrazen (animace, zvuk, haptika). */
+    fun markSectionBadgeSeen(sectionKey: String) {
+        prefs.edit().putBoolean("section_badge_seen_$sectionKey", true).apply()
+    }
+
+    // endregion
+
     fun registerOnLessonProgressChanged(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }

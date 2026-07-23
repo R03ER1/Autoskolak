@@ -37,6 +37,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cz.autokolk.GlobalLesson
 import cz.autokolk.SeasonalEvents
+import cz.autokolk.audio.SoundManager
+import cz.autokolk.ui.components.badges.SectionMilestoneBadge
 import cz.autokolk.ui.components.feedback.RandomEventOverlay
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
@@ -44,6 +46,7 @@ import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.GlassWhite
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
+import cz.autokolk.ui.util.HapticFeedback
 import kotlinx.coroutines.delay
 
 @Composable
@@ -145,6 +148,7 @@ fun HomeScreen(
                 when (row) {
                     is HomePathRow.Header -> "h:${row.title}:${row.doneCount}:${row.totalCount}"
                     is HomePathRow.LessonItem -> "l:${row.lesson.lessonNumber}"
+                    is HomePathRow.SectionBadge -> "badge:${row.sectionKey}"
                     HomePathRow.Footer -> "footer"
                 }
             }) { row ->
@@ -244,6 +248,30 @@ fun HomeScreen(
                                 text = row.subtitle,
                                 style = MaterialTheme.typography.labelMedium,
                                 color = TextPrimary,
+                            )
+                        }
+                    }
+                    is HomePathRow.SectionBadge -> {
+                        val alreadySeen = remember(row.sectionKey) {
+                            vm.lessonProgress.isSectionBadgeSeen(row.sectionKey)
+                        }
+                        LaunchedEffect(row.sectionKey) {
+                            if (!alreadySeen) {
+                                SoundManager.play(SoundManager.Sound.ACHIEVEMENT)
+                                HapticFeedback.onAchievement(context)
+                                vm.lessonProgress.markSectionBadgeSeen(row.sectionKey)
+                            }
+                        }
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 14.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            SectionMilestoneBadge(
+                                sectionTitle = row.sectionTitle,
+                                sectionColor = row.sectionColor,
+                                justUnlocked = !alreadySeen,
                             )
                         }
                     }
