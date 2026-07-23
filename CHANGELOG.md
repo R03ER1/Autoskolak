@@ -7,6 +7,13 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.66] - 2026-07-23
+- Legacy cleanup (kroky 153–154 z `REDESIGN_PLAN.md`): odstraněna nepoužívaná `LoadingActivity` (nahrazena `ComposeMainActivity` jako launcherem, nikde v kódu už nebyla spouštěna) včetně `activity_loading.xml` a záznamu v `AndroidManifest.xml`.
+- Odstraněna mrtvá view třída `CurvyPathView` a její layouty `curvy_lesson_path.xml`, `item_lesson_curvy.xml` — `HomeActivity` už dávno kreslí lekce jako jednoduchý vertikální seznam.
+- Odstraněno 11 osiřelých XML layoutů z doby před přechodem na Compose, které už nebyly odkazované z žádného `R.layout.*` (`activity_achievements.xml`, `activity_alex.xml`, `activity_alex_death.xml`, `activity_changelog.xml`, `fragment_alex_page_one.xml`, `fragment_alex_page_two.xml`, `fragment_alex_shop_sunglasses.xml`, `item_category_header.xml`, `item_info_button.xml`, `item_subcategory_header.xml`, `view_hunger_overlay.xml`).
+- `EventOverlay` (Compose `RandomEventOverlay`) už nezabaluje legacy `ConfettiView` přes `AndroidView` — používá stejnou Compose komponentu `ConfettiOverlay` jako `LevelUpOverlay`, `ResultsComposeScreen` a další obrazovky.
+- Ověřeno (a záměrně NEPROVEDENO): `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity`, `TestResultsActivity` zůstávají — jsou aktivně používané z `HomeActivity`/`MainActivity` (drženy jako fallback pro staré deep linky), jejich smazání by rozbilo kompilaci. Stejně tak zůstávají `ConfettiView`, `ScoresChartView`, `RingProgressDrawable` (stále využívané legacy Activity vrstvou) a všechny jimi používané XML layouty.
+
 ## [2.0.65] - 2026-07-23
 - Zvýšen `targetSdk` z 35 na 36 (Android 16) — požadavek Google Play na cílení nejnovější dostupné API úrovně. `compileSdk` byl už na 36, takže šlo čistě o změnu `targetSdk` v `app/build.gradle.kts` (`defaultConfig`).
 - Zkontrolován dynamic feature modul `:mediaassets` — nemá vlastní `targetSdk` (dědí z `app`), žádná úprava potřebná.

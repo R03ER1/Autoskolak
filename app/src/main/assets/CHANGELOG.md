@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.66] - 2026-07-23
+- Legacy cleanup: odstraněna nepoužívaná `LoadingActivity` (nahradila ji `ComposeMainActivity` jako launcher) a mrtvá view třída `CurvyPathView`.
+- Smazáno 11 osiřelých XML layoutů z doby před přechodem na Compose (staré Alex fragmenty, achievementy, changelog atd.), na které už nic neodkazovalo.
+- Náhodná událost (`EventOverlay`) v Compose teď používá stejnou konfeta komponentu jako ostatní obrazovky (level-up, výsledky) místo starého View widgetu.
+- `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity` a související obrazovky zůstávají — pořád je používá `HomeActivity`/`MainActivity` jako fallback pro staré odkazy.
+
 ## [2.0.65] - 2026-07-23
 - Zvýšen `targetSdk` na 36 (Android 16) — požadavek Google Play na cílení nejnovější API úrovně.
 - Zkontrolován modul `:mediaassets` i verze build nástrojů (AGP, Gradle) — bez nutnosti dalších úprav.

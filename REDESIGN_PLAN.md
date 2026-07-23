@@ -2,8 +2,8 @@
 
 > **Verze plánu:** 1.1  
 > **Datum:** 2026-07-23 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.0.64 (17 commitů od baseline `d1cf05b`)  
-> **Postup:** **148 / 165 kroků hotových (~90 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, zbývá dodělat fázi 13 (legacy cleanup, performance/a11y, release checklist) a kroky 41, 141, 142 (plné SRS), 143.  
+> **Aktuální verze aplikace:** 2.0.66  
+> **Postup:** **148 / 165 kroků hotových (~90 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 153–154 částečně hotové (viz poznámka níže), zbývá dodělat zbytek fáze 13 (krok 155 styly/témata, performance/a11y, release checklist) a kroky 41, 141, 142 (plné SRS), 143.  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -217,7 +217,8 @@ Práce, která není přímo číslovanou položkou v tabulce, ale byla dokonče
 - **Krok 141** — milestones / odznaky na lesson path po sekcích.
 - **Krok 142** — plné SRS s intervaly (dnes hotová jen oprava zavádějícího textu „Spaced repetition" v Nastavení, který nyní správně říká „Procvič otázky, ve kterých jsi chyboval").
 - **Krok 143** — sdílení výsledku / streaku jako PNG karta (obrázek, ne jen text).
-- **Fáze 13, kroky 153–163 + 165** — legacy cleanup (částečně: `MainActivity` a `HomeActivity` zatím zůstávají kvůli AdMob / launcher toku), performance & accessibility audit, tablet / landscape support, ProGuard/R8, app size, finální QA + release checklist.
+- **Krok 153/154 — legacy cleanup (částečně hotovo, 2.0.66):** Smazána nepoužívaná `LoadingActivity` (nahradila ji `ComposeMainActivity` jako launcher) a mrtvá `CurvyPathView`; smazáno 14 osiřelých XML layoutů. **Záměrně NEsmazáno** (ověřeno přes `rg`, reference by rozbily build): `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity`, `TestResultsActivity` — jsou aktivně volané z `HomeActivity`/`MainActivity`, které explicitně zůstávají jako fallback pro staré deep linky. Stejně tak zůstávají `ConfettiView`, `ScoresChartView`, `RingProgressDrawable` a jimi používané layouty (`view_event_overlay.xml`, `activity_test_stats.xml`, ...). `EventOverlay` (Compose) refaktorován na `ConfettiOverlay` místo legacy `ConfettiView`+`AndroidView`.
+- **Fáze 13, kroky 155, 156–163 + 165** — zbývá: odstranění starých stylů/témat, performance & accessibility audit, tablet / landscape support, ProGuard/R8, app size, finální QA + release checklist.
 
 ---
 
@@ -4166,6 +4167,10 @@ Tyto kroky zahrnují:
 
 **Výstup:** Čistý single-activity Compose codebase.
 
+> **Stav (2.0.66, částečně hotovo):** `AlexActivity`, `SettingsActivity`, `AchievementsActivity`, `ChangelogActivity`, `ReadingLessonActivity`, `AlexDeathActivity`, `AlexPageOneFragment`, `AlexPageTwoFragment`, `AlexPagerAdapter` už neexistovaly (smazány v dřívější fázi). V této dávce navíc smazána `LoadingActivity.kt` (nikde spouštěná, nahrazena `ComposeMainActivity` launcherem) a `CurvyPathView.kt` (mrtvá, nepoužívaná).
+> **Explicitně zůstává** (ověřeno `rg` — smazání by rozbilo build): `MainActivity`, `HomeActivity` (fallback pro staré deep linky, dle požadavku), a transitivně i `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity`, `TestResultsActivity`, `AutokolkActivity` (abstraktní báze) — všechny jsou aktivně volané z `HomeActivity`/`MainActivity` bottom nav / lesson flow. Stejně zůstává `EventStyleOverlay.kt`, `ConfettiView.kt`, `ScoresChartView.kt`, `RingProgressDrawable.kt` (používá je legacy Activity vrstva). `CustomMediaController.kt` už neexistoval.
+> Compose `EventOverlay.kt` (`RandomEventOverlay`) byl refaktorován na `ConfettiOverlay` namísto legacy `ConfettiView` + `AndroidView`.
+
 ---
 
 ### Krok 154 — Odstranění starých XML layoutů
@@ -4176,6 +4181,9 @@ Tyto kroky zahrnují:
 2. Ponechat pouze pokud nějaký je stále potřeba (AndroidView wrapper v Compose pro VideoView).
 
 **Výstup:** Žádné legacy XML layouty.
+
+> **Stav (2.0.66, částečně hotovo):** Smazáno 14 osiřelých layoutů (`activity_loading.xml`, `curvy_lesson_path.xml`, `item_lesson_curvy.xml`, `activity_achievements.xml`, `activity_alex.xml`, `activity_alex_death.xml`, `activity_changelog.xml`, `fragment_alex_page_one.xml`, `fragment_alex_page_two.xml`, `fragment_alex_shop_sunglasses.xml`, `item_category_header.xml`, `item_info_button.xml`, `item_subcategory_header.xml`, `view_hunger_overlay.xml`) — žádný nebyl odkazován z `R.layout.*` v kódu.
+> **Zůstává** (aktivně používáno zbývajícími legacy Activity, `widget_streak.xml` a `activity_settings.xml` dle explicitního požadavku): `activity_main.xml`, `activity_home.xml`, `activity_results.xml`, `activity_streak.xml`, `activity_practice.xml`, `activity_test_attempt.xml`, `activity_test_stats.xml`, `activity_test_results.xml`, `activity_blank_page.xml`, `item_lesson.xml`, `item_test_detail.xml`, `popup_lesson_info.xml`, `streak_bottom_sheet.xml`, `dialog_test_details.xml`, `coin_popup.xml`, `view_event_overlay.xml`, `view_tutorial_overlay.xml`, `widget_streak.xml`, `activity_settings.xml`.
 
 ---
 
