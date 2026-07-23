@@ -1,6 +1,5 @@
 package cz.autokolk.ui.components.feedback
 
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,16 +19,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import cz.autokolk.ConfettiView
 import cz.autokolk.RandomEventManager
+import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.media.AssetImageFromPath
@@ -73,26 +70,12 @@ fun RandomEventOverlay(
                         .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    key(e.message, e.valueLine) {
-                        AndroidView(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(120.dp),
-                            factory = { ctx ->
-                                ConfettiView(ctx).apply {
-                                    layoutParams = ViewGroup.LayoutParams(
-                                        ViewGroup.LayoutParams.MATCH_PARENT,
-                                        ViewGroup.LayoutParams.MATCH_PARENT,
-                                    )
-                                    postDelayed({
-                                        if (isAttachedToWindow) {
-                                            startFor(2000L, 300L)
-                                        }
-                                    }, 280)
-                                }
-                            },
-                        )
-                    }
+                    ConfettiOverlay(
+                        isActive = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                    )
                     AssetImageFromPath(
                         assetPath = "images/alex/AlexCool.png",
                         contentDescription = null,
