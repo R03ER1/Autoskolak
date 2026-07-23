@@ -2,9 +2,6 @@ package cz.autokolk.ui.components.feedback
 
 import android.app.Activity
 import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +34,7 @@ import cz.autokolk.ui.theme.AutokolkTheme
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.readThemeMode
+import cz.autokolk.ui.util.HapticFeedback
 
 /**
  * Celoobrazovkový efekt při odemčení úspěchu (Lottie + volitelně konfety).
@@ -47,8 +45,8 @@ object AchievementUnlockOverlay {
         if (activity.isFinishing) return
         if (Build.VERSION.SDK_INT >= 17 && activity.isDestroyed) return
 
-        vibrateSuccess(activity)
-        SoundManager.play(SoundManager.Sound.LEVELUP)
+        HapticFeedback.onAchievement(activity)
+        SoundManager.play(SoundManager.Sound.ACHIEVEMENT)
 
         val root = activity.findViewById<ViewGroup>(android.R.id.content) ?: return
         val composeView = ComposeView(activity).apply {
@@ -80,27 +78,6 @@ object AchievementUnlockOverlay {
         )
     }
 
-    private fun vibrateSuccess(activity: Activity) {
-        if (!cz.autokolk.ui.settings.AppSettingsStore.isHapticEnabled(activity)) return
-        val v = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vm = activity.getSystemService(android.content.Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-            vm?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            activity.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? Vibrator
-        } ?: return
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                v.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK))
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                v.vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                @Suppress("DEPRECATION")
-                v.vibrate(60)
-            }
-        } catch (_: Throwable) {
-        }
-    }
 }
 
 @Composable

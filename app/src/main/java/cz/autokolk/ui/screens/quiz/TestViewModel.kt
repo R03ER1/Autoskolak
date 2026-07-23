@@ -1,20 +1,13 @@
 package cz.autokolk.ui.screens.quiz
 
-import android.Manifest
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
+import cz.autokolk.audio.SoundManager
 import cz.autokolk.data.test.TestAttemptRepository
-import cz.autokolk.ui.settings.AppSettingsStore
+import cz.autokolk.ui.util.HapticFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -111,11 +104,11 @@ class TestViewModel(
     private suspend fun runCountdownThenStartTimer() {
         for (v in 3 downTo 1) {
             _state.update { it.copy(countdownShow = v) }
-            buzzTick()
+            countdownTick()
             delay(1000L)
         }
         _state.update { it.copy(countdownShow = 0) }
-        buzzTick()
+        countdownTick()
         delay(800L)
         _state.update {
             it.copy(
@@ -131,8 +124,18 @@ class TestViewModel(
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             var t = TEST_DURATION_MS
+            // Poslední úplná sekunda, u níž jsme zahráli tikot (zabraňuje 4× tik/sekundu).
+            var lastTickedSecond: Int = -1
             while (t > 0) {
                 _state.update { it.copy(testRemainingMs = t) }
+                // V posledních 5 sekundách přehraj krátký countdown tik jednou za vteřinu.
+                if (t <= 5_000L) {
+                    val secondsLeft = ((t + 999L) / 1000L).toInt()
+                    if (secondsLeft in 1..5 && secondsLeft != lastTickedSecond) {
+                        lastTickedSecond = secondsLeft
+                        countdownTick()
+                    }
+                }
                 delay(250L)
                 t -= 250L
             }
@@ -219,38 +222,8 @@ class TestViewModel(
         }
     }
 
-    private fun buzzTick() {
-        vibrate(12L, 28)
-    }
-
-    private fun vibrate(durationMs: Long, amplitude: Int) {
-        val app = getApplication<Application>()
-        if (!AppSettingsStore.isHapticEnabled(app)) return
-        if (ContextCompat.checkSelfPermission(app, Manifest.permission.VIBRATE)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-        val v = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vm = app.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-            vm?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            app.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        } ?: return
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                v.vibrate(
-                    VibrationEffect.createOneShot(
-                        durationMs,
-                        amplitude.coerceIn(1, 255),
-                    ),
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                v.vibrate(durationMs)
-            }
-        } catch (_: SecurityException) {
-        }
+    private fun countdownTick() {
+        HapticFeedback.onCountdown(getApplication())
+        SoundManager.play(SoundManager.Sound.COUNTDOWN)
     }
 }

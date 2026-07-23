@@ -1,14 +1,6 @@
 package cz.autokolk.ui.screens.quiz
 
-import android.Manifest
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import cz.autokolk.AchievementsManager
@@ -17,7 +9,8 @@ import cz.autokolk.LessonPoints
 import cz.autokolk.LessonProgress
 import cz.autokolk.Question
 import cz.autokolk.XpRewardTable
-import cz.autokolk.ui.settings.AppSettingsStore
+import cz.autokolk.audio.SoundManager
+import cz.autokolk.ui.util.HapticFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -212,7 +205,7 @@ class QuizViewModel(
         _state.update { it.copy(pendingAnswerKey = norm) }
         revealJob = viewModelScope.launch {
             delay(200)
-            buzzLight()
+            HapticFeedback.onTap(getApplication())
             delay(100)
             applyAnswer(q, norm)
             _state.update { it.copy(pendingAnswerKey = null) }
@@ -278,10 +271,17 @@ class QuizViewModel(
                 !correct &&
                 heartsNow <= 0
 
-        if (!correct) {
-            buzzWrong()
+        if (correct) {
+            HapticFeedback.onCorrect(getApplication())
+            SoundManager.play(SoundManager.Sound.CORRECT)
+            // Combo streak zvuk / haptika: první milník od 3 správných v řadě.
+            if (newCombo >= 3 && newCombo % 3 == 0) {
+                HapticFeedback.onCombo(getApplication())
+                SoundManager.play(SoundManager.Sound.COMBO)
+            }
         } else {
-            buzzLight()
+            HapticFeedback.onWrong(getApplication())
+            SoundManager.play(SoundManager.Sound.WRONG)
         }
 
         _state.update {
@@ -552,42 +552,4 @@ class QuizViewModel(
         }
     }
 
-    private fun buzzLight() {
-        vibrate(18, 32)
-    }
-
-    private fun buzzWrong() {
-        vibrate(50, 96)
-    }
-
-    private fun vibrate(durationMs: Long, amplitude: Int) {
-        val app = getApplication<Application>()
-        if (!AppSettingsStore.isHapticEnabled(app)) return
-        if (ContextCompat.checkSelfPermission(app, Manifest.permission.VIBRATE)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-        val v = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vm = app.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-            vm?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            app.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        } ?: return
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                v.vibrate(
-                    VibrationEffect.createOneShot(
-                        durationMs,
-                        amplitude.coerceIn(1, 255),
-                    ),
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                v.vibrate(durationMs)
-            }
-        } catch (_: SecurityException) {
-        }
-    }
 }
