@@ -75,10 +75,8 @@ import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.quiz.QuestionContent
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.GlassWhite
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.PillShape
+import cz.autokolk.ui.theme.glassPalette
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
 
@@ -246,14 +244,14 @@ private fun OnboardingInfoPage(page: OnboardingStep.InfoPage) {
         Text(
             text = page.title,
             style = MaterialTheme.typography.headlineLarge,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))
         Text(
             text = page.description,
             style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
     }
@@ -274,7 +272,7 @@ private fun OnboardingDailyGoalPage(
         Text(
             "Nastav si denní cíl",
             style = MaterialTheme.typography.headlineMedium,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -282,11 +280,12 @@ private fun OnboardingDailyGoalPage(
         Text(
             "Kolik lekcí chceš denně zvládnout?",
             style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(24.dp))
+        val goalRowBorder = glassPalette().borderStart
         dailyGoalRows.forEach { row ->
             val selectedRow = row.value == selected
             val scale by animateFloatAsState(
@@ -300,12 +299,12 @@ private fun OnboardingDailyGoalPage(
                     .padding(vertical = 6.dp)
                     .scale(scale)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(TextPrimary.copy(alpha = 0.06f))
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
                     .then(
                         if (selectedRow) {
                             Modifier.border(2.dp, AccentCyan, RoundedCornerShape(16.dp))
                         } else {
-                            Modifier.border(1.dp, GlassWhite, RoundedCornerShape(16.dp))
+                            Modifier.border(1.dp, goalRowBorder, RoundedCornerShape(16.dp))
                         },
                     )
                     .clickable { onSelect(row.value) }
@@ -318,8 +317,8 @@ private fun OnboardingDailyGoalPage(
                     Text(row.emoji, style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.width(16.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(row.title, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-                        Text(row.subtitle, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
+                        Text(row.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(row.subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (selectedRow) {
                         Text("✓", style = MaterialTheme.typography.titleLarge, color = AccentCyan)
@@ -356,14 +355,14 @@ private fun OnboardingNameLionPage(
         Text(
             "Pojmenuj svého lva",
             style = MaterialTheme.typography.headlineMedium,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(8.dp))
         Text(
             "Bude tě doprovázet celou cestu k řidičáku.",
             style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
@@ -402,12 +401,12 @@ private fun OnboardingNameLionPage(
             singleLine = true,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = TextPrimary,
-                unfocusedTextColor = TextPrimary,
-                focusedLabelColor = TextSecondary,
-                unfocusedLabelColor = TextSecondary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 focusedBorderColor = AccentCyan,
-                unfocusedBorderColor = GlassWhite,
+                unfocusedBorderColor = glassPalette().borderStart,
             ),
             modifier = Modifier.fillMaxWidth(),
         )
@@ -428,7 +427,7 @@ private fun OnboardingDemoQuestionPage(
         Text(
             "Vyzkoušej si ukázkovou otázku",
             style = MaterialTheme.typography.titleLarge,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
@@ -450,7 +449,7 @@ private fun OnboardingDemoQuestionPage(
             Text(
                 text = if (correct) "Skvěle! Vidíš? To zvládneš!" else "Zkus to znovu příště — důležité je učit se!",
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (correct) AccentCyan else TextSecondary,
+                color = if (correct) AccentCyan else MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -481,14 +480,14 @@ private fun OnboardingNotificationPage(
         Text(
             "Připomínky",
             style = MaterialTheme.typography.headlineMedium,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))
         Text(
             "Pošleme ti připomínku, abys nepřišel o streak a o Alexe!",
             style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(32.dp))
@@ -504,7 +503,7 @@ private fun OnboardingNotificationPage(
             onClick = onSkip,
             modifier = Modifier.wrapContentWidth(),
         ) {
-            Text("Teď ne", color = TextSecondary)
+            Text("Teď ne", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -530,6 +529,7 @@ private fun OnboardingFooter(
             .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val inactiveDotColor = glassPalette().borderStart
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             repeat(pageCount) { index ->
                 val active = index == currentPage
@@ -538,7 +538,7 @@ private fun OnboardingFooter(
                     label = "onboardingDotW",
                 )
                 val color by animateColorAsState(
-                    targetValue = if (active) accent else GlassWhite,
+                    targetValue = if (active) accent else inactiveDotColor,
                     label = "onboardingDotC",
                 )
                 Box(
@@ -590,7 +590,7 @@ private fun OnboardingFooter(
                         onClick = onSkip,
                         modifier = Modifier.wrapContentWidth(),
                     ) {
-                        Text("Přeskočit", color = TextSecondary)
+                        Text("Přeskočit", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Spacer(Modifier.width(24.dp))
                     PrimaryGradientButton(

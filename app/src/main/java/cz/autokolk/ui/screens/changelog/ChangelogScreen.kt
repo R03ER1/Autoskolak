@@ -22,8 +22,6 @@ import cz.autokolk.data.changelog.ChangelogParser
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun ChangelogScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostController) {
@@ -48,7 +46,7 @@ fun ChangelogScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostControll
                 Text(
                     "Historie změn",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
             }
@@ -64,7 +62,7 @@ fun ChangelogScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostControll
                             Text(
                                 entry.date,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = TextSecondary,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         Spacer(Modifier.height(8.dp))
@@ -72,7 +70,7 @@ fun ChangelogScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostControll
                             Text(
                                 "• $change",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextPrimary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(vertical = 2.dp),
                             )
                         }

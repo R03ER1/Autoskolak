@@ -32,8 +32,6 @@ import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.home.categoryCodeForReadingLesson
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -105,7 +103,7 @@ fun ReadingLessonComposeScreen(
                 Text(
                     text = "Čtení (${page + 1}/${pages.size})",
                     style = MaterialTheme.typography.labelMedium,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(8.dp))
                 if (!lesson.imagePath.isNullOrBlank()) {
@@ -120,7 +118,7 @@ fun ReadingLessonComposeScreen(
                 }
                 Text(
                     text = lesson.text,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }

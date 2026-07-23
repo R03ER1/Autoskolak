@@ -29,7 +29,6 @@ import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AutokolkShapes
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.ThemeMode
 
 @Composable
@@ -43,7 +42,7 @@ fun SettingsGroup(
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
-            color = if (isDanger) ErrorRed else TextSecondary,
+            color = if (isDanger) ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
         )
         Column(content = content)
@@ -65,6 +64,7 @@ fun SwitchSetting(
             Text(
                 title,
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
             )
             Switch(
@@ -99,12 +99,12 @@ fun ClickableSetting(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.bodyLarge)
+                Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
                 if (subtitle != null) {
                     Text(
                         subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -119,7 +119,7 @@ fun ClickableSetting(
             Icon(
                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = TextSecondary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -165,12 +165,12 @@ fun SettingsProfileCard(
         shape = AutokolkShapes.large,
     ) {
         Column(Modifier.padding(20.dp)) {
-            Text("Tvůj profil", style = MaterialTheme.typography.labelMedium, color = TextSecondary)
+            Text("Tvůj profil", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(lionName, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
             Text(
                 "Denní cíl: $dailyGoalLabel",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }

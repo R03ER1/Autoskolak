@@ -36,8 +36,6 @@ import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.sheets.RewardedAdHelper
 import cz.autokolk.ui.theme.GameVisualStyle
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 private const val PRICE_SUNGLASSES = 1000
 private const val PRICE_HAT = 650
@@ -90,9 +88,9 @@ fun CoinShopScreen(navController: NavHostController) {
                 .padding(16.dp),
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zpět", tint = TextPrimary)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zpět", tint = MaterialTheme.colorScheme.onSurface)
             }
-            Text("Obchod a bonusy", style = MaterialTheme.typography.headlineSmall, color = TextPrimary)
+            Text("Obchod a bonusy", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(4.dp))
             Text(
                 "Tvoje mince: $coins",
@@ -101,20 +99,20 @@ fun CoinShopScreen(navController: NavHostController) {
             )
             Spacer(Modifier.height(8.dp))
             snack?.let {
-                Text(it, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(8.dp))
             }
 
             Text(
                 "Motivy aplikace",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
             )
             Text(
                 "Barvy, typografie a tvary karet v celé aplikaci (Compose). Jeden motiv je zdarma.",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(8.dp))
             GameVisualStyle.entries.forEach { style ->
@@ -144,13 +142,13 @@ fun CoinShopScreen(navController: NavHostController) {
             Text(
                 "Doplňky pro Alexe",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
             )
             Text(
                 "Ikony jsou zatím placeholdery — později nahradíš obrázky.",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(8.dp))
 
@@ -222,7 +220,7 @@ fun CoinShopScreen(navController: NavHostController) {
             Text(
                 "Bonusy",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(8.dp))
             PrimaryGradientButton(
@@ -239,7 +237,7 @@ fun CoinShopScreen(navController: NavHostController) {
             Text(
                 "Bonusové kolo — zbývá $wheelLeft/3",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.Start),
             )
             Spacer(Modifier.height(4.dp))
@@ -253,7 +251,7 @@ fun CoinShopScreen(navController: NavHostController) {
             Text(
                 "Mystery box — zbývá $boxLeft/2",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.Start),
             )
             Spacer(Modifier.height(4.dp))
@@ -282,7 +280,7 @@ fun CoinShopScreen(navController: NavHostController) {
             Text(
                 "Combo násobič: při 5+ správných v řadě dostaneš o 5 % více XP z lekce, při 10+ o 10 %.",
                 style = MaterialTheme.typography.bodySmall,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -299,9 +297,9 @@ private fun VisualThemeShopCard(
 ) {
     GlassCard(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
         Column(Modifier.padding(16.dp)) {
-            Text(style.titleCs, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+            Text(style.titleCs, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(4.dp))
-            Text(style.subtitleCs, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+            Text(style.subtitleCs, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(10.dp))
             when {
                 active -> Text("Právě aktivní", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
@@ -310,7 +308,7 @@ private fun VisualThemeShopCard(
                     if (price == null) {
                         PrimaryGradientButton("Aktivovat (zdarma)", onClick = onActivate, modifier = Modifier.fillMaxWidth())
                     } else {
-                        Text("$price mincí", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                        Text("$price mincí", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                         Spacer(Modifier.height(6.dp))
                         PrimaryGradientButton(
                             text = "Koupit",
@@ -339,17 +337,17 @@ private fun AlexAccessoryShopCard(
 ) {
     GlassCard(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium) {
         Column(Modifier.padding(16.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(4.dp))
-            Text(detail, style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+            Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(10.dp))
             if (owned) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Zobrazení", color = TextSecondary, modifier = Modifier.weight(1f))
+                    Text("Zobrazení", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
                     Switch(checked = enabledVisual, onCheckedChange = onToggle)
                 }
             } else {
-                Text("$price mincí", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text("$price mincí", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(8.dp))
                 PrimaryGradientButton(
                     text = "Koupit",

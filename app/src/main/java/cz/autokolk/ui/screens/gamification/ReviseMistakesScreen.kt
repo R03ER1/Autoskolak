@@ -24,8 +24,6 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.navigateToTab
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun ReviseMistakesScreen(navController: NavHostController) {
@@ -43,14 +41,14 @@ fun ReviseMistakesScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.Start)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zpět", tint = TextPrimary)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zpět", tint = MaterialTheme.colorScheme.onSurface)
             }
-            Text("Revize chyb", style = MaterialTheme.typography.headlineSmall, color = TextPrimary)
+            Text("Revize chyb", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
             Spacer(Modifier.height(12.dp))
             Text(
                 text = "Otázek k opakování: $n (správně zodpovězených v této kategorii: ${ok.size})",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(24.dp))
             PrimaryGradientButton(
