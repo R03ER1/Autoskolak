@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.68] - 2026-07-23
+- Shared element transitions (krok 41): `NavGraph.kt` obalen `SharedTransitionLayout`, nové `LocalSharedTransitionScope`/`LocalNavAnimatedVisibilityScope` (`ui/navigation/SharedElementTransition.kt`) zpřístupňují scope hluboko ve stromu bez protahování parametrů. Kolečko lekce na Home cestě (`LessonNode`) má volitelný `transitionKey` — při navigaci do kvízu plynule morphuje (`Modifier.sharedBounds`) pozici a velikost do "hero" pilulky s číslem otázky v hlavičce Quiz obrazovky (`QuizTopBar`), místo obyčejného hard-cut/slide přechodu. Použito nativní Compose Foundation API (BOM 2026.03.01 / navigation-compose 2.9.7 jsou dostatečně nové), žádný upgrade knihoven nebyl potřeba.
+
 ## [2.0.67] - 2026-07-23
 - Odznaky/milníky na lesson path (krok 141): nová komponenta `SectionMilestoneBadge` (trofej s pop-in animací) se vkládá na cestu lekcí za každou zcela dokončenou sekci (Základní pojmy, Začátečník, Pokročilý, ... Skoro hotovo!). Odemčení se odvozuje z existujícího progressu (`HomePathListBuilder`), první zobrazení se persistuje v `LessonProgress` a spouští `SoundManager.ACHIEVEMENT` + `HapticFeedback.onAchievement`.
 - Sdílení jako PNG karta (krok 143): týdenní souhrn (`WeeklyXpScreen`) se teď sdílí jako vizuální obrázek (streak, plamínek, statistiky za 7 dní) přes nový `ShareCardGenerator`, ne jen jako čistý text. Bitmapa se kreslí klasickým `Canvas`+`Paint` (kompatibilní s minSdk 24), ukládá se do cache a nasdílí přes nově přidaný `FileProvider` (`res/xml/file_paths.xml`). Při chybě generování obrázku tichý fallback na původní textové sdílení.

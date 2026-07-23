@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.68] - 2026-07-23
+- Plynulý přechod z cesty lekcí do kvízu (krok 41): kolečko lekce na Home obrazovce teď při kliknutí vizuálně "doputuje" do hlavičky Quiz obrazovky místo obyčejného přeřezu/slide přechodu (shared element transition).
+
 ## [2.0.67] - 2026-07-23
 - Nové odznaky/milníky na cestě lekcí za dokončené sekce (trofej s malou animací při odemčení).
 - Sdílení týdenního souhrnu je nyní jako vizuální obrázek (streak + statistiky), ne jen text.
