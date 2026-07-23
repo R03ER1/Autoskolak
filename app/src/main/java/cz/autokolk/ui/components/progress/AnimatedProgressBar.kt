@@ -9,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cz.autokolk.ui.theme.GlassWhite
 
 /**
  * Tenký progress bar s animovaným gradientem (lehký „shimmer“ posun).
@@ -30,7 +30,8 @@ fun AnimatedProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
     accent: Color,
-    trackColor: Color = GlassWhite.copy(alpha = 0.18f),
+    // Theme-aware výchozí track — fixní 10% bílá by ve světlém režimu na světlém pozadí zmizela.
+    trackColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
     height: Dp = 8.dp,
 ) {
     val p = progress.coerceIn(0f, 1f)

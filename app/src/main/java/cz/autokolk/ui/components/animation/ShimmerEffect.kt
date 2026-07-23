@@ -6,17 +6,21 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import cz.autokolk.ui.theme.GlassFill
 
 fun Modifier.shimmerLoading(active: Boolean = true): Modifier = composed {
     if (!active) return@composed this
+    // Theme-aware: v tmavém i světlém režimu musí být shimmer viditelný — fixní bílá
+    // by ve světlém režimu na světlém pozadí zmizela.
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val glassFill = onSurface.copy(alpha = 0.06f)
+    val highlight = onSurface.copy(alpha = 0.16f)
     val transition = rememberInfiniteTransition(label = "shimmer")
     val shift by transition.animateFloat(
         initialValue = 0f,
@@ -31,10 +35,10 @@ fun Modifier.shimmerLoading(active: Boolean = true): Modifier = composed {
         drawContent()
         val w = size.width
         val brush = Brush.linearGradient(
-            0f to GlassFill.copy(alpha = 0.25f),
-            0.45f to Color.White.copy(alpha = 0.18f),
-            0.55f to Color.White.copy(alpha = 0.18f),
-            1f to GlassFill.copy(alpha = 0.25f),
+            0f to glassFill,
+            0.45f to highlight,
+            0.55f to highlight,
+            1f to glassFill,
             start = Offset(-w + shift * 2 * w, 0f),
             end = Offset(shift * 2 * w, size.height),
         )

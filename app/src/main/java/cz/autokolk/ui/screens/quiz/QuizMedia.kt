@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -20,7 +21,6 @@ import cz.autokolk.VideoAssetFileCache
 import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.theme.AutokolkShapes
 import cz.autokolk.ui.theme.AutokolkTokens
-import cz.autokolk.ui.theme.GlassFill
 import java.io.File
 
 @Composable
@@ -31,6 +31,7 @@ fun QuizMedia(
 ) {
     val context = LocalContext.current
     val shape = AutokolkShapes.medium
+    val placeholderFill = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
     val cache = remember {
         VideoAssetFileCache(File(context.cacheDir, "quiz_video_cache"))
     }
@@ -40,7 +41,7 @@ fun QuizMedia(
                 .fillMaxWidth()
                 .shadow(AutokolkTokens.ElevationLow, shape)
                 .clip(shape)
-                .background(GlassFill.copy(alpha = 0.2f)),
+                .background(placeholderFill),
         ) {
             AssetImageFromPath(
                 assetPath = imagePath,
@@ -60,7 +61,7 @@ fun QuizMedia(
                 .height(200.dp)
                 .shadow(AutokolkTokens.ElevationLow, shape)
                 .clip(shape)
-                .background(GlassFill.copy(alpha = 0.25f)),
+                .background(placeholderFill),
         ) {
             key(videoPath) {
                 val path = videoPath!!
