@@ -1,6 +1,5 @@
 package cz.autokolk.ui.screens.gamification
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +39,7 @@ import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.util.ShareCardGenerator
 
 @Composable
 fun WeeklyXpScreen(navController: NavHostController) {
@@ -148,11 +148,21 @@ fun WeeklyXpScreen(navController: NavHostController) {
             PrimaryGradientButton(
                 text = shareAction,
                 onClick = {
-                    val send = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, shareTemplate)
-                    }
-                    context.startActivity(Intent.createChooser(send, shareChooser))
+                    // Krok 143: sdílení jako vizuální PNG karta (streak + týdenní souhrn),
+                    // s tichým fallbackem na čistě textové sdílení při chybě generování bitmapy.
+                    val stats = ShareCardGenerator.CardStats(
+                        streak = streak,
+                        xpThisWeek = sum7,
+                        lessonsThisWeek = lessons7,
+                        activeDaysThisWeek = activeDays,
+                        totalXp = lp.getTotalXp(),
+                    )
+                    ShareCardGenerator.shareStreakCard(
+                        context = context,
+                        stats = stats,
+                        shareText = shareTemplate,
+                        chooserTitle = shareChooser,
+                    )
                 },
                 modifier = Modifier.fillMaxWidth(),
             )
