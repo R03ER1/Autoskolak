@@ -1,6 +1,7 @@
 package cz.autokolk
 
 import android.app.Application
+import android.util.Log
 import com.google.android.gms.ads.MobileAds
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.data.test.TestAttemptRepository
@@ -17,6 +18,10 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         MobileAds.initialize(this)
+        Log.i(
+            "InterstitialAd",
+            "[Ads] using ${if (BuildConfig.DEBUG) "TEST" else "PROD"} ad unit IDs",
+        )
         SoundManager.init(this)
         val lp = LessonProgress(this)
         HeartRefillJobService.scheduleNext(this, lp)

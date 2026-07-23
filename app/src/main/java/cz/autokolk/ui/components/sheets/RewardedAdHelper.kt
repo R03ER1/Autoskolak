@@ -6,10 +6,12 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.LoadAdError
+import cz.autokolk.BuildConfig
 import cz.autokolk.LessonProgress
 
 object RewardedAdHelper {
-    private const val AD_UNIT_ID = "ca-app-pub-7904041740523292/3817416182"
+    // Debug buildy dostávají Google test ID, release produkční ID — viz app/build.gradle.kts.
+    private val AD_UNIT_ID: String = BuildConfig.ADMOB_REWARDED_ID
     private var rewardedAd: RewardedAd? = null
     private var isLoading = false
 

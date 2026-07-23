@@ -15,7 +15,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 object LessonInterstitialAds {
     private const val TAG = "InterstitialAd"
     private const val LOG_PREFIX = "[Ads]"
-    internal const val AD_UNIT_ID = "ca-app-pub-7904041740523292/1806063612"
+    // Debug buildy dostávají Google test ID, release produkční ID — viz app/build.gradle.kts.
+    internal val AD_UNIT_ID: String = BuildConfig.ADMOB_INTERSTITIAL_ID
 
     private val lock = Any()
     @Volatile

@@ -71,12 +71,21 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Google's official AdMob test ad unit IDs — bezpečné pro dev/emulátor,
+            // brání označení reálné traffic jako neplatné.
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_REWARDED_ID",     "\"ca-app-pub-3940256099942544/5224354917\"")
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Produkční AdMob ad unit IDs — pouze pro release build.
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-7904041740523292/1806063612\"")
+            buildConfigField("String", "ADMOB_REWARDED_ID",     "\"ca-app-pub-7904041740523292/3817416182\"")
             val releaseSigning = signingConfigs.findByName("release")
             if (releaseSigning?.storeFile != null && releaseSigning.storeFile?.exists() == true) {
                 signingConfig = releaseSigning
