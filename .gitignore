@@ -21,3 +21,7 @@ keystore.properties
 app/release/
 *.aab
 *.apk
+# Cursor subagent scratch + Kotlin build cache + IDE planning
+.artifacts/
+.kotlin/
+/.idea/planningMode.xml
