@@ -15,7 +15,6 @@ import cz.autokolk.Question
 import cz.autokolk.ui.components.buttons.AnswerButton
 import cz.autokolk.ui.components.buttons.AnswerState
 import cz.autokolk.ui.components.glass.GlassCard
-import cz.autokolk.ui.theme.TextPrimary
 
 @Composable
 fun QuestionContent(
@@ -60,7 +59,7 @@ fun QuestionContent(
         GlassCard(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = question.questionText,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -71,7 +70,7 @@ fun QuestionContent(
                 Spacer(Modifier.height(10.dp))
                 Text(
                     text = "💡 $hintLine",
-                    color = TextPrimary.copy(alpha = 0.85f),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

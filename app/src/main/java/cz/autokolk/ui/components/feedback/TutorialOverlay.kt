@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import cz.autokolk.TutorialManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
+import cz.autokolk.ui.theme.GlassTone
 import cz.autokolk.ui.theme.TextPrimary
 import kotlinx.coroutines.delay
 
@@ -111,6 +112,9 @@ fun HomeTutorialSpotlightOverlay(
         }
 
         GlassCard(
+            // Karta sedí na pevném tmavém scrimu (drawRect Black výše) — glass tón
+            // musí zůstat vždy tmavý, jinak by v light režimu vznikl bílo-na-tmavém bug.
+            tone = GlassTone.Dark,
             modifier = Modifier
                 .align(if (step == 2 && t != null) Alignment.BottomCenter else Alignment.TopCenter)
                 .then(

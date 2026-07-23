@@ -30,6 +30,7 @@ import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.media.AssetImageFromPath
+import cz.autokolk.ui.theme.GlassTone
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
@@ -56,6 +57,8 @@ fun RandomEventOverlay(
             contentAlignment = Alignment.Center,
         ) {
             GlassCard(
+                // Pevný tmavý scrim za kartou — glass tón musí zůstat tmavý v obou režimech.
+                tone = GlassTone.Dark,
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .fillMaxWidth(0.92f)

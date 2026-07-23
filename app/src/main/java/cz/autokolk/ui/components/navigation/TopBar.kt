@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import cz.autokolk.R
 import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.components.buttons.GlassButton
+import androidx.compose.material3.MaterialTheme
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.WarningAmber
 
 @Composable
@@ -103,7 +103,7 @@ private fun StatBadge(
         Spacer(Modifier.width(6.dp))
         AnimatedCounter(
             targetValue = value,
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

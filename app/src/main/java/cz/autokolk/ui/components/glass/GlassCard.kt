@@ -18,33 +18,41 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import cz.autokolk.ui.theme.AutokolkShapes
 import cz.autokolk.ui.theme.AutokolkTokens
-import cz.autokolk.ui.theme.GlassFill
-import cz.autokolk.ui.theme.GlassWhite
+import cz.autokolk.ui.theme.GlassTone
+import cz.autokolk.ui.theme.glassPalette
 
-/** Jednoduchý „fake glass“ bez rozostření pozadí — levnější na GPU. */
+/**
+ * Jednoduchý „fake glass“ bez rozostření pozadí — levnější na GPU.
+ *
+ * [tone] řídí, jestli se barva skla přizpůsobí aktuálnímu světlému/tmavému
+ * režimu ([GlassTone.Auto], výchozí — vhodné pro běžné obrazovky/karty), nebo
+ * zůstane vždy stejná ([GlassTone.Dark]/[GlassTone.Light]) — to se používá u
+ * komponent na záměrně fixním pozadí (např. celoobrazovkové overlaye s tmavým
+ * scrimem), kde by přizpůsobení tématu naopak rozbilo kontrast.
+ */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
     shape: Shape = AutokolkShapes.medium,
-    borderGradient: List<Color> = listOf(GlassWhite, Color.Transparent),
+    tone: GlassTone = GlassTone.Auto,
+    borderGradient: List<Color>? = null,
     content: @Composable () -> Unit,
 ) {
+    val palette = glassPalette(tone)
+    val border = borderGradient ?: listOf(palette.borderStart, palette.borderEnd)
     Box(
         modifier = modifier
             .clip(shape)
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(
-                        GlassFill,
-                        GlassFill.copy(alpha = 0.02f),
-                    ),
+                    colors = listOf(palette.fillStart, palette.fillEnd),
                     start = Offset(0f, 0f),
                     end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY),
                 ),
             )
             .border(
                 width = AutokolkTokens.GlassBorderWidth,
-                brush = Brush.linearGradient(colors = borderGradient),
+                brush = Brush.linearGradient(colors = border),
                 shape = shape,
             ),
     ) {
@@ -62,17 +70,20 @@ fun GlassCardBlur(
     hazeState: HazeState,
     modifier: Modifier = Modifier,
     shape: Shape = AutokolkShapes.medium,
-    borderGradient: List<Color> = listOf(GlassWhite, Color.Transparent),
+    tone: GlassTone = GlassTone.Auto,
+    borderGradient: List<Color>? = null,
     style: HazeStyle = HazeMaterials.thin(MaterialTheme.colorScheme.surface),
     content: @Composable () -> Unit,
 ) {
+    val palette = glassPalette(tone)
+    val border = borderGradient ?: listOf(palette.borderStart, palette.borderEnd)
     Box(
         modifier = modifier
             .clip(shape)
             .hazeEffect(state = hazeState, style = style)
             .border(
                 width = AutokolkTokens.GlassBorderWidth,
-                brush = Brush.linearGradient(colors = borderGradient),
+                brush = Brush.linearGradient(colors = border),
                 shape = shape,
             ),
     ) {

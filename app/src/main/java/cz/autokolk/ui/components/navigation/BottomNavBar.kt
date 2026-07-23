@@ -36,7 +36,6 @@ import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.PillShape
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.util.rememberHaptic
 
 private data class BottomNavItem(
@@ -105,7 +104,7 @@ private fun BottomNavItemView(
         label = "navScale",
     )
     val iconColor by animateColorAsState(
-        targetValue = if (isSelected) AccentCyan else TextSecondary,
+        targetValue = if (isSelected) AccentCyan else MaterialTheme.colorScheme.onSurfaceVariant,
         animationSpec = tween(200),
         label = "navColor",
     )

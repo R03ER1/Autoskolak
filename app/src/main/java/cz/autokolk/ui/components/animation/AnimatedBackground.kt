@@ -8,33 +8,34 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.AccentTeal
-import cz.autokolk.ui.theme.DarkBackground
-import cz.autokolk.ui.theme.LightAccentTeal
-import cz.autokolk.ui.theme.LightBackground
-import cz.autokolk.ui.theme.LocalIsDarkTheme
 
 /**
  * Jemný animovaný radial gradient na pozadí (Fáze 2 / onboarding).
+ *
+ * Pozadí je vždy nejdřív vyplněné PLNOU (opakní) barvou z aktuálního
+ * `MaterialTheme.colorScheme.background` — díky tomu obrazovka vždy odpovídá
+ * zvolenému světlému/tmavému režimu (i vizuálnímu stylu), bez ohledu na to,
+ * co je "pod" ní (legacy Activity `windowBackground` apod. se tak nikdy
+ * neprosvítí). Přes tuto plnou barvu se pak vykreslí jemný, pohyblivý glow
+ * tak, aby uprostřed i na okrajích zůstal průhledný (žádný "tvrdý kruh").
  */
 @Composable
 fun AnimatedBackground(
     modifier: Modifier = Modifier,
-    accentColor: Color = AccentCyan,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     content: @Composable () -> Unit,
 ) {
-    val isDark = LocalIsDarkTheme.current
-    val baseBg = if (isDark) DarkBackground else LightBackground
-    val secondaryAccent = if (isDark) AccentTeal else LightAccentTeal
-    val primaryAlpha = if (isDark) 0.05f else 0.08f
-    val secondaryAlpha = if (isDark) 0.03f else 0.06f
+    val baseBg = MaterialTheme.colorScheme.background
+    val secondaryAccent = MaterialTheme.colorScheme.secondary
+    val glowAlpha = 0.10f
+    val secondaryGlowAlpha = 0.07f
 
     val infiniteTransition = rememberInfiniteTransition(label = "animatedBg")
     val offset by infiniteTransition.animateFloat(
@@ -48,17 +49,22 @@ fun AnimatedBackground(
     )
 
     Box(
-        modifier = modifier.background(
-            Brush.radialGradient(
-                colors = listOf(
-                    accentColor.copy(alpha = primaryAlpha),
-                    baseBg,
-                    secondaryAccent.copy(alpha = secondaryAlpha),
+        modifier = modifier
+            // 1) Plná, vždy theme-správná základní barva pozadí.
+            .background(baseBg)
+            // 2) Jemný pohyblivý glow nad ní — začíná i končí průhledně,
+            //    takže nikdy nevznikne viditelný "prsten" jiné barvy.
+            .background(
+                Brush.radialGradient(
+                    colors = listOf(
+                        accentColor.copy(alpha = glowAlpha),
+                        Color.Transparent,
+                        secondaryAccent.copy(alpha = secondaryGlowAlpha),
+                    ),
+                    center = Offset(offset * 1000f, offset * 1500f),
+                    radius = 900f,
                 ),
-                center = Offset(offset * 1000f, offset * 1500f),
-                radius = 800f,
             ),
-        ),
     ) {
         content()
     }

@@ -16,14 +16,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import cz.autokolk.ui.theme.TextPrimary
 
 @Composable
 fun AnimatedCounter(
     targetValue: Int,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.titleMedium,
-    color: Color = TextPrimary,
+    color: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     var oldValue by remember { mutableIntStateOf(targetValue) }
     SideEffect { oldValue = targetValue }

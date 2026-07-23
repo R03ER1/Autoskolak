@@ -4,10 +4,12 @@ import android.content.SharedPreferences
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -152,7 +154,17 @@ fun AutokolkApp(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    // Vždy opakní, theme-správný podklad pro CELOU appku. Bez tohoto by v místech,
+    // kde Compose obsah nechá "průhledno" (edge-to-edge oblasti, okraje AnimatedBackground
+    // gradientu, obrazovky bez vlastního pozadí), prosvítalo statické legacy
+    // `android:windowBackground` z themes.xml — to NEreaguje na přepnutí Světlý/Tmavý
+    // v Nastavení a byl to hlavní zdroj bugu se "zůstávajícím tmavým pozadím" po přepnutí
+    // na Světlý režim (viditelné jako obarvený prsten/glow na jinak stále tmavé obrazovce).
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
         Scaffold(
             bottomBar = {
                 AnimatedVisibility(

@@ -28,6 +28,7 @@ import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.sheets.RewardedAdHelper
+import cz.autokolk.ui.theme.GlassTone
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import java.util.Locale
@@ -52,6 +53,8 @@ fun QuizNoLivesOverlay(
         contentAlignment = Alignment.Center,
     ) {
         GlassCard(
+            // Pevný tmavý scrim za kartou — glass tón musí zůstat tmavý v obou režimech.
+            tone = GlassTone.Dark,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),

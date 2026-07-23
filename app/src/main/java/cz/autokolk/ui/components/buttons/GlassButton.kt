@@ -30,9 +30,9 @@ import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.AutokolkTokens
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.GlassFill
-import cz.autokolk.ui.theme.GlassWhite
+import cz.autokolk.ui.theme.GlassTone
 import cz.autokolk.ui.theme.PillShape
+import cz.autokolk.ui.theme.glassPalette
 
 private val DangerRedEnd = Color(0xFFE53935)
 
@@ -41,6 +41,7 @@ fun GlassButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    tone: GlassTone = GlassTone.Auto,
     content: @Composable RowScope.() -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -50,13 +51,14 @@ fun GlassButton(
         animationSpec = spring(dampingRatio = 0.6f),
         label = "glassButtonScale",
     )
+    val palette = glassPalette(tone)
 
     Box(
         modifier = modifier
             .scale(scale)
             .clip(PillShape)
-            .background(GlassFill)
-            .border(AutokolkTokens.GlassBorderWidth, GlassWhite, PillShape)
+            .background(palette.fillStart)
+            .border(AutokolkTokens.GlassBorderWidth, palette.borderStart, PillShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
@@ -125,13 +127,14 @@ fun SecondaryButton(
         animationSpec = spring(dampingRatio = 0.6f),
         label = "secondaryButtonScale",
     )
+    val palette = glassPalette()
 
     Box(
         modifier = modifier
             .scale(scale)
             .clip(PillShape)
-            .background(GlassFill)
-            .border(AutokolkTokens.GlassBorderWidth, GlassWhite, PillShape)
+            .background(palette.fillStart)
+            .border(AutokolkTokens.GlassBorderWidth, palette.borderStart, PillShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
