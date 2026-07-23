@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.65] - 2026-07-23
+- Zvýšen `targetSdk` na 36 (Android 16) — požadavek Google Play na cílení nejnovější API úrovně.
+- Zkontrolován modul `:mediaassets` i verze build nástrojů (AGP, Gradle) — bez nutnosti dalších úprav.
+
 ## [2.0.64] - 2026-07-23
 - Debug buildy nyní používají oficiální Google test AdMob ID (produkční ID zůstávají v release buildu).
 - Sjednocení rewarded ad unit ID do jedné konstanty (`BuildConfig.ADMOB_REWARDED_ID`).

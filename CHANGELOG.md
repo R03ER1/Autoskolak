@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.65] - 2026-07-23
+- Zvýšen `targetSdk` z 35 na 36 (Android 16) — požadavek Google Play na cílení nejnovější dostupné API úrovně. `compileSdk` byl už na 36, takže šlo čistě o změnu `targetSdk` v `app/build.gradle.kts` (`defaultConfig`).
+- Zkontrolován dynamic feature modul `:mediaassets` — nemá vlastní `targetSdk` (dědí z `app`), žádná úprava potřebná.
+- Zkontrolována verze AGP (9.3.1) a Gradle wrapperu (9.5.0) — obě verze `targetSdk 36` podporují, upgrade nebyl nutný.
+- Zkontrolován `AndroidManifest.xml` a kód kolem chování Android 16 (predictive back, `PendingIntent` mutabilita, foreground services, broadcast receivery) — nic nevyžadovalo úpravu.
+
 ## [2.0.64] - 2026-07-23
 - Debug buildy nyní používají oficiální Google test AdMob ID (produkční ID zůstávají v release buildu) — zdroj pravdy je `app/build.gradle.kts` (`buildConfigField` pro `ADMOB_INTERSTITIAL_ID` a `ADMOB_REWARDED_ID`).
 - Sjednocení rewarded ad unit ID do jedné konstanty (`BuildConfig.ADMOB_REWARDED_ID`) — `HeartsRewardAds` i `RewardedAdHelper` čtou z jednoho místa, žádné kopírované řetězce.
