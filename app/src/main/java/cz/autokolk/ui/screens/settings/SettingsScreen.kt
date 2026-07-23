@@ -140,7 +140,7 @@ fun SettingsScreen(navController: NavHostController) {
                     )
                     ClickableSetting(
                         title = "Revize chyb",
-                        subtitle = "Spaced repetition — tvoje chyby",
+                        subtitle = "Procvič otázky, ve kterých jsi chyboval",
                         onClick = { navController.navigate(Route.ReviseMistakes.route) },
                     )
                 }
