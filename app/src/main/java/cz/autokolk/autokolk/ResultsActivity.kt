@@ -158,6 +158,13 @@ class ResultsActivity : AutokolkActivity() {
             return
         }
 
+        // Sjednocené pravidlo „každou 3. lekci" napříč Compose flow a legacy Activity vrstvou.
+        if (!InterstitialAdController.shouldShowInterstitial(this)) {
+            adLoadingOverlay.visibility = View.GONE
+            resultsContent.visibility = View.VISIBLE
+            return
+        }
+
         resultsContent.visibility = View.INVISIBLE
 
         val ready = LessonInterstitialAds.takeReadyAd()
@@ -183,6 +190,8 @@ class ResultsActivity : AutokolkActivity() {
                     lessonInterstitialAd = null
                     adLoadingOverlay.visibility = View.GONE
                     resultsContent.visibility = View.VISIBLE
+                    // Reset i po fail-to-load, ať nebudujeme frontu reklam do budoucna.
+                    InterstitialAdController.resetSinceAd(this@ResultsActivity)
                     LessonInterstitialAds.preload(this@ResultsActivity)
                 }
             }
@@ -200,6 +209,7 @@ class ResultsActivity : AutokolkActivity() {
                 lessonInterstitialAd = null
                 adLoadingOverlay.visibility = View.GONE
                 resultsContent.visibility = View.VISIBLE
+                InterstitialAdController.resetSinceAd(this@ResultsActivity)
                 LessonInterstitialAds.preload(this@ResultsActivity)
             }
 
@@ -208,6 +218,7 @@ class ResultsActivity : AutokolkActivity() {
                 lessonInterstitialAd = null
                 adLoadingOverlay.visibility = View.GONE
                 resultsContent.visibility = View.VISIBLE
+                InterstitialAdController.resetSinceAd(this@ResultsActivity)
                 LessonInterstitialAds.preload(this@ResultsActivity)
             }
         }

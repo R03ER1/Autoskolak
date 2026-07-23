@@ -1056,6 +1056,15 @@ class MainActivity : AutokolkActivity() {
             intent.putExtra(EXTRA_IS_RANDOM, true)
             intent.putExtra("extra_random_earned", randomEarned)
         }
+        // Interstitial reklamy: skutečné lekce (i review) zvedají počítadlo. Procvičování,
+        // náhodné kvízy a testy se nezapočítávají — odpovídá pravidlům pro Compose flow.
+        val isRealLesson = category.isBlank() && randomCount <= 0 && !isTestMode
+        if (isRealLesson) {
+            try {
+                InterstitialAdController.onLessonCompleted(this)
+            } catch (_: Throwable) {
+            }
+        }
         startActivity(intent)
         finish() // Return to HomePage after showing results
     }
