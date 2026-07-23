@@ -3,7 +3,7 @@
 > **Verze plánu:** 1.1  
 > **Datum:** 2026-07-23 (poslední aktualizace)  
 > **Aktuální verze aplikace:** 2.0.67  
-> **Postup:** **150 / 165 kroků hotových (~91 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path) a 143 (sdílení PNG karty) hotové, kroky 153–154 částečně hotové (viz poznámka níže), zbývá dodělat zbytek fáze 13 (krok 155 styly/témata, performance/a11y, release checklist) a kroky 41, 142 (plné SRS).  
+> **Postup:** **150 / 165 kroků hotových (~91 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), zbývá dodělat zbytek fáze 13 (krok 155 styly/témata, performance/a11y, release checklist) a krok 142 (plné SRS).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -70,7 +70,7 @@
 | 38 | Coins / XP bottom sheet | 3 | ✅ |
 | 39 | App shell (Scaffold) | 3 | ✅ |
 | 40 | Tab navigation logika | 3 | ✅ |
-| 41 | Shared element transitions (příprava) | 3 | ✅ |
+| 41 | Shared element transitions | 3 | ✅ |
 | 42 | Přepojení launcher Activity na Compose | 3 | ✅ |
 | 43 | Onboarding data model | 4 | ✅ |
 | 44 | Onboarding screen (HorizontalPager) | 4 | ✅ |
@@ -1634,18 +1634,29 @@ Práce, která není přímo číslovanou položkou v tabulce, ale byla dokonče
 
 ---
 
-### Krok 41 — Shared element transitions (příprava) ✅
+### Krok 41 — Shared element transitions ✅
 
-**Soubory:** Žádné nové soubory — přípravný krok
+**Soubory:** `ui/navigation/NavGraph.kt`, nový `ui/navigation/SharedElementTransition.kt`,
+`ui/screens/home/LessonNode.kt`, `ui/screens/home/HomeScreen.kt`, `ui/screens/quiz/QuizScreen.kt`,
+`ui/screens/quiz/QuizTopBar.kt`
 
-1. Compose Navigation 2.8+ podporuje `SharedTransitionLayout` a `sharedElement()` modifier.
-2. Identifikovat páry pro shared element transitions:
-   - **Lesson node** (Home) → **Quiz header** (detail) — ikona lekce.
-   - **Alex obrázek** (Alex page) → **Alex obrázek** (AlexDeath).
-   - **Achievement card** → **Achievement detail**.
-3. V dalších krocích implementovat na konkrétních přechodech.
+1. Projekt měl dostatečně novou verzi Compose BOM (2026.03.01) i `navigation-compose` (2.9.7),
+   takže je použité nativní `SharedTransitionLayout` + `Modifier.sharedBounds()` API (stabilní od
+   Compose Foundation 1.7.0), žádný upgrade knihoven nebyl potřeba.
+2. Celý `NavHost` v `AutokolkNavGraph` je obalený `SharedTransitionLayout`; nové
+   `LocalSharedTransitionScope`/`LocalNavAnimatedVisibilityScope` (CompositionLocal) zpřístupňují
+   scope hluboko ve stromu (`LessonNode`, `QuizTopBar`) bez nutnosti protahovat parametry přes
+   `HomeScreen`/`QuizScreen`.
+3. Implementován první pár: **Lesson node** (Home cesta lekcí) → **Quiz header "hero" pilulka**
+   (číslo otázky v `QuizTopBar`) — klíč `lessonHeroTransitionKey(lessonId)`. Při kliknutí na kolečko
+   lekce a spuštění kvízu kolečko plynule morphuje pozici/velikost do pilulky v hlavičce místo
+   hard-cut/slide přechodu.
+4. Ostatní páry z původního plánu (**Alex obrázek** Alex page → AlexDeath, **Achievement card** →
+   detail) ponechány mimo scope tohoto kroku — infrastruktura (`LocalSharedTransitionScope` atd.)
+   je připravená, lze na ně navázat stejným vzorem v budoucím kroku.
 
-**Výstup:** Plán shared element přechodů.
+**Výstup:** Funkční shared-bounds přechod LessonNode → Quiz header, znovupoužitelná infrastruktura
+pro další shared element páry.
 
 ---
 
