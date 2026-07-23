@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.69] - 2026-07-23
+- Oprava Světlého a Tmavého režimu: zmizel bílý "glow" kruh, který zůstával viditelný po přepnutí na Světlý režim.
+- Opraveny desítky míst s nečitelným textem (černý na černém / bílý na bílém) na Home, Alexovi, v Testu, Procvičování, Nastavení, kvízu, achievementech, statistikách a dalších obrazovkách — text i karty se nyní vždy správně přebarví podle zvoleného režimu.
+
 ## [2.0.68] - 2026-07-23
 - Plynulý přechod z cesty lekcí do kvízu (krok 41): kolečko lekce na Home obrazovce teď při kliknutí vizuálně "doputuje" do hlavičky Quiz obrazovky místo obyčejného přeřezu/slide přechodu (shared element transition).
 

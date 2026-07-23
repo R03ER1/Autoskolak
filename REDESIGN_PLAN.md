@@ -4381,7 +4381,7 @@ Tyto kroky zahrnují:
    - [ ] Vizuální shoda s design systémem.
    - [ ] Animace plynulé a nedráždivé.
    - [ ] Zvuky a vibrace správně mapované.
-   - [ ] Dark/light mode funguje všude.
+   - [x] Dark/light mode funguje všude. (Audit + fix 2026-07-23: kontrast textu, glass komponenty, animované pozadí — viz CHANGELOG 2.0.69.)
    - [ ] Edge-to-edge korektní (žádný obsah pod systémovými bary).
    - [ ] Back navigation funguje logicky.
    - [ ] Žádné memory leaky (LeakCanary).
