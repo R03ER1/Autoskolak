@@ -3,9 +3,16 @@ description:
 alwaysApply: true
 ---
 
-If you do an update, update the verion in activity_settings.xml. Update it for +0.0.01
+Když děláš update aplikace, zvedni verzi. Verze je zdrojově uložená v `app/build.gradle.kts`
+(`versionName` + `versionCode`) a v runtime se čte z `BuildConfig.VERSION_NAME`
+(Compose obrazovka Nastavení). Legacy `activity_settings.xml` už neexistuje —
+neupravuj ho.
 
-The version number is made from 3 numbers, make only the last one +1. For example, from 0.0.9, make 0.0.10 or from 3.15.2 make 3.15.3.
+Bump o +0.0.01: verze je tvořena třemi čísly, měň jen poslední (např. z 0.0.9 → 0.0.10,
+z 3.15.2 → 3.15.3). `versionCode` v `app/build.gradle.kts` bumpni o 1.
 
+Změny zaznamenej do OBOU changelogů:
+- `CHANGELOG.md` (kořen repa)
+- `app/src/main/assets/CHANGELOG.md` (zobrazuje se v aplikaci)
 
-Then note what you changed in  autokolk/CHANGELOG.md and into autokolk/src/main/assets/CHANGELOG.md and apply the new version name to versionName in build.gradle
+Formát nového záznamu je `## [X.Y.Z] - YYYY-MM-DD` následovaný bullety.
