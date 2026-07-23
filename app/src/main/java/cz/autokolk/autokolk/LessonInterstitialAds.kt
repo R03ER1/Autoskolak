@@ -13,7 +13,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
  * that ends with this ad.
  */
 object LessonInterstitialAds {
-    private const val TAG = "LessonInterstitialAds"
+    private const val TAG = "InterstitialAd"
+    private const val LOG_PREFIX = "[Ads]"
     internal const val AD_UNIT_ID = "ca-app-pub-7904041740523292/1806063612"
 
     private val lock = Any()
@@ -28,6 +29,7 @@ object LessonInterstitialAds {
             if (cached != null || loading) return
             loading = true
         }
+        Log.d(TAG, "$LOG_PREFIX preload started")
         val app = context.applicationContext
         InterstitialAd.load(
             app,
@@ -39,10 +41,11 @@ object LessonInterstitialAds {
                         cached = ad
                         loading = false
                     }
+                    Log.d(TAG, "$LOG_PREFIX preload succeeded")
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
-                    Log.w(TAG, "Preload failed: ${error.message}")
+                    Log.w(TAG, "$LOG_PREFIX preload failed: ${error.message}")
                     synchronized(lock) {
                         loading = false
                     }
