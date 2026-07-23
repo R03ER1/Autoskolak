@@ -23,11 +23,6 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-7904041740523292~4238857086" />
         <activity
-            android:name=".LoadingActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".HomeActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
