@@ -13,34 +13,68 @@ import cz.autokolk.ui.settings.AppSettingsStore
  * Low-latency sound effect engine backed by [SoundPool].
  *
  * Call [init] once (e.g. from [cz.autokolk.App.onCreate]) to build the pool
- * and pre-load every [Sound] whose raw resource already exists.  Resources
+ * and pre-load every [Sound] whose raw resource already exists. Resources
  * that are missing are silently skipped so the app won't crash before the
- * actual OGG files are added in Phase 12.
+ * actual audio files are added.
  *
- * Expected raw resource names: `sound_correct`, `sound_wrong`, `sound_streak`,
- * `sound_coin`, `sound_tap`, `sound_levelup`, `sound_countdown`,
- * `sound_alex_tap`, `sound_alex_feed` (Alex mazlíček).
+ * Raw resource names (extension free) are listed in [Sound.resName]. Any of
+ * `.ogg`, `.wav` or `.mp3` on disk works — resource ID lookup is agnostic.
+ *
+ * Sounds respect the "Zvuky" toggle in [AppSettingsStore] on every [play].
  */
 object SoundManager {
 
     private const val TAG = "SoundManager"
-    private const val MAX_STREAMS = 4
+    private const val MAX_STREAMS = 6
 
     private var soundPool: SoundPool? = null
     private val soundIds = mutableMapOf<Sound, Int>()
     private var enabled = true
     private var appContext: Context? = null
 
+    /** Semantic sound events. `resName` is the raw-resource base name. */
     enum class Sound(val resName: String) {
+        /** Kvíz — správná odpověď. */
         CORRECT("sound_correct"),
+
+        /** Kvíz — špatná odpověď. */
         WRONG("sound_wrong"),
-        STREAK("sound_streak"),
-        COIN("sound_coin"),
-        TAP("sound_tap"),
-        LEVELUP("sound_levelup"),
+
+        /** Kvíz — řetězec správných odpovědí (combo). */
+        COMBO("sound_combo"),
+
+        /** Test — poslední sekundy odpočtu / start countdown. */
         COUNTDOWN("sound_countdown"),
-        ALEX_TAP("sound_alex_tap"),
+
+        /** Navigace — jemné klepnutí (bottom nav / drobné akce). */
+        TAP("sound_tap"),
+
+        /** Navigace — otevření/zavření sheetu. */
+        WHOOSH("sound_whoosh"),
+
+        /** Alex — krmení. */
         ALEX_FEED("sound_alex_feed"),
+
+        /** Alex — pohlazení / interakce. */
+        ALEX_TAP("sound_alex_tap"),
+
+        /** Overlay odemčení úspěchu. */
+        ACHIEVEMENT("sound_achievement"),
+
+        /** Bonusové kolo — tik segmentu. */
+        WHEEL_TICK("sound_wheel_tick"),
+
+        /** Bonusové kolo / mystery box — výherní jingle. */
+        WHEEL_WIN("sound_wheel_win"),
+
+        /** Milník streaku (overlay). */
+        STREAK("sound_streak"),
+
+        /** Získání mincí. */
+        COIN("sound_coin"),
+
+        /** XP level-up. */
+        LEVELUP("sound_levelup"),
     }
 
     fun init(context: Context) {
@@ -71,12 +105,19 @@ object SoundManager {
         }
     }
 
-    fun play(sound: Sound) {
+    /**
+     * Play a sound event. No-op if the SoundPool hasn't been initialized,
+     * if the user disabled sounds, if the raw resource wasn't found, or if
+     * the app has been silenced via [setEnabled].
+     */
+    fun play(sound: Sound, volume: Float = 1f, rate: Float = 1f) {
         if (!enabled) return
         val ctx = appContext
         if (ctx != null && !AppSettingsStore.isSoundEnabled(ctx)) return
         val id = soundIds[sound] ?: return
-        soundPool?.play(id, 1f, 1f, 1, 0, 1f)
+        val v = volume.coerceIn(0f, 1f)
+        val r = rate.coerceIn(0.5f, 2f)
+        soundPool?.play(id, v, v, 1, 0, r)
     }
 
     fun setEnabled(enabled: Boolean) {
@@ -94,6 +135,10 @@ object SoundManager {
 
 // ── Compose integration ─────────────────────────────────────────────────
 
+/**
+ * Composable helper. Guarantees the pool is initialized (idempotent) and
+ * returns the singleton for call sites that don't have direct access.
+ */
 @Composable
 fun rememberSoundManager(): SoundManager {
     val context = LocalContext.current
