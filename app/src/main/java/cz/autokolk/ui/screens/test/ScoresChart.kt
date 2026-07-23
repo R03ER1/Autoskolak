@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -17,10 +18,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.ErrorRed
-private val AxisColor = Color(0x66FFFFFF)
-private val GridColor = Color(0x33FFFFFF)
+
+// LineColor je záměrně fixní brand amber (dobrý kontrast na obou tmavém i světlém pozadí).
 private val LineColor = Color(0xFFFFC107)
-private val PointColor = Color.White
 
 /**
  * Graf skóre (0–[maxPoints]); [threshold] čárkovaná čára (např. 43 u max 50).
@@ -39,6 +39,13 @@ fun ScoresChart(
         reveal.animateTo(1f, tween(durationMillis = 900))
     }
 
+    // Theme-aware: v tmavém režimu bílé osy/mřížka/body, ve světlém tmavé — jinak by graf
+    // v jednom z režimů zmizel (byl by stejné barvy jako karta pod ním).
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val axisColor = onSurface.copy(alpha = 0.4f)
+    val gridColor = onSurface.copy(alpha = 0.2f)
+    val pointColor = onSurface
+
     Canvas(
         modifier = modifier
             .fillMaxWidth()
@@ -50,12 +57,12 @@ fun ScoresChart(
         val bottom = size.height - 12.dp.toPx()
         if (right <= left || bottom <= top) return@Canvas
 
-        drawLine(AxisColor, Offset(left, bottom), Offset(right, bottom), strokeWidth = 2f)
-        drawLine(AxisColor, Offset(left, top), Offset(left, bottom), strokeWidth = 2f)
+        drawLine(axisColor, Offset(left, bottom), Offset(right, bottom), strokeWidth = 2f)
+        drawLine(axisColor, Offset(left, top), Offset(left, bottom), strokeWidth = 2f)
 
         for (i in 1..3) {
             val y = bottom - (bottom - top) * (i / 4f)
-            drawLine(GridColor, Offset(left, y), Offset(right, y), strokeWidth = 1f)
+            drawLine(gridColor, Offset(left, y), Offset(right, y), strokeWidth = 1f)
         }
 
         if (scores.isEmpty()) return@Canvas
@@ -115,7 +122,7 @@ fun ScoresChart(
             val clamped = value.coerceIn(0, maxPoints)
             val ratio = clamped.toFloat() / maxPoints.toFloat()
             val y = bottom - ratio * (bottom - top)
-            drawCircle(PointColor, radius = 5f, center = Offset(x, y))
+            drawCircle(pointColor, radius = 5f, center = Offset(x, y))
             drawCircle(LineColor, radius = 3f, center = Offset(x, y))
         }
     }

@@ -48,8 +48,6 @@ import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.SuccessGreen
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun TestResultsScreen(navController: NavHostController, attemptId: Long) {
@@ -72,7 +70,7 @@ fun TestResultsScreen(navController: NavHostController, attemptId: Long) {
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Načítám výsledek…", color = TextSecondary)
+                    Text("Načítám výsledek…", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             state.missing -> {
@@ -82,7 +80,7 @@ fun TestResultsScreen(navController: NavHostController, attemptId: Long) {
                         .systemBarsPadding()
                         .padding(24.dp),
                 ) {
-                    Text("Pokus nenalezen.", style = MaterialTheme.typography.titleLarge, color = TextPrimary)
+                    Text("Pokus nenalezen.", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(Modifier.height(16.dp))
                     PrimaryGradientButton(
                         text = "Zpět na zkoušku",
@@ -138,32 +136,32 @@ private fun TestResultsContent(
             Text(
                 text = if (state.passed) "Úspěšně složeno!" else "Nesloženo",
                 style = MaterialTheme.typography.headlineLarge,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "${state.score}",
                 style = MaterialTheme.typography.displayLarge,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = "z ${state.maxScore} bodů",
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         if (!state.hasDetails) {
             Text(
                 text = "U tohoto pokusu nejsou uložené podrobnosti jednotlivých otázek.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(16.dp),
             )
         } else {
             Text(
                 text = "Podrobnosti",
                 style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(16.dp),
             )
             state.rows.forEach { row ->
@@ -215,7 +213,7 @@ private fun TestDetailRow(detail: TestResultRowUi) {
                 Text(
                     text = detail.questionText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = if (expanded) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
@@ -223,14 +221,14 @@ private fun TestDetailRow(detail: TestResultRowUi) {
                 Text(
                     text = detail.pointsLabel,
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             AnimatedVisibility(visible = expanded) {
                 Text(
                     text = "Tvoje odpověď: ${detail.userAnswerLabel}\nSprávně: ${detail.correctAnswerLabel}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }

@@ -67,9 +67,6 @@ import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.quiz.QuizMedia
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.GlassWhite
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,22 +108,22 @@ fun PracticeScreen(navController: NavHostController) {
                 Text(
                     text = stringResource(R.string.practice_page_title),
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { vm.setSearchQuery(it) },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Hledat v otázkách…", color = TextSecondary) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
+                    placeholder = { Text("Hledat v otázkách…", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         focusedBorderColor = AccentCyan,
-                        unfocusedBorderColor = TextSecondary.copy(alpha = 0.4f),
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                     ),
                 )
                 Spacer(Modifier.height(10.dp))
@@ -136,7 +133,7 @@ fun PracticeScreen(navController: NavHostController) {
                 )
                 Spacer(Modifier.height(8.dp))
                 if (searchHits.isNotEmpty() && searchQuery.trim().length >= 2) {
-                    Text("Výsledky hledání", style = MaterialTheme.typography.labelLarge, color = TextSecondary)
+                    Text("Výsledky hledání", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(4.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -154,7 +151,7 @@ fun PracticeScreen(navController: NavHostController) {
                                     Text(
                                         hit.preview,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = TextPrimary,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         maxLines = 4,
                                         overflow = TextOverflow.Ellipsis,
                                     )
@@ -204,7 +201,7 @@ fun PracticeScreen(navController: NavHostController) {
                 ) {
                     Text(hit.categoryTitle, style = MaterialTheme.typography.titleSmall, color = AccentCyan)
                     Spacer(Modifier.height(8.dp))
-                    Text(hit.preview, style = MaterialTheme.typography.bodyMedium, color = TextPrimary)
+                    Text(hit.preview, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                     if (hit.imagePath != null) {
                         Spacer(Modifier.height(12.dp))
                         QuizMedia(imagePath = hit.imagePath, videoPath = null)
@@ -244,8 +241,8 @@ private fun FilterChipRow(selected: Int, onSelect: (Int) -> Unit) {
                 label = { Text(label) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = AccentCyan.copy(alpha = 0.35f),
-                    selectedLabelColor = TextPrimary,
-                    labelColor = TextSecondary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSurface,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
             )
         }
@@ -261,7 +258,7 @@ private fun MistakesOverviewCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onOpen),
-        borderGradient = listOf(MaterialTheme.colorScheme.error.copy(alpha = 0.55f), GlassWhite.copy(alpha = 0.12f)),
+        borderGradient = listOf(MaterialTheme.colorScheme.error.copy(alpha = 0.55f), MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)),
     ) {
         Column(Modifier.padding(16.dp)) {
             Text("Tvoje chyby", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
@@ -269,7 +266,7 @@ private fun MistakesOverviewCard(
             Text(
                 "K procvičení: ${mistakes.wrongCount} · Opravené: ${mistakes.correctCount}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -294,7 +291,7 @@ private fun CategoryPracticeCard(
     val border = if (data.completed) {
         listOf(WarningAmber, WarningAmber.copy(alpha = 0.4f))
     } else {
-        listOf(GlassWhite, GlassWhite.copy(alpha = 0.08f))
+        listOf(MaterialTheme.colorScheme.onSurface, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
     }
     GlassCard(
         modifier = Modifier
@@ -322,7 +319,7 @@ private fun CategoryPracticeCard(
             Text(
                 data.title,
                 style = MaterialTheme.typography.titleSmall,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -342,12 +339,12 @@ private fun CategoryPracticeCard(
                     Text(
                         "${(data.progress * 100).toInt()}%",
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         "${data.percentCorrect}% správně · ${data.attemptCount} odp.",
                         style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -389,13 +386,13 @@ private fun CategoryPracticeCard(
                                 .padding(vertical = 4.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
-                            Text(sub.title, style = MaterialTheme.typography.bodySmall, color = TextPrimary, modifier = Modifier.weight(1f))
-                            Text("${sub.questionCount}", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                            Text(sub.title, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                            Text("${sub.questionCount}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     if (data.worstQuestionIds.isNotEmpty()) {
                         Spacer(Modifier.height(6.dp))
-                        Text("Nejhůř:", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+                        Text("Nejhůř:", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         data.worstQuestionIds.forEach { id ->
                             Text(
                                 "#$id",

@@ -27,8 +27,6 @@ import cz.autokolk.data.test.TestAttemptRepository
 import cz.autokolk.data.test.TestStatsSnapshot
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.glass.GlassCard
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun TestStatsScreen(navController: NavHostController) {
@@ -54,7 +52,7 @@ fun TestStatsScreen(navController: NavHostController) {
             Text(
                 text = "Statistiky zkoušek",
                 style = MaterialTheme.typography.headlineMedium,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(16.dp))
             GlassCard(Modifier.fillMaxWidth()) {
@@ -70,21 +68,21 @@ fun TestStatsScreen(navController: NavHostController) {
             Text(
                 text = "Graf pokusů v čase",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(8.dp))
             if (chartScores.isEmpty()) {
                 Text(
                     text = "Zatím žádná data.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 ScoresChart(scores = chartScores, threshold = 43, maxPoints = 50)
             }
             Spacer(Modifier.height(24.dp))
             TextButton(onClick = { navController.popBackStack() }) {
-                Text("Zpět", color = TextPrimary)
+                Text("Zpět", color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }
@@ -93,7 +91,7 @@ fun TestStatsScreen(navController: NavHostController) {
 @Composable
 private fun StatLine(label: String, value: String) {
     Column {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = TextSecondary)
-        Text(value, style = MaterialTheme.typography.titleLarge, color = TextPrimary)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
     }
 }

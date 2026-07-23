@@ -37,11 +37,9 @@ import cz.autokolk.ui.components.progress.QuizProgressBar
 import cz.autokolk.ui.navigation.LocalNavAnimatedVisibilityScope
 import cz.autokolk.ui.navigation.LocalSharedTransitionScope
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.GlassFill
 import cz.autokolk.ui.theme.PillShape
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.glassPalette
 import java.util.Locale
 
 // Shared element transition (krok 41): `heroTransitionKey` napojí pilulku s číslem otázky
@@ -62,6 +60,7 @@ fun QuizTopBar(
     belowProgress: (@Composable () -> Unit)? = null,
     heroTransitionKey: String? = null,
 ) {
+    val palette = glassPalette()
     Column(modifier = modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth()) {
             if (showCombo && comboStreak >= 2) {
@@ -88,13 +87,13 @@ fun QuizTopBar(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Zavřít", tint = TextPrimary)
+                Icon(Icons.Default.Close, contentDescription = "Zavřít", tint = MaterialTheme.colorScheme.onSurface)
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (hearts != null) {
                     Surface(
                         shape = PillShape,
-                        color = GlassFill.copy(alpha = 0.35f),
+                        color = palette.fillStart,
                     ) {
                         Row(
                             Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
@@ -102,7 +101,7 @@ fun QuizTopBar(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             Icon(Icons.Default.Favorite, contentDescription = null, tint = ErrorRed, modifier = Modifier.padding(2.dp))
-                            Text("$hearts", style = MaterialTheme.typography.labelLarge, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            Text("$hearts", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -121,7 +120,7 @@ fun QuizTopBar(
                 Surface(
                     modifier = heroModifier,
                     shape = PillShape,
-                    color = GlassFill.copy(alpha = 0.35f),
+                    color = palette.fillStart,
                 ) {
                     AnimatedContent(
                         targetState = current,
@@ -132,7 +131,7 @@ fun QuizTopBar(
                     ) { c ->
                         Text(
                             text = "$c/$total",
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         )
@@ -146,7 +145,7 @@ fun QuizTopBar(
                 val color = when {
                     ms <= 60_000L -> ErrorRed
                     ms <= 5 * 60_000L -> WarningAmber
-                    else -> TextPrimary
+                    else -> MaterialTheme.colorScheme.onSurface
                 }
                 val pulse = ms in 1..10_000L
                 val scale by animateFloatAsState(
@@ -156,7 +155,7 @@ fun QuizTopBar(
                 )
                 Surface(
                     shape = RoundedCornerShape(20.dp),
-                    color = GlassFill.copy(alpha = 0.45f),
+                    color = palette.fillStart,
                 ) {
                     AnimatedContent(
                         targetState = m * 60 + s,
@@ -177,7 +176,7 @@ fun QuizTopBar(
                     }
                 }
             } else {
-                Text(text = " ", color = TextPrimary)
+                Text(text = " ", color = MaterialTheme.colorScheme.onSurface)
             }
         }
         QuizProgressBar(

@@ -54,8 +54,6 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.sound.QuizTestCountdownSoundEffect
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.DarkSurfaceVariant
-import cz.autokolk.ui.theme.TextSecondary
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -111,7 +109,6 @@ fun TestQuizSession(navController: NavHostController) {
     if (state.showQuitDialog) {
         AlertDialog(
             onDismissRequest = { vm.dismissQuitDialog() },
-            containerColor = DarkSurfaceVariant,
             title = { Text("Ukončit zkoušku?") },
             text = {
                 Text(
@@ -186,7 +183,7 @@ private fun TestQuizSessionReadyContent(
                         Text(
                             text = examSubtitle,
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 4,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -241,7 +238,7 @@ private fun TestQuizSessionReadyContent(
                 Text(
                     text = "Otázka ${state.index + 1}/$TEST_QUESTION_COUNT",
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                 )

@@ -36,8 +36,6 @@ import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.quiz.TEST_QUESTION_COUNT
-import cz.autokolk.ui.theme.TextPrimary
-import cz.autokolk.ui.theme.TextSecondary
 
 @Composable
 fun TestScreen(navController: NavHostController) {
@@ -84,14 +82,14 @@ fun TestScreen(navController: NavHostController) {
                     Text(
                         text = "Zkouška z teorie",
                         style = MaterialTheme.typography.headlineLarge,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = "$TEST_QUESTION_COUNT otázek • 30 minut • min. 43 bodů",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(20.dp))
@@ -119,14 +117,14 @@ fun TestScreen(navController: NavHostController) {
                     Text(
                         text = "Vývoj skóre",
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(8.dp))
                     if (chartScores.isEmpty()) {
                         Text(
                             text = "Zatím žádné pokusy — spusť první zkoušku.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextSecondary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     } else {
                         ScoresChart(scores = chartScores, threshold = 43, maxPoints = 50)
@@ -134,7 +132,7 @@ fun TestScreen(navController: NavHostController) {
                 }
             }
             TextButton(onClick = { navController.navigate(Route.TestStats.route) }) {
-                Text("Statistiky zkoušek", color = TextPrimary)
+                Text("Statistiky zkoušek", color = MaterialTheme.colorScheme.onSurface)
             }
             Spacer(Modifier.height(24.dp))
         }
@@ -143,11 +141,11 @@ fun TestScreen(navController: NavHostController) {
 
 @Composable
 private fun RowTitleStats(stats: cz.autokolk.data.test.TestStatsSnapshot) {
-    Text("Tvoje výsledky", style = MaterialTheme.typography.titleLarge, color = TextPrimary)
+    Text("Tvoje výsledky", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
     Spacer(Modifier.height(8.dp))
     Text(
         text = "Pokusů: ${stats.attemptCount}   Průměr: ${"%.1f".format(stats.averageScore)} bodů   Úspěšnost: ${"%.0f".format(stats.passRatePercent)} %",
         style = MaterialTheme.typography.bodySmall,
-        color = TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
