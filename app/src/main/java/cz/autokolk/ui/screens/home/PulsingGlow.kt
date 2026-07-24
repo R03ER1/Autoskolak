@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
 
 @Composable
 fun Modifier.pulsingGlow(
@@ -26,16 +27,24 @@ fun Modifier.pulsingGlow(
     colors: List<Color> = listOf(AccentCyan.copy(alpha = 0.55f), AccentTeal.copy(alpha = 0.35f)),
 ): Modifier {
     if (!enabled) return this
-    val transition = rememberInfiniteTransition(label = "pulsingGlow")
-    val phase by transition.animateFloat(
-        initialValue = 0.65f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(900, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "pulsingGlowPhase",
-    )
+    // Krok 160: v reduced-motion / low-power režimu zůstává glow statický (bez nekonečné
+    // animace), aby neběžel kontinuální redraw jen kvůli čistě dekorativnímu pulzování.
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
+    val phase = if (lowPerformanceMode) {
+        1f
+    } else {
+        val transition = rememberInfiniteTransition(label = "pulsingGlow")
+        val animatedPhase by transition.animateFloat(
+            initialValue = 0.65f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(900, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "pulsingGlowPhase",
+        )
+        animatedPhase
+    }
     return this.drawBehind {
         val r = CornerRadius(cornerRadius.toPx(), cornerRadius.toPx())
         val stroke = 3.dp.toPx() * phase

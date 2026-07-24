@@ -34,6 +34,7 @@ import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
 import cz.autokolk.ui.util.HapticFeedback
+import cz.autokolk.ui.util.rememberReducedMotionEnabled
 
 @Composable
 fun LevelUpOverlay(
@@ -43,6 +44,7 @@ fun LevelUpOverlay(
 ) {
     val view = LocalView.current
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset("lottie/level_up.json"))
+    val reducedMotion = rememberReducedMotionEnabled()
 
     LaunchedEffect(Unit) {
         HapticFeedback.onMilestone(view.context)
@@ -55,14 +57,15 @@ fun LevelUpOverlay(
             .background(Color.Black.copy(alpha = 0.88f)),
         contentAlignment = Alignment.Center,
     ) {
-        ConfettiOverlay(isActive = true, modifier = Modifier.fillMaxSize())
+        ConfettiOverlay(isActive = !reducedMotion, modifier = Modifier.fillMaxSize())
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(24.dp),
         ) {
             LottieAnimation(
                 composition = composition,
-                iterations = LottieConstants.IterateForever,
+                // Krok 160: reduced motion přehraje animaci jen jednou místo nekonečné smyčky.
+                iterations = if (reducedMotion) 1 else LottieConstants.IterateForever,
                 modifier = Modifier.size(160.dp),
             )
             Spacer(Modifier.height(12.dp))

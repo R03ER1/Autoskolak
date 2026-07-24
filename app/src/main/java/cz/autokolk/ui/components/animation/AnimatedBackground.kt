@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
 
 /**
  * Jemný animovaný radial gradient na pozadí (Fáze 2 / onboarding).
@@ -25,6 +26,11 @@ import androidx.compose.ui.graphics.Color
  * co je "pod" ní (legacy Activity `windowBackground` apod. se tak nikdy
  * neprosvítí). Přes tuto plnou barvu se pak vykreslí jemný, pohyblivý glow
  * tak, aby uprostřed i na okrajích zůstal průhledný (žádný "tvrdý kruh").
+ *
+ * Krok 160 (reduced motion / low power): pokud má uživatel zapnuté systémové
+ * odstranění animací nebo zařízení běží ve spořiči baterie, glow zůstává
+ * staticky na výchozí pozici místo nekonečné animace (žádný kontinuální
+ * recompose/redraw na pozadí, dokud je obrazovka zobrazená).
  */
 @Composable
 fun AnimatedBackground(
@@ -36,17 +42,23 @@ fun AnimatedBackground(
     val secondaryAccent = MaterialTheme.colorScheme.secondary
     val glowAlpha = 0.10f
     val secondaryGlowAlpha = 0.07f
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
 
-    val infiniteTransition = rememberInfiniteTransition(label = "animatedBg")
-    val offset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(10_000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "animatedBgOffset",
-    )
+    val offset = if (lowPerformanceMode) {
+        0.5f
+    } else {
+        val infiniteTransition = rememberInfiniteTransition(label = "animatedBg")
+        val animatedOffset by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(10_000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "animatedBgOffset",
+        )
+        animatedOffset
+    }
 
     Box(
         modifier = modifier

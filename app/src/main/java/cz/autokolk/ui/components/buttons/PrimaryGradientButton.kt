@@ -40,6 +40,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.theme.PillShape
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
 
 /**
  * Hlavní CTA s gradientem, barevným stínem (glow) a volitelným jemným shimmerem přes gradient.
@@ -66,16 +67,24 @@ fun PrimaryGradientButton(
         label = "primaryGradientElevation",
     )
 
-    val shimmer = rememberInfiniteTransition(label = "primaryGradientShimmer")
-    val shimmerPhase by shimmer.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "primaryGradientShimmerPhase",
-    )
+    // Krok 160: v reduced-motion / low-power režimu shimmer neběží (čistě dekorativní).
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
+    val shimmerActive = shimmerEnabled && !lowPerformanceMode
+    val shimmerPhase = if (shimmerActive) {
+        val shimmer = rememberInfiniteTransition(label = "primaryGradientShimmer")
+        val animatedPhase by shimmer.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 2200, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+            label = "primaryGradientShimmerPhase",
+        )
+        animatedPhase
+    } else {
+        0f
+    }
 
     val primary = MaterialTheme.colorScheme.primary
     val secondary = MaterialTheme.colorScheme.secondary
@@ -110,7 +119,7 @@ fun PrimaryGradientButton(
                 .clip(PillShape)
                 .drawWithContent {
                     drawContent()
-                    if (shimmerEnabled && enabled && !isPressed) {
+                    if (shimmerActive && enabled && !isPressed) {
                         drawRect(
                             brush = Brush.linearGradient(
                                 colors = listOf(

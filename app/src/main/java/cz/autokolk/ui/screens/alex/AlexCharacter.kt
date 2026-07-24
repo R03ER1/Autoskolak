@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.util.rememberHaptic
+import cz.autokolk.ui.util.rememberReducedMotionEnabled
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -62,16 +63,23 @@ fun AlexCharacter(
         }.getOrNull()
     }
 
-    val breath = rememberInfiniteTransition(label = "alexBreath")
-    val breathScale by breath.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.02f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "breath",
-    )
+    // Krok 160: čistě dekorativní "dýchací" smyčka se v reduced-motion režimu vypíná.
+    val reducedMotion = rememberReducedMotionEnabled()
+    val breathScale = if (reducedMotion) {
+        1f
+    } else {
+        val breath = rememberInfiniteTransition(label = "alexBreath")
+        val animatedBreathScale by breath.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.02f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(2000),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "breath",
+        )
+        animatedBreathScale
+    }
 
     val bounceScale = remember { Animatable(1f) }
     LaunchedEffect(bounceTrigger) {

@@ -34,12 +34,14 @@ import cz.autokolk.ui.theme.GlassTone
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.util.rememberReducedMotionEnabled
 
 @Composable
 fun RandomEventOverlay(
     event: RandomEventManager.RandomEventPresentation?,
     onDismiss: () -> Unit,
 ) {
+    val reducedMotion = rememberReducedMotionEnabled()
     AnimatedVisibility(
         visible = event != null,
         enter = fadeIn() + scaleIn(initialScale = 0.92f),
@@ -74,7 +76,7 @@ fun RandomEventOverlay(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     ConfettiOverlay(
-                        isActive = true,
+                        isActive = !reducedMotion,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(120.dp),

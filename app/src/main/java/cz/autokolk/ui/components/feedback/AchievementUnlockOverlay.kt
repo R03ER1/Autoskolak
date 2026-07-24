@@ -35,6 +35,8 @@ import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
 import cz.autokolk.ui.theme.readThemeMode
 import cz.autokolk.ui.util.HapticFeedback
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
+import cz.autokolk.ui.util.rememberReducedMotionEnabled
 
 /**
  * Celoobrazovkový efekt při odemčení úspěchu (Lottie + volitelně konfety).
@@ -88,6 +90,11 @@ private fun AchievementUnlockContent(
 ) {
     val main by rememberLottieComposition(LottieCompositionSpec.Asset("lottie/achievement_unlock.json"))
     val confetti by rememberLottieComposition(LottieCompositionSpec.Asset("lottie/confetti.json"))
+    // Krok 156–160: konfety jsou nejnáročnější prvek tohoto overlaye (fullscreen Lottie
+    // particle animace hraná donekonečna). V reduced-motion se úplně vypnou, v low-power
+    // (battery saver) se přehrají jen jednou místo nekonečné smyčky.
+    val reducedMotion = rememberReducedMotionEnabled()
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
 
     Box(
         Modifier
@@ -96,11 +103,13 @@ private fun AchievementUnlockContent(
             .clickable(onClick = onDismiss),
         contentAlignment = Alignment.Center,
     ) {
-        LottieAnimation(
-            composition = confetti,
-            iterations = LottieConstants.IterateForever,
-            modifier = Modifier.fillMaxSize(),
-        )
+        if (!reducedMotion) {
+            LottieAnimation(
+                composition = confetti,
+                iterations = if (lowPerformanceMode) 1 else LottieConstants.IterateForever,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
             LottieAnimation(
                 composition = main,
