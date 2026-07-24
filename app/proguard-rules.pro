@@ -26,6 +26,20 @@
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
 
+# Gson-reflected model classes (krok 162): žádná z nich používá @SerializedName, takže
+# Gson mapuje JSON klíče na názvy polí za běhu. Bez těchto pravidel by R8 tyto názvy
+# přejmenoval/odstranil a existující uložený JSON (progres, practice store) by po
+# aktualizaci s minifyEnabled=true přestal jít načíst.
+-keepclassmembers class cz.autokolk.Question {
+    <fields>;
+}
+-keepclassmembers class cz.autokolk.LessonProgress$LessonStateJson {
+    <fields>;
+}
+-keepclassmembers class cz.autokolk.LessonProgress$PracticeStore {
+    <fields>;
+}
+
 # Play Feature Delivery / Split Install
 -keep class com.google.android.play.core.splitinstall.** { *; }
 -dontwarn com.google.android.play.core.**
