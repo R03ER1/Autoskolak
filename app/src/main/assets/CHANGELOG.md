@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.70] - 2026-07-24
+- Vylepšená přístupnost pro čtečky obrazovky (TalkBack) — spodní menu, horní lišta (séria, mince, životy), odpovědi v kvízu a kolečka lekcí na Home teď mají srozumitelnější popisky.
+- Podpora systémového "Odstranit animace" a spořiče baterie — dekorativní animace (pulzující záře, pozadí, konfety) se v těchto režimech zjednoduší nebo vypnou, aplikace je tak plynulejší na starších/šetřených zařízeních.
+- Menší optimalizace velikosti aplikace a interní údržba (ProGuard/R8 pravidla).
+
 ## [2.0.69] - 2026-07-23
 - Oprava Světlého a Tmavého režimu: zmizel bílý "glow" kruh, který zůstával viditelný po přepnutí na Světlý režim.
 - Opraveny desítky míst s nečitelným textem (černý na černém / bílý na bílém) na Home, Alexovi, v Testu, Procvičování, Nastavení, kvízu, achievementech, statistikách a dalších obrazovkách — text i karty se nyní vždy správně přebarví podle zvoleného režimu.
