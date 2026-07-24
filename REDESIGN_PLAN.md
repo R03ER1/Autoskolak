@@ -185,14 +185,14 @@
 | 153 | Odstranění starých Activity souborů | 13 | ⬜ |
 | 154 | Odstranění starých XML layoutů | 13 | ⬜ |
 | 155 | Odstranění starých stylů a témat | 13 | ⬜ |
-| 156 | Performance audit — recomposition | 13 | ⬜ |
-| 157 | Performance audit — animace | 13 | ⬜ |
-| 158 | Performance audit — image loading | 13 | ⬜ |
-| 159 | Accessibility audit | 13 | ⬜ |
-| 160 | Reduced motion support | 13 | ⬜ |
-| 161 | Tablet / landscape support (základní) | 13 | ⬜ |
-| 162 | ProGuard / R8 pravidla pro nové knihovny | 13 | ⬜ |
-| 163 | App size audit | 13 | ⬜ |
+| 156 | Performance audit — recomposition | 13 | ⬜ (drobná oprava hotová, systematické měření přes Layout Inspector chybí) |
+| 157 | Performance audit — animace | 13 | ⬜ (FPS profiling vyžaduje běžící zařízení, neprovedeno) |
+| 158 | Performance audit — image loading | 13 | ⬜ (Coil `ImageLoader` konfigurace/retry neřešeno) |
+| 159 | Accessibility audit | 13 | ⬜ (contentDescription audit hotov, kontrola kontrastu WCAG AA nástrojem chybí) |
+| 160 | Reduced motion support | 13 | ✅ |
+| 161 | Tablet / landscape support (základní) | 13 | ⬜ (jen audit — `WindowSizeClass` adaptace neimplementována) |
+| 162 | ProGuard / R8 pravidla pro nové knihovny | 13 | ✅ |
+| 163 | App size audit | 13 | ✅ |
 | 164 | Migrace ad logiky do Compose | 13 | ✅ |
 | 165 | Finální QA a release checklist | 13 | ⬜ |
 
