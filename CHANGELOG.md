@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.0] - 2026-07-25
+- Stabilní milník pro externí testování (kamarádi). Shrnuje a uzavírá sérii oprav a vylepšení 2.0.64–2.0.71: legacy cleanup, odznaky/milníky na cestě lekcí, sdílení PNG karty, shared element transition (lekce → kvíz), plošná oprava světlého/tmavého režimu, perf/accessibility audit (reduced motion, battery saver, TalkBack popisky), ProGuard/R8 + zmenšení velikosti aplikace a oprava úklidu videa v kvízu (odstranění rušivých logcat hlášek).
+
 ## [2.0.71] - 2026-07-24
 - Oprava úklidu videa v kvízu (`QuizMedia`): `VideoView` (interně používá `SurfaceView`) se při opuštění otázky/obrazovky teď korektně zastaví (`stopPlayback()`), místo aby zůstal MediaPlayer připojený k už zrušenému Surface. To odstraňuje neškodné, ale rušivé logcat hlášky `BufferQueueProducer: ... BufferQueue has no connected producer`, které se objevovaly kolem otevírání lekcí s video otázkami.
 

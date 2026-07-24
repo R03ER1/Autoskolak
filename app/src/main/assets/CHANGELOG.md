@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.0] - 2026-07-25
+- Stabilní verze pro testování — shrnuje poslední dávku vylepšení: opravu světlého/tmavého režimu, odznaky za dokončené sekce, plynulý přechod z lekce do kvízu, sdílení výsledků jako obrázek, lepší podporu pro čtečky obrazovky a šetřicí režim baterie, menší velikost aplikace a opravu drobné chyby při přehrávání videí v kvízu.
+
 ## [2.0.71] - 2026-07-24
 - Drobná technická oprava přehrávání videí v kvízu — odstraňuje neškodné, ale rušivé chybové hlášky v systémovém logu při přechodu mezi otázkami s videem.
 
