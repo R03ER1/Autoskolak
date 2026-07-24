@@ -82,6 +82,14 @@ fun QuizMedia(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp),
+                    onRelease = { view ->
+                        // Bez tohohle zůstává MediaPlayer připojený k already-torn-down Surface
+                        // (VideoView interně používá SurfaceView), když Compose zahodí starý
+                        // AndroidView při přechodu na jinou otázku/obrazovku — projevuje se to
+                        // jako "BufferQueue has no connected producer" v logcatu.
+                        view.setOnPreparedListener(null)
+                        view.stopPlayback()
+                    },
                 )
             }
         }

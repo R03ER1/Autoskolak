@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.71] - 2026-07-24
+- Drobná technická oprava přehrávání videí v kvízu — odstraňuje neškodné, ale rušivé chybové hlášky v systémovém logu při přechodu mezi otázkami s videem.
+
 ## [2.0.70] - 2026-07-24
 - Vylepšená přístupnost pro čtečky obrazovky (TalkBack) — spodní menu, horní lišta (séria, mince, životy), odpovědi v kvízu a kolečka lekcí na Home teď mají srozumitelnější popisky.
 - Podpora systémového "Odstranit animace" a spořiče baterie — dekorativní animace (pulzující záře, pozadí, konfety) se v těchto režimech zjednoduší nebo vypnou, aplikace je tak plynulejší na starších/šetřených zařízeních.

@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.0.71] - 2026-07-24
+- Oprava úklidu videa v kvízu (`QuizMedia`): `VideoView` (interně používá `SurfaceView`) se při opuštění otázky/obrazovky teď korektně zastaví (`stopPlayback()`), místo aby zůstal MediaPlayer připojený k už zrušenému Surface. To odstraňuje neškodné, ale rušivé logcat hlášky `BufferQueueProducer: ... BufferQueue has no connected producer`, které se objevovaly kolem otevírání lekcí s video otázkami.
+
 ## [2.0.70] - 2026-07-24
 - Performance a accessibility audit (kroky 156–160 z `REDESIGN_PLAN.md`): nové utility `ui/util/ReducedMotion.kt` (`rememberReducedMotionEnabled` — respektuje systémové "Odstranit animace" přes `Settings.Global.ANIMATOR_DURATION_SCALE`) a `ui/util/PerformanceMode.kt` (`rememberPowerSaveModeEnabled` přes `PowerManager.isPowerSaveMode`, kombinovaný `rememberLowPerformanceModeEnabled`). Aplikováno na čistě dekorativní nekonečné animace: `AnimatedBackground` (statický glow), `PulsingGlow` na Home lesson node, shimmer v `PrimaryGradientButton`, "dýchací" smyčka Alexe (`AlexCharacter`), Lottie smyčky a konfety v `LevelUpOverlay`/`StreakMilestoneOverlay`/`EventOverlay`/`AchievementUnlockOverlay` (nejnáročnější fullscreen particle efekt v appce se v reduced motion úplně vypne, v battery saveru přehraje jen jednou).
 - Accessibility audit (krok 159): TalkBack popisky doplněny/opraveny na `BottomNavBar` (ikona vybrané záložky už neduplikuje čtení viditelného labelu), `TopBar` (streak/mince/životy měly `contentDescription` chybějící kontext, protože číslo se kreslí po jednotlivých cifrách — doplněn souhrnný popisek), `AnswerButton` (ikony správně/špatně teď TalkBacku oznámí výsledek odpovědi) a `LessonNode` na Home cestě lekcí (uzel dřív neměl žádný vlastní popisek, protože titulek lekce je samostatný text mimo klikatelný strom).
