@@ -129,7 +129,11 @@ private fun BottomNavItemView(
             }
             Icon(
                 painter = painterResource(item.iconRes),
-                contentDescription = item.label,
+                // Když je záložka vybraná, viditelný Text s labelem níž je součástí stejného
+                // klikatelného uzlu (merged semantics) — ikona by jinak duplikovala čtení
+                // TalkBackem (např. "Domů, Domů"). U nevybraných záložek label vidět není,
+                // takže ikona musí popisek nést sama.
+                contentDescription = if (isSelected) null else item.label,
                 modifier = Modifier
                     .size(24.dp)
                     .scale(scale),

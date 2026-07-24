@@ -14,6 +14,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.autokolk.ui.components.media.AssetImageFromPath
@@ -50,6 +52,10 @@ fun LessonNode(
     modifier: Modifier = Modifier,
     size: Dp = 64.dp,
     transitionKey: String? = null,
+    // Viditelný titulek lekce se v HomeScreen vykresluje jako samostatný Text vedle uzlu
+    // (mimo tento klikatelný strom), takže bez vlastního popisku by TalkBack toto kolečko
+    // ohlásil bez kontextu.
+    accessibilityLabel: String? = null,
 ) {
     val locked = state == LessonNodeState.LOCKED
     val showRing = state == LessonNodeState.COMPLETED || state == LessonNodeState.PERFECT
@@ -84,7 +90,14 @@ fun LessonNode(
                 },
             )
             .alpha(if (locked) 0.5f else 1f)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .then(
+                if (accessibilityLabel != null) {
+                    Modifier.semantics { contentDescription = accessibilityLabel }
+                } else {
+                    Modifier
+                },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         if (showRing) {

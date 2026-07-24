@@ -234,7 +234,9 @@ fun HomeScreen(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 LessonNode(
-                                    iconFileName = mapSubcategoryToIconAsset(row.lesson.subcategory.trim().lowercase()),
+                                    iconFileName = remember(row.lesson.subcategory) {
+                                        mapSubcategoryToIconAsset(row.lesson.subcategory.trim().lowercase())
+                                    },
                                     sectionColor = row.sectionColor,
                                     state = row.nodeState,
                                     ringProgress = row.ringProgress,
@@ -243,6 +245,7 @@ fun HomeScreen(
                                         sheetDisplay = row.displayNumber
                                     },
                                     transitionKey = lessonHeroTransitionKey(row.lesson.lessonNumber),
+                                    accessibilityLabel = "Lekce ${row.displayNumber}: ${row.subtitle}. ${lessonNodeStateLabel(row.nodeState)}.",
                                 )
                             }
                             Spacer(Modifier.width(12.dp))
@@ -327,4 +330,11 @@ fun HomeScreen(
             startEnabled = vm.hasHeartsOrInfinite(),
         )
     }
+}
+
+private fun lessonNodeStateLabel(state: LessonNodeState): String = when (state) {
+    LessonNodeState.LOCKED -> "Zamčeno"
+    LessonNodeState.CURRENT -> "Aktuální lekce"
+    LessonNodeState.COMPLETED -> "Dokončeno"
+    LessonNodeState.PERFECT -> "Dokončeno na 100 %"
 }

@@ -173,8 +173,8 @@ fun AnswerButton(
                     contentAlignment = Alignment.Center,
                 ) {
                     when (state) {
-                        AnswerState.CORRECT -> Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(22.dp))
-                        AnswerState.WRONG -> Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(22.dp))
+                        AnswerState.CORRECT -> Icon(Icons.Default.Check, "Správně", tint = Color.White, modifier = Modifier.size(22.dp))
+                        AnswerState.WRONG -> Icon(Icons.Default.Close, "Špatně", tint = Color.White, modifier = Modifier.size(22.dp))
                         else -> Text(
                             label,
                             style = MaterialTheme.typography.labelLarge,

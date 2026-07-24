@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import cz.autokolk.R
 import cz.autokolk.ui.components.animation.AnimatedCounter
@@ -50,12 +52,14 @@ fun AutokolkTopBar(
             value = streak,
             iconColor = WarningAmber,
             onClick = onStreakClick,
+            accessibilityLabel = "Denní séria: $streak dní. Klepnutím zobrazíš detaily.",
         )
         StatBadge(
             iconRes = R.drawable.ic_coin,
             value = coins,
             iconColor = WarningAmber,
             onClick = onCoinsClick,
+            accessibilityLabel = "Mince: $coins. Klepnutím otevřeš obchod.",
         )
         StatBadge(
             iconRes = R.drawable.ic_heart,
@@ -63,6 +67,7 @@ fun AutokolkTopBar(
             iconColor = ErrorRed,
             onClick = onLivesClick,
             pulse = lives <= 1,
+            accessibilityLabel = "Životy: $lives. Klepnutím zobrazíš detaily.",
         )
     }
 }
@@ -73,6 +78,7 @@ private fun StatBadge(
     value: Int,
     iconColor: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit,
+    accessibilityLabel: String,
     pulse: Boolean = false,
 ) {
     val pulseScale = if (pulse) {
@@ -91,7 +97,12 @@ private fun StatBadge(
         1f
     }
 
-    GlassButton(onClick = onClick) {
+    // AnimatedCounter kreslí každou číslici jako samostatný Text — bez clearAndSetSemantics
+    // by TalkBack četl číslice zvlášť (např. "5", "2") místo jednoho srozumitelného popisku.
+    GlassButton(
+        onClick = onClick,
+        modifier = Modifier.clearAndSetSemantics { contentDescription = accessibilityLabel },
+    ) {
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
