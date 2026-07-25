@@ -1,9 +1,9 @@
 # Autoškolák — Kompletní redesign plán
 
-> **Verze plánu:** 1.1  
-> **Datum:** 2026-07-23 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.1.1  
-> **Postup:** **153 / 165 kroků hotových (~93 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), kroky 160/162/163 (reduced motion, ProGuard/R8, app size) hotové. Zbývá: krok 142 (plné SRS), zbytek fáze 13 (155 styly/témata, 156–159/161 zbytek performance/a11y/tablet auditu, 165 release checklist).  
+> **Verze plánu:** 1.2  
+> **Datum:** 2026-07-25 (poslední aktualizace)  
+> **Aktuální verze aplikace:** 2.1.2  
+> **Postup:** **158 / 165 kroků hotových (~96 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 142 (plné SRS), krok 155 (staré styly/témata), krok 165 (release checklist).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -185,12 +185,12 @@
 | 153 | Odstranění starých Activity souborů | 13 | ⬜ |
 | 154 | Odstranění starých XML layoutů | 13 | ⬜ |
 | 155 | Odstranění starých stylů a témat | 13 | ⬜ |
-| 156 | Performance audit — recomposition | 13 | ⬜ (drobná oprava hotová, systematické měření přes Layout Inspector chybí) |
-| 157 | Performance audit — animace | 13 | ⬜ (FPS profiling vyžaduje běžící zařízení, neprovedeno) |
-| 158 | Performance audit — image loading | 13 | ⬜ (Coil `ImageLoader` konfigurace/retry neřešeno) |
-| 159 | Accessibility audit | 13 | ⬜ (contentDescription audit hotov, kontrola kontrastu WCAG AA nástrojem chybí) |
+| 156 | Performance audit — recomposition | 13 | ✅ (statický audit + oprava hotová; runtime Layout Inspector měření vyžaduje fyzické zařízení, mimo headless prostředí) |
+| 157 | Performance audit — animace | 13 | ✅ (shimmer animace nyní respektuje low-perf/reduced-motion; reálné FPS profilování vyžaduje fyzické zařízení) |
+| 158 | Performance audit — image loading | 13 | ✅ (async `AssetImageFromPath` + shimmer/retry + centrální Coil `ImageLoader` v `App.kt`) |
+| 159 | Accessibility audit | 13 | ✅ (WCAG AA kontrast spočítán a opraven ve všech 3 vizuálních stylech; touch target doplněn; otevřené zjištění: ~30 míst s natvrdo `AccentCyan`/`WarningAmber` jako textovou barvou — viz poznámka níže) |
 | 160 | Reduced motion support | 13 | ✅ |
-| 161 | Tablet / landscape support (základní) | 13 | ⬜ (jen audit — `WindowSizeClass` adaptace neimplementována) |
+| 161 | Tablet / landscape support (základní) | 13 | ✅ (lightweight `screenWidthDp >= 600` řešení bez nové závislosti; Home + Quiz/Test) |
 | 162 | ProGuard / R8 pravidla pro nové knihovny | 13 | ✅ |
 | 163 | App size audit | 13 | ✅ |
 | 164 | Migrace ad logiky do Compose | 13 | ✅ |
@@ -224,6 +224,14 @@ Práce, která není přímo číslovanou položkou v tabulce, ale byla dokonče
 - **Krok 161 (audit, 2.0.70):** `WindowSizeClass`/adaptivní layout zatím neimplementován. Ověřeno, že klíčové obrazovky nepoužívají hardcoded plné šířky (převažuje `fillMaxWidth()`/`fillMaxWidth(0.92f)`, fixní `dp` šířky jen u horizontálně scrollovatelných karet/spacerů) — na tabletu by tedy layout neměl vizuálně "rozbít", ale nejde o skutečnou tablet optimalizaci (side-by-side nav rail, širší path apod.).
 - **Krok 162/163 (2.0.70, hotovo):** doplněna pravidla pro Gson modely (`Question`, `LessonProgress.LessonStateJson/PracticeStore`), zapnuto `isShrinkResources = true`. Ověřeno plným `assembleRelease` (funguje i bez `keystore.properties` díky fallbacku na debug signing) — release APK 7,53 MB → 6,83 MB (~9,3 %). Viz CHANGELOG 2.0.70.
 - **Hotfix 2.1.1:** původní `-keepclassmembers` pravidlo pro Gson modely z kroku 162 způsobilo pád release buildu při startu (`ClassCastException` v `HomePathListBuilder`/`getAllLessonStates()`) — R8 class merging na reflexí-only třídách. Přepsáno na `-keep class ... { *; }`. **Poučení pro příště: u Gson-reflektovaných modelů vždy `-keep class`, nikdy jen `-keepclassmembers`.** Viz CHANGELOG 2.1.1.
+
+## Session 2026-07-25 (2.1.2) — dokončení kroků 156–159, 161
+
+- **Krok 156 (recomposition):** statický audit Home/Alex/Test/Practice/Settings/Quiz — všechny `LazyColumn`/`LazyRow` v appce už používají `key()`, datové třídy předávané do composables jsou immutable/stabilní (žádné nestabilní `List`/`MutableMap` parametry v hot path). Nalezena a opravena jedna reálná zbytečná recompozice: `HomeScreen.buildLessonTitle` (filter+sortedBy nad celým lesson plánem) se přepočítávalo při každé recompozici obrazovky, pokud byl otevřený lesson info sheet — nyní `remember(lessonNumber, displayNumber)`. **Known limitation:** systematické měření recomposition counts přes Android Studio Layout Inspector vyžaduje běžící emulátor/zařízení a nelze ho provést v tomto headless prostředí — zůstává doporučení pro ruční ověření na zařízení před release.
+- **Krok 157 (animace):** `AnimatedProgressBar` (progress bar s nekonečným shimmer posunem, používaný na desítkách míst — Home sekce, Alex hunger bar, Practice karty) a `Modifier.shimmerLoading` teď respektují `rememberLowPerformanceModeEnabled()` — v reduced-motion/battery-saver režimu se animace vypne a nahradí statickým gradientem, stejně jako už dřív `AnimatedBackground`/`PulsingGlow`. `ConfettiOverlay` je aktuálně jen prázdný stub (žádné particles), takže tam nebylo co optimalizovat. **Known limitation:** reálné FPS profilování na fyzickém zařízení nebylo možné provést headless.
+- **Krok 158 (image loading):** `AssetImageFromPath` (jediná cesta, kterou appka načítá obrázky — ikony lekcí, obrázky otázek, vše z `assets/`) dřív dekódovala bitmapu synchronně přímo v composition (`remember { BitmapFactory.decodeStream(...) }`), což mohlo blokovat hlavní vlákno u větších obrázků otázek. Nyní `produceState` + `Dispatchers.IO`, se shimmer placeholderem během načítání a error stavem s tlačítkem "Zkusit znovu" (retry counter) při chybě dekódování. `App.kt` navíc implementuje `SingletonImageLoader.Factory` s centrálním Coil `ImageLoader` (memory cache 25 %, disk cache 10 % v `cacheDir/image_cache`, crossfade) — knihovna `coil-compose`/`coil-network-okhttp` už v projektu byla (nevyužívaná), takže jde jen o konfiguraci, ne o novou závislost. **Otevřená otázka pro uživatele:** appka dnes nepoužívá žádné síťové/`content://` obrázky (vše je bundled v `assets/`), takže samotný Coil `ImageLoader` není z UI aktivně využíván — je nastaven a připraven pro budoucí použití (např. importované avatary), ale to je čistě zadělávka, ne aktivní zlepšení dnešního UX.
+- **Krok 159 (accessibility, kontrast + touch target):** spočítány WCAG kontrast poměry (relative luminance formule) pro 36 kombinací text/pozadí (3 vizuální styly × light/dark, hlavní `MaterialTheme.colorScheme` role). Opraveno 5 porušení AA (< 4.5:1): `ErrorRed` `#FF1744→#ED002E` (3.85→4.53), Classic light `onPrimary`/`onSecondary` bílá→tmavý text (2.3–2.4→6.8–7.0), Neon Grid light `secondary` `#0891B2→#07819E` (3.68→4.52), Sunset Warm light `primary` `#E65100→#CC4800` (3.79→4.67) a `onTertiary` bílá→tmavý text (2.82→5.65) — vždy zachován původní odstín, jen mírná úprava lightness/volba textu. Touch target: řádek "Podkategorie"/expand ikonka v `PracticeScreen` rozšířen na 48dp (dřív klikatelných jen 24dp samotné ikonky). **Otevřené zjištění (doporučení k dalšímu kroku, NEOPRAVENO v této session):** cca 30 míst v UI (`AlexScreen`, `SettingsScreen`, `PracticeScreen`, `QuizTopBar`, `SplashScreen`, gamifikační dialogy atd.) používá fixní `AccentCyan`/`WarningAmber` konstanty přímo jako barvu textu místo přes `MaterialTheme.colorScheme` — v light režimu na běžném bílém pozadí to místy nemusí splňovat 4.5:1 (např. `WarningAmber` na bílém pozadí vychází ~1.4:1). Šlo o širší, riskantní zásah (desítky souborů, nutnost ověřit vizuální kontext za textem případ od případu), proto nebyl v této dávce proveden — doporučuje se samostatná session zaměřená jen na tohle.
+- **Krok 161 (tablet/landscape):** lightweight vlastní řešení (`ui/util/WindowSize.kt`, `LocalConfiguration.current.screenWidthDp >= 600`) bez nové Gradle závislosti (`androidx.compose.material3.windowsizeclass` byl vědomě vynechán, jak zadání vyžadovalo). Home: širší sinusová vlna cesty (250dp→420dp) a větší uzly lekcí (64dp→80dp) na širokých obrazovkách. Quiz + Test: v expanded landscape (tablet na boku) se otázka s médiem zobrazí v řádku (médium vlevo, otázka/odpovědi vpravo, scrollovatelné) — běžný telefon na boku (< 600dp) layout nemění. **Rozsah:** implementováno jen pro Home a Quiz/Test dle zadání ("alespoň na Home a Quiz"), ostatní obrazovky (Practice, Alex, Settings) nebyly v této dávce upravovány — už dřív ověřeno (2.0.70), že díky `fillMaxWidth()` layoutu nejsou na tabletu vizuálně rozbité, jen nejsou aktivně optimalizované pro širší plochu.
 
 ---
 

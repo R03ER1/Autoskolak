@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.2] - 2026-07-25
+- Plynulejší animace a rychlejší načítání obrázků — jemné "shimmer" efekty a obrázky lekcí se teď chytřeji přizpůsobují výkonu telefonu a šetřicímu režimu baterie.
+- Lepší kontrast barev v některých tlačítkách a odznacích pro snazší čtení textu.
+- Základní podpora pro tablety a otočení na šířku — cesta lekcí na Home je širší a otázky v kvízu s obrázkem/videem se na širší obrazovce zobrazí vedle sebe místo pod sebou.
+- Drobné vylepšení dotykových ploch u menších tlačítek v sekci Procvičování.
+
 ## [2.1.1] - 2026-07-25
 - Opravena vážná chyba, kvůli které appka po dokončení lekce spadla a nešla znovu spustit (týkalo se jen instalace z release verze, ne z Android Studia). Prosíme, kdo měl 2.1.0 a appka mu přestala jít spustit, ať si nainstaluje tuto verzi znovu.
 
