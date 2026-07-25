@@ -1,7 +1,9 @@
 package cz.autokolk
 
 /**
- * Body za dokončenou lekci / opakování — stejná pravidla jako v [ResultsActivity].
+ * Body za dokončenou lekci / opakování — stejná pravidla jako v legacy [cz.autokolk.autokolk.MainActivity]
+ * (krok 153: legacy ResultsActivity zrušena, výpočet bodů se dnes provádí přímo v MainActivity
+ * před přesměrováním na Compose výsledkovou obrazovku).
  */
 object LessonPoints {
 

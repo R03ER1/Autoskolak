@@ -13,7 +13,8 @@ import com.google.android.gms.ads.FullScreenContentCallback
  *  - Po každé 3. dokončené lekci ukázat reklamu.
  *  - První 3 lekce jsou bez reklam (grace window).
  *  - Rozhodnutí je jednotné pro Compose flow ([cz.autokolk.ui.screens.results.ResultsComposeScreen])
- *    i legacy Activity vrstvu ([ResultsActivity]).
+ *    i legacy [MainActivity] flow (krok 153: legacy ResultsActivity zrušena, MainActivity
+ *    přesměrovává na Compose ResultsComposeScreen).
  *  - Předpokládá se, že reklama je předem předpřipravena přes [LessonInterstitialAds.preload].
  *    Když není nachystaná v okamžiku „show", reklamu přeskočíme, ale počítadlo stejně
  *    resetujeme (nebudujeme frontu reklam do budoucna).
@@ -46,7 +47,7 @@ object InterstitialAdController {
     /**
      * Zavolej PŘESNĚ jednou po dokončení skutečné lekce (nikoli procvičování / náhodného
      * kvízu / testu). V Compose flow to dělá [cz.autokolk.ui.screens.quiz.QuizViewModel]
-     * v `completeLesson`, v legacy [MainActivity] před spuštěním [ResultsActivity].
+     * v `completeLesson`, v legacy [MainActivity] před přesměrováním na Compose výsledkovou obrazovku.
      */
     fun onLessonCompleted(context: Context) {
         val p = prefs(context)

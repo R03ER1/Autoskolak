@@ -31,34 +31,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ResultsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".StreakActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".PracticeActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".TestAttemptActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".TestAttemptStatsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".TestResultsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Autokolk.NoActionBar"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ComposeMainActivity"
             android:exported="true"
             android:launchMode="singleTop"

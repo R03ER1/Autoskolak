@@ -1296,7 +1296,7 @@ class MainActivity : AutokolkActivity() {
         testCountDownTimer = null
     }
 
-    /** Sessions that end with [ResultsActivity] interstitial — preload while user answers questions. */
+    /** Sessions that end with a results-screen interstitial — preload while user answers questions. */
     private fun shouldPreloadLessonInterstitial(): Boolean {
         if (isTestMode) return false
         if (category.isNotBlank()) return false
