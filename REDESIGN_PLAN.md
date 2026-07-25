@@ -2,8 +2,8 @@
 
 > **Verze plánu:** 1.1  
 > **Datum:** 2026-07-23 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.0.67  
-> **Postup:** **150 / 165 kroků hotových (~91 %)** — fáze 12 (zvuky + haptika) kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), zbývá dodělat zbytek fáze 13 (krok 155 styly/témata, performance/a11y, release checklist) a krok 142 (plné SRS).  
+> **Aktuální verze aplikace:** 2.1.1  
+> **Postup:** **153 / 165 kroků hotových (~93 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), kroky 160/162/163 (reduced motion, ProGuard/R8, app size) hotové. Zbývá: krok 142 (plné SRS), zbytek fáze 13 (155 styly/témata, 156–159/161 zbytek performance/a11y/tablet auditu, 165 release checklist).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
