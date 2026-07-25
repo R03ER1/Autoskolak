@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.3] - 2026-07-25
+- Oprava obrázku Alexe — po redesignu se ukazovala jen jedna (neutrální) tvář. Alex se teď zase tváří vesele nebo smutně/hladově podle toho, jak je sytý.
+
 ## [2.2.2] - 2026-07-25
 - Odstraněna přerušovaná spojka mezi lekcemi, která se při scrollování zamotávala.
 - Odstraněn přetékající text s počtem otázek u lekcí — kolečka lekcí zůstávají na svém místě.

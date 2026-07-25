@@ -24,53 +24,14 @@ object AlexAssetResolver {
     }
 
     private fun candidatePaths(mood: AlexMood, sun: Boolean): List<String> {
-        return when (mood) {
-            AlexMood.Happy ->
-                if (sun) {
-                    listOf(
-                        "CAlexCool.png",
-                        "AlexCool.png",
-                        "CAlex.png",
-                        "Alex.png",
-                    )
-                } else {
-                    listOf("Alex.png", "AlexHappy.png")
-                }
-            AlexMood.Neutral ->
-                if (sun) listOf("CAlexSad.png", "AlexSad.png")
-                else listOf("AlexSad.png")
-            AlexMood.Hungry ->
-                if (sun) {
-                    listOf(
-                        "CAlexSadC.png",
-                        "AlexSadC.png",
-                        "CAlexHungry.png",
-                        "AlexHungry.png",
-                        "CAlexSad.png",
-                        "AlexSad.png",
-                    )
-                } else {
-                    listOf(
-                        "AlexSadC.png",
-                        "AlexHungry.png",
-                        "AlexSad.png",
-                    )
-                }
-            AlexMood.Starving ->
-                if (sun) {
-                    listOf(
-                        "CAlexFamine.png",
-                        "AlexFamine.png",
-                        "CAlexHungry.png",
-                        "AlexHungry.png",
-                    )
-                } else {
-                    listOf(
-                        "AlexFamine.png",
-                        "AlexHungry.png",
-                        "AlexSad.png",
-                    )
-                }
+        // Základní obrázek podle nálady (viz historická AlexActivity.getAlexImageName).
+        // "Cool" (sluneční brýle) je samostatný vizuál napojený na coins-nákup, ne na hlad.
+        val base = when (mood) {
+            AlexMood.Happy -> "AlexHappy.png"
+            AlexMood.Neutral -> "Alex.png"
+            AlexMood.Hungry -> "AlexSad.png"
+            AlexMood.Starving -> "AlexHungry.png"
         }
+        return if (sun) listOf("C$base", base) else listOf(base)
     }
 }
