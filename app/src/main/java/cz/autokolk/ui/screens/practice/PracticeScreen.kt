@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -351,24 +352,25 @@ private fun CategoryPracticeCard(
                 }
             }
             Row(
-                Modifier.fillMaxWidth(),
+                Modifier
+                    .fillMaxWidth()
+                    // Krok 159 (touch target audit): celý řádek je klikatelný a má min. výšku
+                    // 48dp — dřív mělo aktivní plochu jen samotné ikonky (24dp).
+                    .heightIn(min = 48.dp)
+                    .clickable(onClick = onToggleExpand),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     if (expanded) "Skrýt" else "Podkategorie",
                     style = MaterialTheme.typography.labelMedium,
                     color = AccentCyan,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(onClick = onToggleExpand),
+                    modifier = Modifier.weight(1f),
                 )
                 Icon(
                     if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = null,
                     tint = AccentCyan,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable(onClick = onToggleExpand),
+                    modifier = Modifier.size(24.dp),
                 )
             }
             if (expanded) {

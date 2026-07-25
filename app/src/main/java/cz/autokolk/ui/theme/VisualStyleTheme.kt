@@ -40,8 +40,11 @@ fun colorSchemeForVisualStyle(style: GameVisualStyle, isDark: Boolean): ColorSch
         background = LightBackground,
         surface = LightSurface,
         surfaceVariant = LightSurfaceVariant,
-        onPrimary = LightSurface,
-        onSecondary = LightSurface,
+        // Krok 159 (WCAG AA audit): bílý text (LightSurface) na #00B8D4/#00BFA5 měl jen
+        // 2.3–2.4:1 kontrastu (hluboko pod 4.5:1). Tmavý text (LightTextPrimary) na stejných
+        // barvách dává 6.8–7.0:1 — barvy primary/secondary zůstávají nezměněné.
+        onPrimary = LightTextPrimary,
+        onSecondary = LightTextPrimary,
         onTertiary = LightSurface,
         onBackground = LightTextPrimary,
         onSurface = LightTextPrimary,
@@ -56,7 +59,9 @@ fun colorSchemeForVisualStyle(style: GameVisualStyle, isDark: Boolean): ColorSch
         return when (style) {
             GameVisualStyle.NEON_GRID -> lightColorScheme(
                 primary = Color(0xFF7C3AED),
-                secondary = Color(0xFF0891B2),
+                // Krok 159 (WCAG AA audit): #0891B2 s bílým textem měla jen 3.68:1. Lehce
+                // ztemněno na #07819E (stejný odstín tyrkysové) — s bílým textem 4.52:1.
+                secondary = Color(0xFF07819E),
                 tertiary = Color(0xFF4F46E5),
                 background = Color(0xFFF5F3FF),
                 surface = Color(0xFFFFFFFF),
@@ -71,7 +76,9 @@ fun colorSchemeForVisualStyle(style: GameVisualStyle, isDark: Boolean): ColorSch
                 onError = LightSurface,
             )
             GameVisualStyle.SUNSET_WARM -> lightColorScheme(
-                primary = Color(0xFFE65100),
+                // Krok 159 (WCAG AA audit): #E65100 s bílým textem měla jen 3.79:1. Lehce
+                // ztemněno na #CC4800 (stejný odstín pálené oranžové) — s bílým textem 4.67:1.
+                primary = Color(0xFFCC4800),
                 secondary = Color(0xFFFF8F00),
                 tertiary = Color(0xFFFF6D00),
                 background = Color(0xFFFFF8F0),
@@ -79,7 +86,9 @@ fun colorSchemeForVisualStyle(style: GameVisualStyle, isDark: Boolean): ColorSch
                 surfaceVariant = Color(0xFFFFE8D6),
                 onPrimary = Color.White,
                 onSecondary = Color(0xFF3E2723),
-                onTertiary = Color.White,
+                // Krok 159: bílý text na #FF6D00 měl jen 2.82:1. Tmavý text (stejný odstín
+                // jako onPrimary v tmavém režimu) dává 5.65:1 — barva tertiary je nezměněná.
+                onTertiary = Color(0xFF3E1508),
                 onBackground = LightTextPrimary,
                 onSurface = LightTextPrimary,
                 onSurfaceVariant = LightTextSecondary,

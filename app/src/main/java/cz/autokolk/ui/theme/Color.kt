@@ -24,7 +24,10 @@ val AccentGradientEnd = Color(0xFF1DE9B6)
 
 // region Semantic
 val SuccessGreen = Color(0xFF00E676)
-val ErrorRed = Color(0xFFFF1744)
+// Krok 159 (WCAG AA audit): původní #FF1744 s bílým textem měla kontrast jen 3.85:1
+// (< 4.5:1 pro běžný text). Lehce ztemněno na #ED002E (stejný odstín červené) — s bílým
+// textem/ikonami vychází kontrast 4.53:1, vizuálně jde jen o mírně sytější odstín.
+val ErrorRed = Color(0xFFED002E)
 val WarningAmber = Color(0xFFFFD600)
 val InfoBlue = Color(0xFF2196F3)
 // endregion
