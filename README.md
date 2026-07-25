@@ -26,8 +26,6 @@ Over a year of development, I leveraged AI coding assistants as a pair programme
 * **Targeted Practice (Spaced Repetition):** Automatically tracks incorrect answers and creates custom practice sessions to target the user's specific weak points.
 * **Modern UI/UX:** Fully responsive Jetpack Compose interface featuring glassmorphism elements, dynamic theming (Light/Dark mode), Lottie animations, and custom haptic feedback.
 
-*(Insert a GIF or screenshot showing the animations, virtual pet, or dark mode here)*
-
 ## 🛠 Tech Stack
 This project evolved significantly over its lifecycle, culminating in a complete migration to a modern Android architecture:
 
