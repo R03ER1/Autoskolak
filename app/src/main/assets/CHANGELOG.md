@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.6] - 2026-07-25
+- Nová chytrá revize chybných otázek — appka si teď pamatuje, kdy jsi na otázku chybovala/chyboval, a nabízí ti ji znovu k opakování v narůstajících intervalech (nejdřív brzy, pak za pár dní, pak za týden), dokud si ji nezapamatuješ.
+- Na hlavní obrazovce se objeví kartička "Čas na revizi!", pokud máš dnes nějaké otázky k opakování — jedním klikem se otevře revize.
+
 ## [2.1.5] - 2026-07-25
 - Interní úklid — odstraněno posledních 6 starých obrazovek z doby před redesignem (výsledky, streak, procvičování, test). Appka vypadá a funguje stejně, jen bez starého kódu pod kapotou.
 

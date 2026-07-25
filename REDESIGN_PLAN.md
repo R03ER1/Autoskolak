@@ -2,8 +2,8 @@
 
 > **Verze plánu:** 1.3  
 > **Datum:** 2026-07-25 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.1.5  
-> **Postup:** **161 / 165 kroků hotových (~98 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 dokončeny (odstranění posledních 6 legacy Activity — Results/Streak/Practice/TestAttempt/TestAttemptStats/TestResults — a jejich XML layoutů, s přesměrováním starých vstupních bodů do Compose, viz poznámky u kroků), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 142 (plné SRS), krok 165 (release checklist).  
+> **Aktuální verze aplikace:** 2.1.6  
+> **Postup:** **162 / 165 kroků hotových (~98 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 dokončeny (odstranění posledních 6 legacy Activity — Results/Streak/Practice/TestAttempt/TestAttemptStats/TestResults — a jejich XML layoutů, s přesměrováním starých vstupních bodů do Compose, viz poznámky u kroků), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové, krok 142 (spaced repetition pro revizi chyb) hotov — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 165 (release checklist).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -171,7 +171,7 @@
 | 139 | Dvojitý XP boost (reklama, 30 min) | 11 | ✅ |
 | 140 | Týdenní souhrn (in-app přehled + push) | 11 | ✅ |
 | 141 | Milestones / odznaky na lesson path (po sekcích) | 11 | ✅ |
-| 142 | Revize — spaced repetition (chybné otázky) | 11 | ⬜ (pouze oprava textu v Nastavení, plné SRS odloženo) |
+| 142 | Revize — spaced repetition (chybné otázky) | 11 | ✅ |
 | 143 | Social sharing — obrázek (streak / výsledek) | 11 | ✅ |
 | 144 | Widget (home screen — streak, denní výzvy) | 11 | ✅ |
 | 145 | Zvukové soubory | 12 | ✅ |
@@ -4006,14 +4006,32 @@ Tyto kroky zahrnují:
 
 ---
 
-### Krok 142 — Revize — spaced repetition (chybné otázky)
+### Krok 142 — Revize — spaced repetition (chybné otázky) ✅
 
-**Soubory:** `ReviseMistakesScreen`, `LessonProgress`, případně fronta otázek
+**Soubory:** `MistakeReviewScheduler` (nový, čistě funkční), `LessonProgress`, `ReviseMistakesScreen`,
+`PracticeQuestionList`, `HomeViewModel`/`HomeScreen`, `ReviewReminderCard` (nový)
 
-1. Nad rámec „procvič chyby“: intervalové opakování (např. 1 d / 3 d / 7 d) podle omylů.
-2. Notifikace nebo připomínka v Home („dnes reviduj 5 otázek“).
+1. ✅ Nad rámec „procvič chyby“: jednoduchý Leitner-like rozvrh intervalů (1 d / 3 d / 7 d), NE plný
+   SM-2. Správná odpověď na chybnou otázku posune „stage“ nahoru (delší interval); špatná odpověď
+   vrátí na stage 0 (okamžitě znovu k dispozici). Po 3 úspěšných opakováních v řadě je otázka
+   „graduated“ a mizí ze seznamu k revizi.
+2. ✅ Připomínka na Home: nová `ReviewReminderCard` (glass card v stylu ostatních karet na path) —
+   zobrazí se jen když je dnes k dispozici ≥ 1 otázka k revizi („Dnes máš N otázek k opakování“),
+   klik otevře `ReviseMistakesScreen`. Bez due otázek se karta nevykresluje (žádný prázdný stav).
+3. ✅ Zpětná kompatibilita: nový rozvrh je persistovaný v samostatném, čistě přídavném klíči
+   (`mistake_review_schedule_v1`, stejný Gson JSON vzor jako `mistake_consecutive_wrong`) —
+   existující `mistake_consecutive_wrong`/`practice_store` zůstávají beze změny. Chybějící
+   záznam (staré uložené progressy uživatelů) se bezpečně interpretuje jako „stage 0 / okamžitě
+   k dispozici“ — ověřeno unit testem deserializace legacy JSON bez nových polí.
+4. ✅ Unit testy (`MistakeReviewSchedulerTest`) pro posun stage/intervaly, graduaci a migraci.
 
 **Výstup:** Delší zapamatování než jednorázové procvičení.
+
+**Otevřená otázka (poznámka pro budoucí úpravu, neblokující):** stage se posouvá při jakékoli
+správné odpovědi na otázku, která byla mistake — kdekoli v appce (lekce, test, procvičování),
+ne jen v `ReviseMistakesScreen`. To je konzistentní s původním chováním (i dřív stačila jedna
+správná odpověď kdekoli, aby otázka zmizela ze seznamu chyb), ale pokud by bylo v budoucnu žádoucí,
+aby se žebříček posouval jen při odpovídání přímo v revizní obrazovce, je to samostatná úprava.
 
 ---
 

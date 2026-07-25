@@ -7,6 +7,18 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.6] - 2026-07-25
+- **Krok 142 dokončen — spaced repetition pro revizi chybných otázek** (`REDESIGN_PLAN.md`):
+  - Nový čistě funkční `MistakeReviewScheduler` (bez Android/Context závislostí) — jednoduchý Leitner-like rozvrh, ne plný SM-2: intervaly 1 den / 3 dny / 7 dní; po 3 úspěšných opakováních v řadě je otázka „graduated" a mizí ze seznamu k revizi. Špatná odpověď vrátí otázku na stage 0 (okamžitě znovu k dispozici).
+  - `LessonProgress`: nová čistě přídavná perzistentní vrstva `mistake_review_schedule_v1` (Gson JSON, stejný vzor jako existující `mistake_consecutive_wrong`/`practice_store`) mapující ID otázky → `ReviewScheduleEntry(stage, nextReviewAtMs)`. Existující logika (`mistake_consecutive_wrong` streak, `practice_store`) se nemění — nový rozvrh je jen navrstvená vrstva navíc, takže staré uložené progressy uživatelů se načtou bezpečně (chybějící klíč/pole = stage 0 / okamžitě k dispozici, žádná breaking migrace).
+  - `getPracticeStatus(CATEGORY_USER_MISTAKES)` rozšířeno: otázky rozjeté v žebříčku (poslední odpověď správná, ale čekají na další interval) zůstávají v „wrong" množině, dokud nevyprší celý rozvrh (graduace) nebo dokud nejsou znovu odpovězeny špatně.
+  - Nová `getDueUserMistakeIds()`/`getDueUserMistakeCount()` — podmnožina chyb naplánovaná k revizi dnes/dříve.
+  - `ReviseMistakesScreen` a `PracticeQuestionList.buildUserMistakesList` upraveny, aby nabízely jen otázky, které jsou dnes „due" — ne celý pool chybných otázek najednou.
+  - Home: nová `ReviewReminderCard` (glass card ve stylu ostatních karet) — zobrazí se jen když je alespoň 1 otázka due ("Dnes máš N otázek k opakování"), klik otevře `ReviseMistakesScreen`. Bez due otázek se karta nevykresluje (žádný prázdný stav).
+  - Přidány unit testy (`MistakeReviewSchedulerTest`) pro posun stage, graduaci a bezpečnou deserializaci legacy dat bez nového pole.
+  - **Otevřená otázka:** stage se posouvá při KTERÉKOLI správné odpovědi na otázku, která byla mistake (kdekoli v appce, ne jen v revizní obrazovce) — konzistentní s tím, že i dřívější "jedna správná odpověď = zmizí z chyb" fungovalo napříč celou appkou; pokud by bylo žádoucí, aby postup v žebříčku probíhal jen při odpovídání v `ReviseMistakesScreen`, je to změna k dalšímu zvážení.
+- Verze bumpnuta na 2.1.6 (`versionCode` 68).
+
 ## [2.1.5] - 2026-07-25
 - **Kroky 153+154 dokončeny** — odstranění posledních legacy Activity a jejich XML layoutů (`REDESIGN_PLAN.md`):
   - Smazáno 6 legacy Activity: `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity`, `TestResultsActivity`. Statickou analýzou ověřeno, že tvořily uzavřený graf odkazující jen na sebe navzájem a na `HomeActivity`/`MainActivity` (ty zůstávají, dle dřívějšího rozhodnutí, jako fallback pro staré externí vstupní body — `HomeActivity` je jediná `exported="true"` legacy Activity a cíl notifikace z `HeartRefillJobService`).
