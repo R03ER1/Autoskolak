@@ -110,6 +110,7 @@ fun AlexScreen(
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val moodTint = remember(state.mood, onSurfaceColor) {
         when (state.mood) {
+            AlexMood.Cool -> Color.Transparent
             AlexMood.Happy -> Color.Transparent
             AlexMood.Neutral -> onSurfaceColor.copy(alpha = 0.08f)
             AlexMood.Hungry -> WarningAmber.copy(alpha = 0.08f)

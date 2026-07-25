@@ -2,6 +2,8 @@ package cz.autokolk.ui.screens.alex
 
 /** Nálada podle REDESIGN (krok 95), odvozena od sytosti 0–100. */
 enum class AlexMood {
+    /** Nejvyšší stupeň radosti (historicky hunger 81–100 % → `AlexCool.png`). */
+    Cool,
     Happy,
     Neutral,
     Hungry,
@@ -9,6 +11,7 @@ enum class AlexMood {
 }
 
 fun hungerPercentToMood(percent: Int): AlexMood = when {
+    percent >= 81 -> AlexMood.Cool
     percent >= 80 -> AlexMood.Happy
     percent >= 50 -> AlexMood.Neutral
     percent >= 20 -> AlexMood.Hungry
@@ -16,6 +19,7 @@ fun hungerPercentToMood(percent: Int): AlexMood = when {
 }
 
 fun moodTitle(mood: AlexMood): String = when (mood) {
+    AlexMood.Cool -> "Naprosto spokojený lev"
     AlexMood.Happy -> "Spokojený lev"
     AlexMood.Neutral -> "Lev v pohodě"
     AlexMood.Hungry -> "Hladový lev"

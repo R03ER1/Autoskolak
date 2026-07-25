@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.4] - 2026-07-25
+- Doplněn 5. nejvyšší stupeň nálady Alexe — při plné (81–100 %) sytosti se teď zobrazuje speciální nejveselejší obrázek.
+
 ## [2.2.3] - 2026-07-25
 - Oprava obrázku Alexe — po redesignu se ukazovala jen jedna (neutrální) tvář. Alex se teď zase tváří vesele nebo smutně/hladově podle toho, jak je sytý.
 

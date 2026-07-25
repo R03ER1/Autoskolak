@@ -27,6 +27,7 @@ object AlexAssetResolver {
         // Základní obrázek podle nálady (viz historická AlexActivity.getAlexImageName).
         // "Cool" (sluneční brýle) je samostatný vizuál napojený na coins-nákup, ne na hlad.
         val base = when (mood) {
+            AlexMood.Cool -> "AlexCool.png"
             AlexMood.Happy -> "AlexHappy.png"
             AlexMood.Neutral -> "Alex.png"
             AlexMood.Hungry -> "AlexSad.png"

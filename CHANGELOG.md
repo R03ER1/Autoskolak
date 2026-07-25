@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.4] - 2026-07-25
+- Fix (upřesnění): doplněn chybějící 5. stupeň nálady `AlexMood.Cool` (maximální radost, historicky sytost 81–100 %), který se v `AlexAssetResolver.kt` mapuje na `AlexCool.png`. Předchozí oprava (2.2.3) omylem považovala "cool" obrázky jen za placenou sluneční-brýlovou variantu — ve skutečnosti je `AlexCool.png` nejvyšší nálada v hunger-based mapování, zatímco `C`-prefix soubory (`CAlex*.png`) jsou skutečná placená varianta se slunečními brýlemi a jejich fallback logika zůstává nezměněná/nezávislá.
+- `hungerPercentToMood` nyní vrací: `Cool` (81–100 %), `Happy` (80 %), `Neutral` (50–79 %), `Hungry` (20–49 %), `Starving` (0–19 %) — pouze doplnění nejvyššího pásma, ostatní hranice beze změny.
+
 ## [2.2.3] - 2026-07-25
 - Fix: obrázek Alexe na Alex stránce se opět mění podle sytosti (hladu), jako před redesignem. V `AlexAssetResolver.kt` byly seznamy kandidátních souborů pro nálady popletené — pro `Happy` byl na první místě vždy existující `Alex.png` (takže se nikdy nezobrazil `AlexHappy.png`) a pro `Neutral` se místo neutrálního obrázku vracel `AlexSad.png`. Mapování nyní odpovídá historické logice (`AlexActivity.getAlexImageName`): `Happy → AlexHappy.png`, `Neutral → Alex.png`, `Hungry → AlexSad.png`, `Starving → AlexHungry.png`.
 - Obrázky s "cool" (sluneční brýle za coins) zůstávají samostatné a nejsou součástí hunger mapování — jen se jako dřív prefixují `C` variantou, pokud jsou brýle zapnuté.
