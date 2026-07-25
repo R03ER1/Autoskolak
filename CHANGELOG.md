@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.1] - 2026-07-25
+- **Kritická oprava pádu release buildu při startu** (appka po dokončení lekce spadla a nešla už nikdy znovu spustit). Root cause: ProGuard/R8 pravidlo z 2.0.70/2.1.0 pro Gson modely (`Question`, `LessonProgress.LessonStateJson`, `LessonProgress.PracticeStore`) používalo `-keepclassmembers`, což chrání jen pole tříd, ale nechrání identitu/strukturu samotné třídy. Protože tyto třídy jsou vytvářeny čistě reflexí (Gson `TypeToken`, žádné přímé `new` volání v kódu), R8 je vyhodnotil jako bezpečné ke sloučení s jinou třídou (class merging) — Gson pak při deserializaci uloženého progresu vrátil objekt jiného runtime typu než očekávaný, což skončilo `ClassCastException` hned v konstruktoru `HomeViewModel`. Oprava: pravidla přepsána na `-keep class ... { *; }`, což zachovává plnou identitu tříd a zabraňuje jejich sloučení/odstranění. Ověřeno v `mapping.txt` po `assembleRelease` — všechny tři třídy i anonymní `TypeToken` podtřídy si zachovávají původní název/identitu.
+
 ## [2.1.0] - 2026-07-25
 - Stabilní milník pro externí testování (kamarádi). Shrnuje a uzavírá sérii oprav a vylepšení 2.0.64–2.0.71: legacy cleanup, odznaky/milníky na cestě lekcí, sdílení PNG karty, shared element transition (lekce → kvíz), plošná oprava světlého/tmavého režimu, perf/accessibility audit (reduced motion, battery saver, TalkBack popisky), ProGuard/R8 + zmenšení velikosti aplikace a oprava úklidu videa v kvízu (odstranění rušivých logcat hlášek).
 

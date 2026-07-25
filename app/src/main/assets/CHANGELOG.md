@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.1] - 2026-07-25
+- Opravena vážná chyba, kvůli které appka po dokončení lekce spadla a nešla znovu spustit (týkalo se jen instalace z release verze, ne z Android Studia). Prosíme, kdo měl 2.1.0 a appka mu přestala jít spustit, ať si nainstaluje tuto verzi znovu.
+
 ## [2.1.0] - 2026-07-25
 - Stabilní verze pro testování — shrnuje poslední dávku vylepšení: opravu světlého/tmavého režimu, odznaky za dokončené sekce, plynulý přechod z lekce do kvízu, sdílení výsledků jako obrázek, lepší podporu pro čtečky obrazovky a šetřicí režim baterie, menší velikost aplikace a opravu drobné chyby při přehrávání videí v kvízu.
 

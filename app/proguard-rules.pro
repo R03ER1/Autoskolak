@@ -27,18 +27,16 @@
 -keep class * extends com.google.gson.reflect.TypeToken
 
 # Gson-reflected model classes (krok 162): žádná z nich používá @SerializedName, takže
-# Gson mapuje JSON klíče na názvy polí za běhu. Bez těchto pravidel by R8 tyto názvy
-# přejmenoval/odstranil a existující uložený JSON (progres, practice store) by po
-# aktualizaci s minifyEnabled=true přestal jít načíst.
--keepclassmembers class cz.autokolk.Question {
-    <fields>;
-}
--keepclassmembers class cz.autokolk.LessonProgress$LessonStateJson {
-    <fields>;
-}
--keepclassmembers class cz.autokolk.LessonProgress$PracticeStore {
-    <fields>;
-}
+# Gson mapuje JSON klíče na názvy polí za běhu a instance vznikají čistě reflexí
+# (TypeToken + UnsafeAllocator), bez jediného přímého "new" volání v kódu. Proto NESTAČÍ
+# "-keepclassmembers" (ten chrání jen pole/metody, POKUD třída už přežije shrinking z
+# jiného důvodu) — R8 takové "jen reflexí používané" třídy vyhodnotí jako bezpečné ke
+# class-mergingu/odstranění, Gson pak vrátí objekt jiného runtime typu a appka spadne
+# s ClassCastException hned při startu (viz 2.1.0 → hotfix). Musí být "-keep class",
+# které navíc zachová identitu/strukturu celé třídy a zabrání jejímu sloučení s jinou.
+-keep class cz.autokolk.Question { *; }
+-keep class cz.autokolk.LessonProgress$LessonStateJson { *; }
+-keep class cz.autokolk.LessonProgress$PracticeStore { *; }
 
 # Play Feature Delivery / Split Install
 -keep class com.google.android.play.core.splitinstall.** { *; }
