@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.4] - 2026-07-25
+- Vylepšený kontrast textu a ikon (žlutá/zlatá a modrotyrkysová barva) ve světlém režimu na několika obrazovkách — text je teď lépe čitelný na bílém pozadí.
+
 ## [2.1.3] - 2026-07-25
 - Interní úklid — odstranění starých nepoužívaných stylů, barev a rozměrů z dob před redesignem. Bez viditelných změn v appce.
 

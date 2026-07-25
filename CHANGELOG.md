@@ -7,6 +7,12 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.4] - 2026-07-25
+- **Krok 159 dořešení (otevřené zjištění z 2.1.2):** cca 30 míst v Compose kódu používalo `AccentCyan`/`WarningAmber` natvrdo jako barvu textu nebo informační ikony (ne přes `MaterialTheme.colorScheme`), přestože composable sedí na theme-aware (přepínajícím se light/dark) pozadí. Ve světlém režimu měly tyto jasné barvy na bílém/světlém pozadí kontrast jen ~1.4–1.5:1 (hluboko pod WCAG AA 4.5:1). Přidány zatemněné, stejně sladěné varianty `accentCyanText()`/`warningAmberText()` (`ui/theme/Color.kt`, `AccentCyanText` `#00728A`, `WarningAmberText` `#7F6B00`) — v tmavém režimu se stále používá původní jasná barva (tam je kontrast > 10:1). Opraveno v `ChangelogScreen`, `SettingsScreen`/`SettingsWidgets`, `StreakScreen`, `TopBar`, `BottomNavBar`, `QuizScreen`/`QuizTopBar`/`TestQuizSession`, `ResultsComposeScreen`, `AlexScreen`, `OnboardingScreen`, `AchievementsScreen`, `WeeklyXpScreen`, `PracticeScreen`.
+- Beze změny (ověřeno, že kontrast je v pořádku i s původními barvami): čistě dekorativní použití (gradient/border/glow/pozadí/výplň progress baru) a místa s pevně tmavým pozadím bez ohledu na zvolený režim (`BonusWheelDialog`, `MysteryBoxDialog`, `CoinsSheet`, `StreakSheet`, `SplashScreen`, achievement/level-up/streak/event overlaye, `ShareCardGenerator`).
+- **Otevřená otázka (neřešeno v této dávce):** barva palce/dráhy přepínače (`Switch`) v `SettingsWidgets.SwitchSetting` používá `AccentCyan` natvrdo — jde o ovládací prvek, ne o text/ikonu s popiskem, proto ponecháno k samostatnému posouzení.
+- Verze bumpnuta na 2.1.4 (`versionCode` 66).
+
 ## [2.1.3] - 2026-07-25
 - **Krok 155 dokončen** — odstranění mrtvých legacy XML stylů/témat (`REDESIGN_PLAN.md`):
   - Smazány prokazatelně nepoužívané styly z `res/values/styles.xml`: `Widget.Autokolk` (prázdný base styl beze zbytku), `Widget.Autokolk.BottomNav.TransparentIndicator`, `Widget.Autokolk.Popup` a `Widget.Autokolk.Popup.Animation` — nikde v projektu (layouty, manifest, Kotlin kód) na ně nevedla žádná reference.
