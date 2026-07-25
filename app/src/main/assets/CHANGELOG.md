@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.3] - 2026-07-25
+- Interní úklid — odstranění starých nepoužívaných stylů, barev a rozměrů z dob před redesignem. Bez viditelných změn v appce.
+
 ## [2.1.2] - 2026-07-25
 - Plynulejší animace a rychlejší načítání obrázků — jemné "shimmer" efekty a obrázky lekcí se teď chytřeji přizpůsobují výkonu telefonu a šetřicímu režimu baterie.
 - Lepší kontrast barev v některých tlačítkách a odznacích pro snazší čtení textu.

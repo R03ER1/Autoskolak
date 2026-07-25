@@ -7,6 +7,14 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.3] - 2026-07-25
+- **Krok 155 dokončen** — odstranění mrtvých legacy XML stylů/témat (`REDESIGN_PLAN.md`):
+  - Smazány prokazatelně nepoužívané styly z `res/values/styles.xml`: `Widget.Autokolk` (prázdný base styl beze zbytku), `Widget.Autokolk.BottomNav.TransparentIndicator`, `Widget.Autokolk.Popup` a `Widget.Autokolk.Popup.Animation` — nikde v projektu (layouty, manifest, Kotlin kód) na ně nevedla žádná reference.
+  - Smazány mrtvé barvy z `res/values/colors.xml`: `progress_track`, `progress_indicator`, `switch_thumb_on`, `switch_track_on` — nikde nepoužité.
+  - Smazán `res/values/dimens.xml` (obsahoval jen `button_margin` a `button_stroke_width`, oba nepoužité, soubor by po odstranění zůstal prázdný).
+  - Zachovány (stále aktivně používané legacy Activity/layouty — `HomeActivity`, `MainActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity` a `activity_settings.xml`): `Theme.Autokolk`/`Theme.Autokolk.Base`/`Theme.Autokolk.NoActionBar`, `Widget.Autokolk.Button`, `Widget.Autokolk.Button.Answer`, `Widget.Autokolk.Button.Primary`, `Widget.Autokolk.BottomNav.ActiveIndicator`, `TextAppearance.Autokolk.BottomNav.Large`, `ThemeOverlay.Autokolk.SwitchNeutral`.
+- Verze bumpnuta na 2.1.3 (`versionCode` 65).
+
 ## [2.1.2] - 2026-07-25
 - **Fáze 13 dokončena (kroky 156, 157, 158, 159, 161)** — zbytek performance/accessibility/tablet auditu z `REDESIGN_PLAN.md`:
   - **Krok 156 (recomposition audit):** projity klíčové obrazovky (Home, Alex, Test, Practice, Settings, Quiz) — LazyColumn/LazyRow položky už všude mají `key()`, datové třídy v listech jsou immutable/stabilní. Nalezena a opravena jedna zbytečná recompozice: `buildLessonTitle` (filter/sortedBy nad celým lesson plánem) v `HomeScreen` se teď počítá jen v `remember(lessonNumber, displayNumber)`, ne při každé recompozici obrazovky s otevřeným lesson sheetem. Systematické měření recomposition counts přes Layout Inspector zůstává **known limitation** — vyžaduje běžící zařízení/emulátor, které v headless prostředí nejde spustit.
