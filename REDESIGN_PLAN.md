@@ -1,9 +1,9 @@
 # Autoškolák — Kompletní redesign plán
 
-> **Verze plánu:** 1.2  
+> **Verze plánu:** 1.3  
 > **Datum:** 2026-07-25 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.1.3  
-> **Postup:** **159 / 165 kroků hotových (~96 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 142 (plné SRS), krok 165 (release checklist).  
+> **Aktuální verze aplikace:** 2.1.5  
+> **Postup:** **161 / 165 kroků hotových (~98 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 dokončeny (odstranění posledních 6 legacy Activity — Results/Streak/Practice/TestAttempt/TestAttemptStats/TestResults — a jejich XML layoutů, s přesměrováním starých vstupních bodů do Compose, viz poznámky u kroků), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 142 (plné SRS), krok 165 (release checklist).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -182,8 +182,8 @@
 | 150 | Integrace zvuků do navigace | 12 | ✅ |
 | 151 | Settings: zvuky a vibrace toggle | 12 | ✅ |
 | 152 | Testování zvuků a haptic feedback | 12 | ✅ |
-| 153 | Odstranění starých Activity souborů | 13 | ⬜ |
-| 154 | Odstranění starých XML layoutů | 13 | ⬜ |
+| 153 | Odstranění starých Activity souborů | 13 | ✅ |
+| 154 | Odstranění starých XML layoutů | 13 | ✅ |
 | 155 | Odstranění starých stylů a témat | 13 | ✅ (smazán jen prokazatelně mrtvý kód — `Widget.Autokolk`, `...BottomNav.TransparentIndicator`, `...Popup(.Animation)`, mrtvé barvy `progress_track`/`progress_indicator`/`switch_thumb_on`/`switch_track_on`, prázdný `dimens.xml`; zbylé `Theme.Autokolk.*`/`Widget.Autokolk.Button*`/`ThemeOverlay.Autokolk.SwitchNeutral` zůstávají, protože je stále referencují aktivní legacy Activity a `activity_settings.xml`) |
 | 156 | Performance audit — recomposition | 13 | ✅ (statický audit + oprava hotová; runtime Layout Inspector měření vyžaduje fyzické zařízení, mimo headless prostředí) |
 | 157 | Performance audit — animace | 13 | ✅ (shimmer animace nyní respektuje low-perf/reduced-motion; reálné FPS profilování vyžaduje fyzické zařízení) |
@@ -4202,8 +4202,14 @@ Tyto kroky zahrnují:
 **Výstup:** Čistý single-activity Compose codebase.
 
 > **Stav (2.0.66, částečně hotovo):** `AlexActivity`, `SettingsActivity`, `AchievementsActivity`, `ChangelogActivity`, `ReadingLessonActivity`, `AlexDeathActivity`, `AlexPageOneFragment`, `AlexPageTwoFragment`, `AlexPagerAdapter` už neexistovaly (smazány v dřívější fázi). V této dávce navíc smazána `LoadingActivity.kt` (nikde spouštěná, nahrazena `ComposeMainActivity` launcherem) a `CurvyPathView.kt` (mrtvá, nepoužívaná).
-> **Explicitně zůstává** (ověřeno `rg` — smazání by rozbilo build): `MainActivity`, `HomeActivity` (fallback pro staré deep linky, dle požadavku), a transitivně i `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity`, `TestResultsActivity`, `AutokolkActivity` (abstraktní báze) — všechny jsou aktivně volané z `HomeActivity`/`MainActivity` bottom nav / lesson flow. Stejně zůstává `EventStyleOverlay.kt`, `ConfettiView.kt`, `ScoresChartView.kt`, `RingProgressDrawable.kt` (používá je legacy Activity vrstva). `CustomMediaController.kt` už neexistoval.
 > Compose `EventOverlay.kt` (`RandomEventOverlay`) byl refaktorován na `ConfettiOverlay` namísto legacy `ConfettiView` + `AndroidView`.
+>
+> **✅ Dokončeno (2.1.5):** Statická analýza potvrdila, že `ResultsActivity`, `StreakActivity`, `PracticeActivity`, `TestAttemptActivity`, `TestAttemptStatsActivity`, `TestResultsActivity` tvořily uzavřený graf odkazující jen na sebe navzájem a na `HomeActivity`/`MainActivity`. Řešení:
+> - Přidána Compose fallback navigace v `ComposeNavIntent`/`AutokolkApp`/`ComposeMainActivity`: `OPEN_TAB_PRACTICE`, `OPEN_TAB_TEST`, `OPEN_TAB_STREAK` (jednoduché přesměrování na tab/modal) a `OPEN_RESULTS` (nese reálné parametry skóre/lekce/bodů a otevře `ResultsComposeScreen` se stejnými daty jako dřív legacy `ResultsActivity`).
+> - `HomeActivity` (bottom nav „Procvičování"/„Test") a `MainActivity` (dokončení lekce/testu, first-of-day streak) upraveny, aby místo spouštění smazaných Activit přesměrovaly přes `ComposeMainActivity` + tato nová extra. Body za lekci se teď počítají přímo v `MainActivity` (`LessonPoints.computeLessonPointsAwarded`, stejný vzorec jako dřív v `ResultsActivity`).
+> - Smazáno všech 6 Activity + mrtvá `ScoresChartView.kt` (vázaná jen na zrušenou `TestAttemptStatsActivity`). `ConfettiView.kt`/`RingProgressDrawable.kt` **zůstávají** — aktivně je používá `HomeActivity` (ring progress) a `EventStyleOverlay` (náhodné události), nejsou vázané výhradně na smazané Activity.
+> - `MainActivity`, `HomeActivity`, `AutokolkActivity` (abstraktní báze) **zůstávají** — `HomeActivity` je jediná `exported="true"` legacy Activity a cíl `PendingIntent` notifikace z `HeartRefillJobService` (fallback pro staré instalace); `MainActivity` je stále legacy quiz engine spouštěný z `HomeActivity`.
+> - **Otevřená otázka:** legacy test-mode a practice-category větve uvnitř `MainActivity` jsou po této změně nedosažitelné (nic už nenastaví `EXTRA_IS_TEST_MODE=true` ani neprázdné `EXTRA_CATEGORY`, protože jediní volající — `TestAttemptActivity`/`PracticeActivity` — byli smazáni). Ponechány jako neaktivní kód s komentářem místo agresivního mazání, aby zásah do 1300řádkového `MainActivity.kt` zůstal minimální a nízkorizikový.
 
 ---
 
@@ -4217,7 +4223,9 @@ Tyto kroky zahrnují:
 **Výstup:** Žádné legacy XML layouty.
 
 > **Stav (2.0.66, částečně hotovo):** Smazáno 14 osiřelých layoutů (`activity_loading.xml`, `curvy_lesson_path.xml`, `item_lesson_curvy.xml`, `activity_achievements.xml`, `activity_alex.xml`, `activity_alex_death.xml`, `activity_changelog.xml`, `fragment_alex_page_one.xml`, `fragment_alex_page_two.xml`, `fragment_alex_shop_sunglasses.xml`, `item_category_header.xml`, `item_info_button.xml`, `item_subcategory_header.xml`, `view_hunger_overlay.xml`) — žádný nebyl odkazován z `R.layout.*` v kódu.
-> **Zůstává** (aktivně používáno zbývajícími legacy Activity, `widget_streak.xml` a `activity_settings.xml` dle explicitního požadavku): `activity_main.xml`, `activity_home.xml`, `activity_results.xml`, `activity_streak.xml`, `activity_practice.xml`, `activity_test_attempt.xml`, `activity_test_stats.xml`, `activity_test_results.xml`, `activity_blank_page.xml`, `item_lesson.xml`, `item_test_detail.xml`, `popup_lesson_info.xml`, `streak_bottom_sheet.xml`, `dialog_test_details.xml`, `coin_popup.xml`, `view_event_overlay.xml`, `view_tutorial_overlay.xml`, `widget_streak.xml`, `activity_settings.xml`.
+>
+> **✅ Dokončeno (2.1.5):** Smazáno dalších 9 XML layoutů vázaných výhradně na 6 legacy Activity zrušených v kroku 153: `activity_results.xml`, `activity_streak.xml`, `activity_practice.xml`, `activity_test_attempt.xml`, `activity_test_stats.xml`, `activity_test_results.xml`, `activity_blank_page.xml`, `dialog_test_details.xml`, `item_test_detail.xml`.
+> **Zůstává** (aktivně používáno `MainActivity`/`HomeActivity`, `widget_streak.xml` a `activity_settings.xml` dle explicitního požadavku): `activity_main.xml`, `activity_home.xml`, `item_lesson.xml`, `popup_lesson_info.xml`, `streak_bottom_sheet.xml`, `coin_popup.xml`, `view_event_overlay.xml`, `view_tutorial_overlay.xml`, `widget_streak.xml`, `activity_settings.xml`.
 
 ---
 

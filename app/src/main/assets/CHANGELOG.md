@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.1.5] - 2026-07-25
+- Interní úklid — odstraněno posledních 6 starých obrazovek z doby před redesignem (výsledky, streak, procvičování, test). Appka vypadá a funguje stejně, jen bez starého kódu pod kapotou.
+
 ## [2.1.4] - 2026-07-25
 - Vylepšený kontrast textu a ikon (žlutá/zlatá a modrotyrkysová barva) ve světlém režimu na několika obrazovkách — text je teď lépe čitelný na bílém pozadí.
 
