@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.5] - 2026-07-25
+- Doplněny chybějící vizuály na 3 obrazovkách: úvodní stránky onboardingu (`OnboardingScreen.kt`) měly u prvních 4 kroků reálně prázdné lottie soubory (`onboarding_welcome.json`, `onboarding_alex.json`, `onboarding_points.json`, `onboarding_test.json` — placeholdery bez vrstev) a zobrazovalo se jen prázdné místo. Nově se v takovém případě zobrazí statická náhrada — bílá Material ikona na barevném gradientovém kruhu (stejný styl jako `SectionMilestoneBadge`/ikony lekcí), pro stránku o Alexovi existující bitmapa lva (`AlexHappy.png`).
+- `TestScreen.kt` a `TestStatsScreen.kt`: prázdný stav grafu skóre (dokud uživatel nemá žádný pokus o zkoušku) měl jen jednořádkový text a velký prázdný prostor po grafu — nahrazeno ikonou grafu (`Icons.Filled.BarChart`) v gradientovém kruhu nad textem (`EmptyScoresChartPlaceholder` v `ScoresChart.kt`).
+- Načítací (splash) obrazovka (`SplashScreen.kt`) — nahrazena stejná prázdná lottie animace za logo aplikace: vektor `ic_launcher_foreground` (reálná ikona appky) na gradientovém kruhu.
+
 ## [2.2.4] - 2026-07-25
 - Fix (upřesnění): doplněn chybějící 5. stupeň nálady `AlexMood.Cool` (maximální radost, historicky sytost 81–100 %), který se v `AlexAssetResolver.kt` mapuje na `AlexCool.png`. Předchozí oprava (2.2.3) omylem považovala "cool" obrázky jen za placenou sluneční-brýlovou variantu — ve skutečnosti je `AlexCool.png` nejvyšší nálada v hunger-based mapování, zatímco `C`-prefix soubory (`CAlex*.png`) jsou skutečná placená varianta se slunečními brýlemi a jejich fallback logika zůstává nezměněná/nezávislá.
 - `hungerPercentToMood` nyní vrací: `Cool` (81–100 %), `Happy` (80 %), `Neutral` (50–79 %), `Hungry` (20–49 %), `Starving` (0–19 %) — pouze doplnění nejvyššího pásma, ostatní hranice beze změny.

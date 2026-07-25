@@ -1,7 +1,12 @@
 package cz.autokolk.ui.screens.onboarding
 
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FactCheck
+import androidx.compose.material.icons.filled.DirectionsCarFilled
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import cz.autokolk.ui.theme.AccentBlue
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
@@ -13,6 +18,12 @@ sealed class OnboardingStep {
         val description: String,
         val lottieAssetPath: String,
         val accentColor: Color,
+        /**
+         * Statická náhrada za lottie animaci, použije se, pokud je [lottieAssetPath]
+         * (ještě) jen prázdný placeholder bez vrstev — viz `OnboardingInfoPage`.
+         * `null` pro stránku s Alexem, kde se místo ikony ukáže bitmapa lva.
+         */
+        val fallbackIcon: ImageVector? = null,
     ) : OnboardingStep()
 
     data object DailyGoalPage : OnboardingStep()
@@ -28,6 +39,7 @@ fun buildOnboardingSteps(): List<OnboardingStep> = buildList {
             description = "Připrav se na zkoušku hravě a rychle.",
             lottieAssetPath = "lottie/onboarding_welcome.json",
             accentColor = AccentCyan,
+            fallbackIcon = Icons.Filled.DirectionsCarFilled,
         ),
     )
     add(
@@ -36,6 +48,7 @@ fun buildOnboardingSteps(): List<OnboardingStep> = buildList {
             description = "Tvůj lev, který potřebuje tvoji pomoc. Uč se a nakrm ho!",
             lottieAssetPath = "lottie/onboarding_alex.json",
             accentColor = AccentTeal,
+            fallbackIcon = null,
         ),
     )
     add(
@@ -44,6 +57,7 @@ fun buildOnboardingSteps(): List<OnboardingStep> = buildList {
             description = "Za každou lekci získáš body a prodloužíš svůj streak.",
             lottieAssetPath = "lottie/onboarding_points.json",
             accentColor = WarningAmber,
+            fallbackIcon = Icons.Filled.EmojiEvents,
         ),
     )
     add(
@@ -52,6 +66,7 @@ fun buildOnboardingSteps(): List<OnboardingStep> = buildList {
             description = "Až budeš připraven, vyzkoušej si ostrý test.",
             lottieAssetPath = "lottie/onboarding_test.json",
             accentColor = AccentBlue,
+            fallbackIcon = Icons.AutoMirrored.Filled.FactCheck,
         ),
     )
     add(OnboardingStep.DailyGoalPage)

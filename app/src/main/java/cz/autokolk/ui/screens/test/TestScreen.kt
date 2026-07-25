@@ -121,10 +121,8 @@ fun TestScreen(navController: NavHostController) {
                     )
                     Spacer(Modifier.height(8.dp))
                     if (chartScores.isEmpty()) {
-                        Text(
-                            text = "Zatím žádné pokusy — spusť první zkoušku.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        EmptyScoresChartPlaceholder(
+                            message = "Zatím žádné pokusy — spusť první zkoušku.",
                         )
                     } else {
                         ScoresChart(scores = chartScores, threshold = 43, maxPoints = 50)

@@ -72,11 +72,7 @@ fun TestStatsScreen(navController: NavHostController) {
             )
             Spacer(Modifier.height(8.dp))
             if (chartScores.isEmpty()) {
-                Text(
-                    text = "Zatím žádná data.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                EmptyScoresChartPlaceholder(message = "Zatím žádná data.")
             } else {
                 ScoresChart(scores = chartScores, threshold = 43, maxPoints = 50)
             }

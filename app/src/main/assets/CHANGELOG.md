@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.5] - 2026-07-25
+- Doplněny chybějící obrázky na 3 místech: úvodní stránky onboardingu (přivítání, Alex, body, zkouška) teď mají viditelnou ikonu/obrázek místo prázdného místa.
+- Na obrazovce zkoušky (a ve statistikách) je u prázdného grafu skóre teď hezká ikonka namísto velkého prázdného prostoru.
+- Načítací obrazovka při startu appky má nově logo Autoškoláka.
+
 ## [2.2.4] - 2026-07-25
 - Doplněn 5. nejvyšší stupeň nálady Alexe — při plné (81–100 %) sytosti se teď zobrazuje speciální nejveselejší obrázek.
 

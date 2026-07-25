@@ -33,6 +33,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.Image
@@ -53,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -229,6 +231,9 @@ fun OnboardingScreen(navController: NavHostController) {
 @Composable
 private fun OnboardingInfoPage(page: OnboardingStep.InfoPage) {
     val composition by rememberLottieComposition(LottieCompositionSpec.Asset(page.lottieAssetPath))
+    // Některé lottie assety jsou zatím jen prázdné placeholdery (bez vrstev) — dokud
+    // nejsou nahrazeny reálnou animací, zobrazí se místo prázdného místa statická náhrada.
+    val hasRealAnimation = composition?.layers?.isNotEmpty() == true
     Column(
         Modifier
             .fillMaxSize()
@@ -236,11 +241,15 @@ private fun OnboardingInfoPage(page: OnboardingStep.InfoPage) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        LottieAnimation(
-            composition = composition,
-            iterations = LottieConstants.IterateForever,
-            modifier = Modifier.size(250.dp),
-        )
+        if (hasRealAnimation) {
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier.size(250.dp),
+            )
+        } else {
+            OnboardingInfoFallbackVisual(page)
+        }
         Spacer(Modifier.height(32.dp))
         Text(
             text = page.title,
@@ -254,6 +263,67 @@ private fun OnboardingInfoPage(page: OnboardingStep.InfoPage) {
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
+        )
+    }
+}
+
+/**
+ * Statická náhrada za (dosud prázdnou) lottie animaci na úvodních info stránkách —
+ * bílá ikona na barevném gradientovém kruhu, stejný vizuální jazyk jako
+ * [cz.autokolk.ui.components.badges.SectionMilestoneBadge] a ikony lekcí
+ * ([cz.autokolk.ui.screens.home.iconForSubcategory]). Pro stránku o Alexovi se
+ * místo ikony zobrazí existující bitmapa lva.
+ */
+@Composable
+private fun OnboardingInfoFallbackVisual(page: OnboardingStep.InfoPage) {
+    val icon = page.fallbackIcon
+    if (icon == null) {
+        val context = LocalContext.current
+        val alexBitmap = remember(context) {
+            try {
+                context.assets.open("images/alex/AlexHappy.png").use { stream ->
+                    BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                }
+            } catch (_: Throwable) {
+                null
+            }
+        }
+        if (alexBitmap != null) {
+            Image(
+                bitmap = alexBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(250.dp),
+            )
+        } else {
+            Image(
+                painter = painterResource(R.drawable.ic_alex),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(250.dp),
+            )
+        }
+        return
+    }
+    Box(
+        modifier = Modifier
+            .size(160.dp)
+            .background(
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        page.accentColor.copy(alpha = 0.95f),
+                        page.accentColor.copy(alpha = 0.55f),
+                    ),
+                ),
+                shape = CircleShape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        androidx.compose.material3.Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(88.dp),
         )
     }
 }
