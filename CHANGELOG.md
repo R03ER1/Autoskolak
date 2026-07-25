@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.2] - 2026-07-25
+- Fix: odstraněna přerušovaná spojka mezi lekcemi na hlavní obrazovce (`LessonPathBackground.kt` zcela odstraněn) — při scrollování se křivka propočítaná z měřených pozic uzlů občas viditelně "zamotávala"/přeskakovala.
+- Fix: odstraněn text s počtem otázek/chyb ("10 otázek (N chyb)") vedle kolečka lekce — při delších textech (víc chyb) přetékal a zalamoval se mimo obrazovku. Popisek zůstává zachován jen pro čtečky obrazovky (accessibility label).
+- Rozložení koleček lekcí na cestě (zig-zag odsazení) i sekční odznaky zůstávají beze změny.
+
 ## [2.2.1] - 2026-07-25
 - Fix: ikony lekcí na hlavní obrazovce (path lekcí) nahrazeny minimalistickou sadou Material ikon namísto starých nekonzistentních bitmapových obrázků z `mediaassets`. Ikony jsou nyní bílé na barevném gradientovém kruhu, konzistentní se stylem ostatních odznaků v appce (`LessonIconMapper.kt`, `LessonNode.kt`).
 

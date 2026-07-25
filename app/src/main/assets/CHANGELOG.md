@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.2] - 2026-07-25
+- Odstraněna přerušovaná spojka mezi lekcemi, která se při scrollování zamotávala.
+- Odstraněn přetékající text s počtem otázek u lekcí — kolečka lekcí zůstávají na svém místě.
+
 ## [2.2.1] - 2026-07-25
 - Nové minimalistické ikony lekcí na hlavní obrazovce — nahradily staré nekonzistentní obrázky za jednotný, čistý styl.
 

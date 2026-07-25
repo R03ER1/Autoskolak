@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,15 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -73,28 +69,8 @@ fun HomeScreen(
     var sheetLesson by remember { mutableStateOf<GlobalLesson?>(null) }
     var sheetDisplay by remember { mutableStateOf(1) }
 
-    val lessonOrder = remember(reordered) { reordered.map { it.lessonNumber } }
-    val measuredCenters = remember { mutableStateMapOf<Int, Offset>() }
-
-    LaunchedEffect(lessonOrder) {
-        measuredCenters.clear()
-    }
-
     LaunchedEffect(Unit) {
         vm.tryShowRandomEventIfDue()
-    }
-
-    var pathRootCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
-
-    val progressFraction = remember(rows, reordered) {
-        if (reordered.isEmpty()) 0f
-        else {
-            val done = rows.count {
-                it is HomePathRow.LessonItem &&
-                    (it.nodeState == LessonNodeState.COMPLETED || it.nodeState == LessonNodeState.PERFECT)
-            }
-            done.toFloat() / reordered.size.toFloat()
-        }
     }
 
     val seasonalMessage = SeasonalEvents.activeMessage()
@@ -126,16 +102,8 @@ fun HomeScreen(
     }
 
     Box(
-        Modifier
-            .fillMaxSize()
-            .onGloballyPositioned { pathRootCoords = it },
+        Modifier.fillMaxSize(),
     ) {
-        LessonPathBackground(
-            lessonOrder = lessonOrder,
-            measuredCenters = measuredCenters,
-            progressFraction = progressFraction,
-            modifier = Modifier.fillMaxSize(),
-        )
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -238,17 +206,9 @@ fun HomeScreen(
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            val root = pathRootCoords
                             Box(
                                 Modifier
                                     .onGloballyPositioned { coords ->
-                                        if (root == null || !root.isAttached || !coords.isAttached) return@onGloballyPositioned
-                                        val centerLocal = Offset(
-                                            coords.size.width / 2f,
-                                            coords.size.height / 2f,
-                                        )
-                                        val inPath = root.localPositionOf(coords, centerLocal)
-                                        measuredCenters[row.lesson.lessonNumber] = inPath
                                         if (row.nodeState == LessonNodeState.CURRENT) {
                                             val b = coords.boundsInRoot()
                                             onCurrentLessonNodeBoundsChanged?.invoke(b)
@@ -272,12 +232,6 @@ fun HomeScreen(
                                     accessibilityLabel = "Lekce ${row.displayNumber}: ${row.subtitle}. ${lessonNodeStateLabel(row.nodeState)}.",
                                 )
                             }
-                            Spacer(Modifier.width(12.dp))
-                            Text(
-                                text = row.subtitle,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
                         }
                     }
                     is HomePathRow.SectionBadge -> {
