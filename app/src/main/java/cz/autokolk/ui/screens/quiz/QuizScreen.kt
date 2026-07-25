@@ -48,7 +48,7 @@ import cz.autokolk.ui.components.animation.FloatingReward
 import androidx.compose.foundation.layout.Row
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.lessonHeroTransitionKey
-import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.accentCyanText
 import cz.autokolk.ui.util.rememberIsExpandedLandscape
 @Composable
 fun QuizScreen(
@@ -344,7 +344,7 @@ fun QuizScreen(
             },
             dismissButton = {
                 TextButton(onClick = { vm.dismissQuitDialog() }) {
-                    Text("Pokračovat", color = AccentCyan)
+                    Text("Pokračovat", color = accentCyanText())
                 }
             },
         )

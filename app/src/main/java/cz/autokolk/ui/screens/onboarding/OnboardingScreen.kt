@@ -76,6 +76,7 @@ import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.quiz.QuestionContent
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.PillShape
+import cz.autokolk.ui.theme.accentCyanText
 import cz.autokolk.ui.theme.glassPalette
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
@@ -321,7 +322,7 @@ private fun OnboardingDailyGoalPage(
                         Text(row.subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (selectedRow) {
-                        Text("✓", style = MaterialTheme.typography.titleLarge, color = AccentCyan)
+                        Text("✓", style = MaterialTheme.typography.titleLarge, color = accentCyanText())
                     }
                 }
             }
@@ -449,7 +450,7 @@ private fun OnboardingDemoQuestionPage(
             Text(
                 text = if (correct) "Skvěle! Vidíš? To zvládneš!" else "Zkus to znovu příště — důležité je učit se!",
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (correct) AccentCyan else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (correct) accentCyanText() else MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()

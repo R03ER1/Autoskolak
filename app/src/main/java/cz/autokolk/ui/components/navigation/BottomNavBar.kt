@@ -34,8 +34,8 @@ import cz.autokolk.R
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.navigation.Route
-import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.PillShape
+import cz.autokolk.ui.theme.accentCyanText
 import cz.autokolk.ui.util.rememberHaptic
 
 private data class BottomNavItem(
@@ -103,8 +103,9 @@ private fun BottomNavItemView(
         animationSpec = spring(dampingRatio = 0.5f, stiffness = 800f),
         label = "navScale",
     )
+    val selectedColor = accentCyanText()
     val iconColor by animateColorAsState(
-        targetValue = if (isSelected) AccentCyan else MaterialTheme.colorScheme.onSurfaceVariant,
+        targetValue = if (isSelected) selectedColor else MaterialTheme.colorScheme.onSurfaceVariant,
         animationSpec = tween(200),
         label = "navColor",
     )
@@ -124,7 +125,7 @@ private fun BottomNavItemView(
                 Box(
                     Modifier
                         .size(40.dp)
-                        .background(AccentCyan.copy(alpha = 0.15f), CircleShape),
+                        .background(selectedColor.copy(alpha = 0.15f), CircleShape),
                 )
             }
             Icon(

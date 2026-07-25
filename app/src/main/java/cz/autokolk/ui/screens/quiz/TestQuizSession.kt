@@ -54,6 +54,7 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.sound.QuizTestCountdownSoundEffect
 import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.accentCyanText
 import cz.autokolk.ui.util.rememberIsExpandedLandscape
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -124,7 +125,7 @@ fun TestQuizSession(navController: NavHostController) {
             },
             dismissButton = {
                 TextButton(onClick = { vm.dismissQuitDialog() }) {
-                    Text("Pokračovat", color = AccentCyan)
+                    Text("Pokračovat", color = accentCyanText())
                 }
             },
         )

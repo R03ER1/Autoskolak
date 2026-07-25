@@ -57,11 +57,11 @@ import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.animation.FloatingReward
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
-import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.SuccessGreen
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.accentCyanText
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -207,7 +207,7 @@ fun AlexScreen(
                 AlexActionChip(
                     label = "Obchod",
                     iconRes = R.drawable.ic_shop,
-                    tint = AccentCyan,
+                    tint = accentCyanText(),
                     onClick = { viewModel.openShop() },
                 )
             }
@@ -373,7 +373,7 @@ fun HungerBar(percent: Int, isFrozen: Boolean) {
             Text(
                 "Hlad zmrazen",
                 style = MaterialTheme.typography.labelMedium,
-                color = AccentCyan,
+                color = accentCyanText(),
                 modifier = Modifier.padding(top = 4.dp),
             )
         }

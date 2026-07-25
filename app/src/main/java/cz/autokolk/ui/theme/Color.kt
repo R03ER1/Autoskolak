@@ -1,5 +1,7 @@
 package cz.autokolk.ui.theme
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
 // region Dark — Backgrounds
@@ -20,6 +22,16 @@ val AccentTeal = Color(0xFF1DE9B6)
 val AccentBlue = Color(0xFF2979FF)
 val AccentGradientStart = Color(0xFF00E5FF)
 val AccentGradientEnd = Color(0xFF1DE9B6)
+
+// Krok 159 dořešení (2.1.4): AccentCyan/WarningAmber mají na bílém/světlém pozadí kontrast
+// jen ~1.4–1.5:1 (hluboko pod AA 4.5:1) — v pořádku jsou jen tam, kde sedí na pevně tmavém
+// pozadí (celoobrazovkový scrim, DarkSurface dialogy typu Mystery Box/Bonus Wheel/Coins/
+// Streak sheet). Pro místa, kde tyto barvy nesou text/informační ikonu na THEME-AWARE
+// (světlo/tmavo přepínajícím se) pozadí, se používá zatemněná varianta níž přes
+// [accentCyanText]/[warningAmberText] — stejný odstín, jen nižší lightness pro AA ve
+// světlém režimu; v tmavém režimu se vrací původní jasná barva (tam je kontrast > 10:1).
+val AccentCyanText = Color(0xFF00728A)   // 5.6:1 na bílé, 5.1:1 na LightBackground
+val WarningAmberText = Color(0xFF7F6B00) // 5.2:1 na bílé, 4.8:1 na LightBackground
 // endregion
 
 // region Semantic
@@ -60,4 +72,16 @@ val LightAccentBlue = Color(0xFF2962FF)
 val LightTextPrimary = Color(0xFF1A1F36)
 val LightTextSecondary = Color(0xFF4A5568)
 val LightTextTertiary = Color(0xFF9CA3AF)
+// endregion
+
+// region Text-safe accent varianty (krok 159 dořešení, 2.1.4)
+/** [AccentCyan] pro text/informační ikonu na theme-aware pozadí — AA-safe v obou režimech. */
+@Composable
+@ReadOnlyComposable
+fun accentCyanText(): Color = if (LocalIsDarkTheme.current) AccentCyan else AccentCyanText
+
+/** [WarningAmber] pro text/informační ikonu na theme-aware pozadí — AA-safe v obou režimech. */
+@Composable
+@ReadOnlyComposable
+fun warningAmberText(): Color = if (LocalIsDarkTheme.current) WarningAmber else WarningAmberText
 // endregion

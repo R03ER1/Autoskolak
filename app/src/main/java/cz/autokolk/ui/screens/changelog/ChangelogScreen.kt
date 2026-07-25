@@ -21,7 +21,7 @@ import androidx.navigation.NavHostController
 import cz.autokolk.data.changelog.ChangelogParser
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.glass.GlassCard
-import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.accentCyanText
 
 @Composable
 fun ChangelogScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostController) {
@@ -56,7 +56,7 @@ fun ChangelogScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostControll
                         Text(
                             "v${entry.version}",
                             style = MaterialTheme.typography.titleMedium,
-                            color = AccentCyan,
+                            color = accentCyanText(),
                         )
                         if (entry.date != null) {
                             Text(

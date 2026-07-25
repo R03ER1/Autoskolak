@@ -36,6 +36,7 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.accentCyanText
 
 @Composable
 fun AchievementsScreen(@Suppress("UNUSED_PARAMETER") navController: NavHostController) {
@@ -96,7 +97,7 @@ private fun AchievementCard(achievement: AchievementRowUi) {
                 Icon(
                     if (achievement.unlocked) Icons.Default.Star else Icons.Default.Lock,
                     contentDescription = null,
-                    tint = if (achievement.unlocked) AccentCyan else MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (achievement.unlocked) accentCyanText() else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Spacer(Modifier.width(12.dp))

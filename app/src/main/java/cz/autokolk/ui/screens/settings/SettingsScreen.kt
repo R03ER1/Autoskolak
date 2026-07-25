@@ -35,7 +35,7 @@ import cz.autokolk.LessonProgress
 import cz.autokolk.AchievementsManager
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.glass.GlassCard
-import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.theme.accentCyanText
 import cz.autokolk.ui.components.settings.ClickableSetting
 import cz.autokolk.ui.components.settings.SettingsGroup
 import cz.autokolk.ui.components.settings.SettingsProfileCard
@@ -186,7 +186,7 @@ fun SettingsScreen(navController: NavHostController) {
                             Text(
                                 BuildConfig.VERSION_NAME,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = AccentCyan,
+                                color = accentCyanText(),
                             )
                         }
                     }

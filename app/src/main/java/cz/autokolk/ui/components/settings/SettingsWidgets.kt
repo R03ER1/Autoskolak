@@ -30,6 +30,7 @@ import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AutokolkShapes
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.ThemeMode
+import cz.autokolk.ui.theme.accentCyanText
 
 @Composable
 fun SettingsGroup(
@@ -87,7 +88,7 @@ fun ClickableSetting(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     valueLabel: String? = null,
-    valueColor: Color = AccentCyan,
+    valueColor: Color? = null,
     onClick: () -> Unit,
 ) {
     GlassCard(modifier = modifier.fillMaxWidth().padding(vertical = 4.dp)) {
@@ -112,7 +113,7 @@ fun ClickableSetting(
                 Text(
                     valueLabel,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = valueColor,
+                    color = valueColor ?: accentCyanText(),
                 )
                 Spacer(Modifier.width(4.dp))
             }

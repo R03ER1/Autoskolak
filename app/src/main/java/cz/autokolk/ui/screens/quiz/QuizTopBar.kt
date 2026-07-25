@@ -38,8 +38,8 @@ import cz.autokolk.ui.navigation.LocalNavAnimatedVisibilityScope
 import cz.autokolk.ui.navigation.LocalSharedTransitionScope
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.PillShape
-import cz.autokolk.ui.theme.WarningAmber
 import cz.autokolk.ui.theme.glassPalette
+import cz.autokolk.ui.theme.warningAmberText
 import java.util.Locale
 
 // Shared element transition (krok 41): `heroTransitionKey` napojí pilulku s číslem otázky
@@ -72,7 +72,7 @@ fun QuizTopBar(
                 Text(
                     text = msg,
                     style = MaterialTheme.typography.labelLarge,
-                    color = WarningAmber,
+                    color = warningAmberText(),
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(top = 2.dp),
@@ -144,7 +144,7 @@ fun QuizTopBar(
                 val s = ((ms % 60000) / 1000).toInt()
                 val color = when {
                     ms <= 60_000L -> ErrorRed
-                    ms <= 5 * 60_000L -> WarningAmber
+                    ms <= 5 * 60_000L -> warningAmberText()
                     else -> MaterialTheme.colorScheme.onSurface
                 }
                 val pulse = ms in 1..10_000L

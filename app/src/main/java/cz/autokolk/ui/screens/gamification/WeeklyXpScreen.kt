@@ -36,7 +36,8 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.accentCyanText
+import cz.autokolk.ui.theme.warningAmberText
 import cz.autokolk.ui.util.ShareCardGenerator
 
 @Composable
@@ -86,7 +87,7 @@ fun WeeklyXpScreen(navController: NavHostController) {
                     Text(
                         "Součet: $sum7 XP",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = WarningAmber,
+                        color = warningAmberText(),
                     )
                     Text(
                         text = when {
@@ -107,7 +108,7 @@ fun WeeklyXpScreen(navController: NavHostController) {
                     SummaryRow(label = "Lekcí dokončeno", value = "$lessons7")
                     SummaryRow(label = "Aktivních dní", value = "$activeDays / 7")
                     SummaryRow(label = "Aktuální streak", value = "$streak dní")
-                    SummaryRow(label = "Osobní rekord (7d)", value = "$best XP", valueColor = AccentCyan)
+                    SummaryRow(label = "Osobní rekord (7d)", value = "$best XP", valueColor = accentCyanText())
                 }
             }
             Spacer(Modifier.height(16.dp))

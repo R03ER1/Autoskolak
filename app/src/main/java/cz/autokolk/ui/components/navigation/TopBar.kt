@@ -28,7 +28,7 @@ import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.components.buttons.GlassButton
 import androidx.compose.material3.MaterialTheme
 import cz.autokolk.ui.theme.ErrorRed
-import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.warningAmberText
 
 @Composable
 fun AutokolkTopBar(
@@ -50,14 +50,14 @@ fun AutokolkTopBar(
         StatBadge(
             iconRes = R.drawable.ic_streak,
             value = streak,
-            iconColor = WarningAmber,
+            iconColor = warningAmberText(),
             onClick = onStreakClick,
             accessibilityLabel = "Denní séria: $streak dní. Klepnutím zobrazíš detaily.",
         )
         StatBadge(
             iconRes = R.drawable.ic_coin,
             value = coins,
-            iconColor = WarningAmber,
+            iconColor = warningAmberText(),
             onClick = onCoinsClick,
             accessibilityLabel = "Mince: $coins. Klepnutím otevřeš obchod.",
         )

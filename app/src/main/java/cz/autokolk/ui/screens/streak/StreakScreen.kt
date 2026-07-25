@@ -31,7 +31,7 @@ import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.animation.AnimatedCounter
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
-import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.warningAmberText
 import cz.autokolk.ui.util.HapticFeedback
 
 @Composable
@@ -66,7 +66,7 @@ fun StreakScreen(navController: NavHostController) {
                 AnimatedCounter(
                     targetValue = streak,
                     style = MaterialTheme.typography.displayLarge,
-                    color = WarningAmber,
+                    color = warningAmberText(),
                 )
                 Text(
                     text = "dní v řadě! 🔥",

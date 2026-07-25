@@ -50,7 +50,9 @@ import cz.autokolk.ui.navigation.navigateToTab
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.SuccessGreen
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.accentCyanText
 import cz.autokolk.ui.theme.glassPalette
+import cz.autokolk.ui.theme.warningAmberText
 import kotlinx.coroutines.delay
 
 @Composable
@@ -163,7 +165,7 @@ fun ResultsComposeScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 StatChip(label = "Správně", value = "$displayScore/$total", color = SuccessGreen)
-                StatChip(label = "Body", value = "+$displayPoints", color = WarningAmber)
+                StatChip(label = "Body", value = "+$displayPoints", color = warningAmberText())
             }
             Spacer(Modifier.height(28.dp))
             if (firstOfDay) {
@@ -216,7 +218,7 @@ fun ResultsComposeScreen(
                         }
                     },
                 ) {
-                    Text("Zkusit znovu", color = AccentCyan)
+                    Text("Zkusit znovu", color = accentCyanText())
                 }
             } else if (!isTest && lessonId > 0) {
                 TextButton(
@@ -228,7 +230,7 @@ fun ResultsComposeScreen(
                         }
                     },
                 ) {
-                    Text("Zkusit znovu", color = AccentCyan)
+                    Text("Zkusit znovu", color = accentCyanText())
                 }
             }
         }

@@ -69,6 +69,8 @@ import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.quiz.QuizMedia
 import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.WarningAmber
+import cz.autokolk.ui.theme.accentCyanText
+import cz.autokolk.ui.theme.warningAmberText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,7 +149,7 @@ fun PracticeScreen(navController: NavHostController) {
                                     .clickable { selectedHit = hit },
                             ) {
                                 Column(Modifier.padding(12.dp)) {
-                                    Text(hit.categoryTitle, style = MaterialTheme.typography.labelSmall, color = AccentCyan)
+                                    Text(hit.categoryTitle, style = MaterialTheme.typography.labelSmall, color = accentCyanText())
                                     Spacer(Modifier.height(4.dp))
                                     Text(
                                         hit.preview,
@@ -200,7 +202,7 @@ fun PracticeScreen(navController: NavHostController) {
                         .padding(horizontal = 20.dp)
                         .padding(bottom = 28.dp),
                 ) {
-                    Text(hit.categoryTitle, style = MaterialTheme.typography.titleSmall, color = AccentCyan)
+                    Text(hit.categoryTitle, style = MaterialTheme.typography.titleSmall, color = accentCyanText())
                     Spacer(Modifier.height(8.dp))
                     Text(hit.preview, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                     if (hit.imagePath != null) {
@@ -314,7 +316,7 @@ private fun CategoryPracticeCard(
                     modifier = Modifier.size(40.dp),
                 )
                 if (data.completed) {
-                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = WarningAmber, modifier = Modifier.size(22.dp))
+                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = warningAmberText(), modifier = Modifier.size(22.dp))
                 }
             }
             Text(
@@ -363,13 +365,13 @@ private fun CategoryPracticeCard(
                 Text(
                     if (expanded) "Skrýt" else "Podkategorie",
                     style = MaterialTheme.typography.labelMedium,
-                    color = AccentCyan,
+                    color = accentCyanText(),
                     modifier = Modifier.weight(1f),
                 )
                 Icon(
                     if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = null,
-                    tint = AccentCyan,
+                    tint = accentCyanText(),
                     modifier = Modifier.size(24.dp),
                 )
             }
@@ -399,7 +401,7 @@ private fun CategoryPracticeCard(
                             Text(
                                 "#$id",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = AccentCyan,
+                                color = accentCyanText(),
                                 modifier = Modifier
                                     .clickable { onOpenWorst(id) }
                                     .padding(vertical = 2.dp),
