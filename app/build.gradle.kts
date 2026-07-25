@@ -160,4 +160,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // LeakCanary — pouze pro debug build (memory leak detekce, krok 165 QA).
+    // Automaticky se inicializuje přes vlastní ContentProvider, žádný kód v App.kt není potřeba.
+    debugImplementation(libs.leakcanary.android)
 }
