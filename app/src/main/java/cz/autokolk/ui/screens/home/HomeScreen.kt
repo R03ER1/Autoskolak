@@ -304,7 +304,12 @@ fun HomeScreen(
     val sl = sheetLesson
     if (sl != null) {
         val st = vm.lessonProgress.getLessonState(sl.lessonNumber)
-        val title = buildLessonTitle(sl, sl.lessonNumber, sheetDisplay, vm.lessonProgress)
+        // Krok 156: buildLessonTitle filtruje/seřazuje celý lesson plán — nemá se přepočítávat
+        // při každé recompozici HomeScreen (např. kvůli scrollu path), jen když se změní
+        // vybraná lekce nebo její pořadové číslo.
+        val title = remember(sl.lessonNumber, sheetDisplay) {
+            buildLessonTitle(sl, sl.lessonNumber, sheetDisplay, vm.lessonProgress)
+        }
         val canStart = vm.canStartLesson(sl.lessonNumber)
         val isReview = st.completed && !st.incorrectQuestionIds.isNullOrEmpty()
         LessonInfoSheet(

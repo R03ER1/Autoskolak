@@ -13,6 +13,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
 
 fun Modifier.shimmerLoading(active: Boolean = true): Modifier = composed {
     if (!active) return@composed this
@@ -21,16 +22,24 @@ fun Modifier.shimmerLoading(active: Boolean = true): Modifier = composed {
     val onSurface = MaterialTheme.colorScheme.onSurface
     val glassFill = onSurface.copy(alpha = 0.06f)
     val highlight = onSurface.copy(alpha = 0.16f)
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val shift by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "shimmerShift",
-    )
+    // Krok 157: v nízkovýkonném/reduced-motion režimu se shimmer nekonečně neanimuje
+    // (fixní posun highlightu), ať placeholder nedrží kontinuální redraw na pozadí.
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
+    val shift = if (lowPerformanceMode) {
+        0.5f
+    } else {
+        val transition = rememberInfiniteTransition(label = "shimmer")
+        val animatedShift by transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1200, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+            label = "shimmerShift",
+        )
+        animatedShift
+    }
     drawWithContent {
         drawContent()
         val w = size.width

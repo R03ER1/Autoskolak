@@ -21,9 +21,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
 
 /**
  * Tenký progress bar s animovaným gradientem (lehký „shimmer“ posun).
+ *
+ * Krok 157: tato komponenta se používá na mnoha místech současně (Home sekce, Alex
+ * hunger bar, Practice karty) a každá instance dřív běžela s vlastní nekonečnou
+ * [rememberInfiniteTransition] animací i mimo obrazovku. V nízkovýkonném/reduced-motion
+ * režimu ([rememberLowPerformanceModeEnabled]) se shimmer efekt vypíná a vykreslí se
+ * jako statický gradient — funkční část (vyplnění podle `progress`) zůstává beze změny.
  */
 @Composable
 fun AnimatedProgressBar(
@@ -35,16 +42,22 @@ fun AnimatedProgressBar(
     height: Dp = 8.dp,
 ) {
     val p = progress.coerceIn(0f, 1f)
-    val transition = rememberInfiniteTransition(label = "progressShimmer")
-    val shift by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1400, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "shimmerShift",
-    )
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
+    val shift = if (lowPerformanceMode) {
+        0.5f
+    } else {
+        val transition = rememberInfiniteTransition(label = "progressShimmer")
+        val animatedShift by transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1400, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+            label = "shimmerShift",
+        )
+        animatedShift
+    }
 
     Canvas(
         modifier = modifier
