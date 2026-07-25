@@ -103,17 +103,23 @@ class HomeActivity : AutokolkActivity() {
                     true
                 }
                 R.id.nav_exercise -> {
-                    val intent = Intent(this, PracticeActivity::class.java)
+                    // Krok 153: legacy PracticeActivity zrušena, přesměrováno na Compose záložku Procvičování.
+                    val intent = Intent(this, ComposeMainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra(ComposeNavIntent.EXTRA_OPEN_TAB, ComposeNavIntent.OPEN_TAB_PRACTICE)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
+                    finish()
                     true
                 }
                 R.id.nav_test -> {
-                    val intent = Intent(this, TestAttemptActivity::class.java)
+                    // Krok 153: legacy TestAttemptActivity zrušena, přesměrováno na Compose záložku Test.
+                    val intent = Intent(this, ComposeMainActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra(ComposeNavIntent.EXTRA_OPEN_TAB, ComposeNavIntent.OPEN_TAB_TEST)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
+                    finish()
                     true
                 }
                 R.id.nav_settings -> {

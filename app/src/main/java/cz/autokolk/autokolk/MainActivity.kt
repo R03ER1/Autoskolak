@@ -41,8 +41,6 @@ import android.os.Looper
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 /**
  * Lesson / practice / test UI. Video + DFM helpers live in [VideoModuleRegistry], [VideoSplitInstallListenerFactory], [VideoAssetFileCache] (audit A1).
@@ -324,13 +322,12 @@ class MainActivity : AutokolkActivity() {
                 firstOfDay = lessonProgress.updateStreakOnLessonCompleted()
             } catch (_: Throwable) { }
 
-            // For practice sessions or test mode, show streak window after closing if first of day
+            // For practice sessions or test mode, show streak window after closing if first of day.
+            // Krok 153: legacy StreakActivity zrušena, přesměrováno na Compose modální obrazovku streaku.
             if ((category.isNotBlank() || isTestMode) && firstOfDay) {
                 try {
-                    val streakIntent = Intent(this, StreakActivity::class.java)
-                    if (isTestMode) {
-                        streakIntent.putExtra(StreakActivity.EXTRA_FROM_TEST, true)
-                    }
+                    val streakIntent = Intent(this, ComposeMainActivity::class.java)
+                        .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_OPEN_TAB, cz.autokolk.ui.navigation.ComposeNavIntent.OPEN_TAB_STREAK)
                     startActivity(streakIntent)
                 } catch (_: Throwable) { }
             }
@@ -979,14 +976,14 @@ class MainActivity : AutokolkActivity() {
                 firstOfDay = lessonProgress.updateStreakOnLessonCompleted() 
             } catch (_: Throwable) { }
             
-            val intent = android.content.Intent(this, TestResultsActivity::class.java)
-            intent.putExtra(TestResultsActivity.EXTRA_TOTAL_POINTS, totalPoints)
-            intent.putExtra(TestResultsActivity.EXTRA_MAX_POINTS, 50)
-            intent.putExtra(TestResultsActivity.EXTRA_FIRST_OF_DAY, firstOfDay)
-            // Pass questions list as JSON
-            val gson = Gson()
-            val questionsJson = gson.toJson(questions)
-            intent.putExtra(TestResultsActivity.EXTRA_QUESTIONS_JSON, questionsJson)
+            // Krok 153: legacy TestResultsActivity zrušena. Tato větev (legacy ad-hoc test v
+            // MainActivity, spouštěný dřív jen z odstraněné TestAttemptActivity) je dnes
+            // nedosažitelná — nic už nespouští MainActivity s EXTRA_IS_TEST_MODE=true. Pro
+            // jistotu (kdyby v budoucnu vznikl nový vstupní bod) přesměrováváme na Compose
+            // záložku Test, kde se nová zkouška spouští přes [cz.autokolk.ui.screens.test.TestScreen].
+            android.util.Log.w("MainActivity", "Legacy isTestMode completion path hit — mělo by být nedosažitelné po kroku 153.")
+            val intent = Intent(this, ComposeMainActivity::class.java)
+                .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_OPEN_TAB, cz.autokolk.ui.navigation.ComposeNavIntent.OPEN_TAB_TEST)
             startActivity(intent)
             finish()
             return
@@ -1037,25 +1034,35 @@ class MainActivity : AutokolkActivity() {
             }
         }
 
-        // Show results page
+        // Show results page.
+        // Krok 153: legacy ResultsActivity zrušena, přesměrováno na Compose [ui.screens.results.ResultsComposeScreen]
+        // se stejnými reálnými parametry (skóre, body, firstOfDay), jaké dřív dostávala legacy Activity.
         val finalDisplayLessonNumber = displayLessonNumber ?: lessonNumber
-        val intent = ResultsActivity.createIntent(
-            this,
+        val isPractice = category.isNotBlank()
+        val isRandom = randomCount > 0
+        val pointsAwarded = LessonPoints.computeLessonPointsAwarded(
+            isPractice = isPractice,
+            isRandom = isRandom,
+            isReviewMode = isReviewMode,
             correctAnswers = correctAnswers,
             totalQuestions = totalQuestions,
-            lessonNumber = finalDisplayLessonNumber,
-            isReviewMode = isReviewMode
         )
-        // Pass practice info so results screen can adjust UI
-        if (category.isNotBlank()) {
-            intent.putExtra(ResultsActivity.EXTRA_IS_PRACTICE, true)
-            intent.putExtra(ResultsActivity.EXTRA_PRACTICE_CATEGORY, category)
+        if (pointsAwarded > 0) {
+            lessonProgress.addPoints(pointsAwarded)
         }
-        intent.putExtra(ResultsActivity.EXTRA_FIRST_OF_DAY, firstOfDay)
-        if (randomCount > 0) {
-            intent.putExtra(EXTRA_IS_RANDOM, true)
-            intent.putExtra("extra_random_earned", randomEarned)
-        }
+        // Pozn.: legacy ResultsActivity měla speciální texty pro náhodný kvíz ("Získáváte extra
+        // život!"/"Bohužel tentokrát bez extra života."). Compose ResultsComposeScreen tuto
+        // variantu nerozlišuje a zobrazí obecný text — samotné udělení srdce (výše, `lessonProgress.setHearts`)
+        // proběhne beze změny, jde jen o kosmetický rozdíl textu na výsledkové obrazovce pro tuto
+        // okrajovou cestu (náhodný kvíz z "+" u srdcí na Home).
+        val intent = Intent(this, ComposeMainActivity::class.java)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_OPEN_TAB, cz.autokolk.ui.navigation.ComposeNavIntent.OPEN_RESULTS)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_RESULTS_LESSON_ID, finalDisplayLessonNumber)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_RESULTS_SCORE, correctAnswers)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_RESULTS_TOTAL, totalQuestions)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_RESULTS_FIRST_OF_DAY, firstOfDay)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_RESULTS_POINTS_AWARDED, pointsAwarded)
+            .putExtra(cz.autokolk.ui.navigation.ComposeNavIntent.EXTRA_RESULTS_FROM_PRACTICE, isPractice)
         // Interstitial reklamy: skutečné lekce (i review) zvedají počítadlo. Procvičování,
         // náhodné kvízy a testy se nezapočítávají — odpovídá pravidlům pro Compose flow.
         val isRealLesson = category.isBlank() && randomCount <= 0 && !isTestMode
