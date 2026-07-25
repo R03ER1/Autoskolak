@@ -26,16 +26,10 @@
     <color name="button_normal">#2196F3</color>
     <color name="button_pressed">#4D666666</color>
 
-    <!-- Progress bar colors -->
-    <color name="progress_track">#FF1B5E20</color>
-    <color name="progress_indicator">#FF81C784</color>
-
     <!-- Settings/dark surfaces -->
     <color name="header_scrim">#CC000000</color>
     <color name="card_dark">#1E1E1E</color>
-    <color name="switch_thumb_on">#FFFFFF</color>
     <color name="switch_thumb_off">#B3FFFFFF</color>
-    <color name="switch_track_on">#332196F3</color>
     <color name="switch_track_off">#33FFFFFF</color>
     
     <!-- Bottom navigation -->
