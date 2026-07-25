@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.AutokolkApp
 import cz.autokolk.ui.navigation.ComposeNavIntent
+import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.AutokolkTheme
 import cz.autokolk.ui.theme.LocalThemeController
 import cz.autokolk.ui.theme.ThemeController
@@ -26,13 +27,35 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class ComposeMainActivity : FragmentActivity() {
     private val openTabExtra = MutableStateFlow<String?>(null)
+    private val resultsRouteExtra = MutableStateFlow<String?>(null)
+
+    /**
+     * Fallback za zrušenou legacy [ResultsActivity] (krok 153): pokud intent nese
+     * [ComposeNavIntent.OPEN_RESULTS] s reálnými výsledkovými extra, sestaví přesnou
+     * [Route.Results] cestu, aby [cz.autokolk.ui.AutokolkApp] mohl otevřít stejnou
+     * obrazovku se stejnými daty jako dřív legacy Activity.
+     */
+    private fun buildResultsRouteFromIntent(intent: Intent): String? {
+        if (intent.getStringExtra(ComposeNavIntent.EXTRA_OPEN_TAB) != ComposeNavIntent.OPEN_RESULTS) return null
+        if (!intent.hasExtra(ComposeNavIntent.EXTRA_RESULTS_LESSON_ID)) return null
+        return Route.Results(
+            lessonId = intent.getIntExtra(ComposeNavIntent.EXTRA_RESULTS_LESSON_ID, -1),
+            score = intent.getIntExtra(ComposeNavIntent.EXTRA_RESULTS_SCORE, 0),
+            total = intent.getIntExtra(ComposeNavIntent.EXTRA_RESULTS_TOTAL, 0),
+            firstOfDay = intent.getBooleanExtra(ComposeNavIntent.EXTRA_RESULTS_FIRST_OF_DAY, false),
+            pointsAwarded = intent.getIntExtra(ComposeNavIntent.EXTRA_RESULTS_POINTS_AWARDED, 0),
+            fromPractice = intent.getBooleanExtra(ComposeNavIntent.EXTRA_RESULTS_FROM_PRACTICE, false),
+        ).buildPath()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         openTabExtra.value = intent.getStringExtra(ComposeNavIntent.EXTRA_OPEN_TAB)
+        resultsRouteExtra.value = buildResultsRouteFromIntent(intent)
         enableEdgeToEdge()
         setContent {
             val initialOpenTab by openTabExtra.collectAsState()
+            val initialResultsRoute by resultsRouteExtra.collectAsState()
             val ctx = LocalContext.current
             val appCtx = ctx.applicationContext
             var themeMode by remember { mutableStateOf(readThemeMode(ctx)) }
@@ -58,7 +81,11 @@ class ComposeMainActivity : FragmentActivity() {
                 AutokolkTheme(themeMode = themeMode, visualStyle = visualStyle) {
                     AutokolkApp(
                         initialOpenTab = initialOpenTab,
-                        onConsumeInitialTab = { openTabExtra.value = null },
+                        initialResultsRoute = initialResultsRoute,
+                        onConsumeInitialTab = {
+                            openTabExtra.value = null
+                            resultsRouteExtra.value = null
+                        },
                     )
                 }
             }
@@ -69,5 +96,6 @@ class ComposeMainActivity : FragmentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         openTabExtra.value = intent.getStringExtra(ComposeNavIntent.EXTRA_OPEN_TAB)
+        resultsRouteExtra.value = buildResultsRouteFromIntent(intent)
     }
 }

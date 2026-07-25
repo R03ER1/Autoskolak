@@ -47,6 +47,7 @@ private val tabRoutes = Route.mainTabs.map { it.route }.toSet()
 @Composable
 fun AutokolkApp(
     initialOpenTab: String? = null,
+    initialResultsRoute: String? = null,
     onConsumeInitialTab: () -> Unit = {},
 ) {
     val navController = rememberNavController()
@@ -143,6 +144,50 @@ fun AutokolkApp(
                         if (r != null && r != Route.Splash.route) {
                             navController.navigateToTab(Route.Home)
                             navController.navigate(Route.WeeklyXp.route)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
+                    }
+                }
+                ComposeNavIntent.OPEN_TAB_PRACTICE -> {
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Practice)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
+                    }
+                }
+                ComposeNavIntent.OPEN_TAB_TEST -> {
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Test)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
+                    }
+                }
+                ComposeNavIntent.OPEN_TAB_STREAK -> {
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Home)
+                            navController.navigate(Route.Streak.route)
+                            return@LaunchedEffect
+                        }
+                        delay(50)
+                    }
+                }
+                ComposeNavIntent.OPEN_RESULTS -> {
+                    val resultsRoute = initialResultsRoute
+                    if (resultsRoute == null) return@LaunchedEffect
+                    repeat(100) {
+                        val r = navController.currentDestination?.route
+                        if (r != null && r != Route.Splash.route) {
+                            navController.navigateToTab(Route.Home)
+                            navController.navigate(resultsRoute)
                             return@LaunchedEffect
                         }
                         delay(50)
