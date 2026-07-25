@@ -24,6 +24,12 @@ sealed class OnboardingStep {
          * `null` pro stránku s Alexem, kde se místo ikony ukáže bitmapa lva.
          */
         val fallbackIcon: ImageVector? = null,
+        /**
+         * Cesta (relativní k `assets/`) k obrázkové náhradě loga/značky (např. logo
+         * z `mediaassets`), která se zobrazí místo gradientového kruhu s [fallbackIcon].
+         * Použito na úvodní "Vítej" stránce.
+         */
+        val fallbackAssetImage: String? = null,
     ) : OnboardingStep()
 
     data object DailyGoalPage : OnboardingStep()
@@ -40,6 +46,7 @@ fun buildOnboardingSteps(): List<OnboardingStep> = buildList {
             lottieAssetPath = "lottie/onboarding_welcome.json",
             accentColor = AccentCyan,
             fallbackIcon = Icons.Filled.DirectionsCarFilled,
+            fallbackAssetImage = "images/IconSign.png",
         ),
     )
     add(

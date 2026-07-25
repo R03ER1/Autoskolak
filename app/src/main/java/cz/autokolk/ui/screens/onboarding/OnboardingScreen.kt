@@ -74,6 +74,7 @@ import cz.autokolk.R
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
+import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.quiz.QuestionContent
 import cz.autokolk.ui.theme.AccentCyan
@@ -272,10 +273,21 @@ private fun OnboardingInfoPage(page: OnboardingStep.InfoPage) {
  * bílá ikona na barevném gradientovém kruhu, stejný vizuální jazyk jako
  * [cz.autokolk.ui.components.badges.SectionMilestoneBadge] a ikony lekcí
  * ([cz.autokolk.ui.screens.home.iconForSubcategory]). Pro stránku o Alexovi se
- * místo ikony zobrazí existující bitmapa lva.
+ * místo ikony zobrazí existující bitmapa lva. Pro úvodní stránku ("Vítej") se
+ * místo kruhu s ikonou zobrazí značka aplikace ([OnboardingStep.InfoPage.fallbackAssetImage]).
  */
 @Composable
 private fun OnboardingInfoFallbackVisual(page: OnboardingStep.InfoPage) {
+    val assetImage = page.fallbackAssetImage
+    if (assetImage != null) {
+        AssetImageFromPath(
+            assetPath = assetImage,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(220.dp),
+        )
+        return
+    }
     val icon = page.fallbackIcon
     if (icon == null) {
         val context = LocalContext.current

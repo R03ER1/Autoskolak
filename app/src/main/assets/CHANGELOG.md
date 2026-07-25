@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.6] - 2026-07-25
+- Na úvodní obrazovce onboardingu ("Vítej v Autoškoláku!") a na načítací obrazovce je teď místo dosavadní jednoduché ikony vidět skutečné logo Autoškoláka.
+
 ## [2.2.5] - 2026-07-25
 - Doplněny chybějící obrázky na 3 místech: úvodní stránky onboardingu (přivítání, Alex, body, zkouška) teď mají viditelnou ikonu/obrázek místo prázdného místa.
 - Na obrazovce zkoušky (a ve statistikách) je u prázdného grafu skóre teď hezká ikonka namísto velkého prázdného prostoru.

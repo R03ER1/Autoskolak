@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.6] - 2026-07-25
+- Statická náhrada na úvodní onboarding stránce ("Vítej v Autoškoláku!") a logo na načítací (splash) obrazovce nahrazeny reálnou grafikou značky (`IconSign.png` z modulu `mediaassets`) místo dosavadní Material ikony/`ic_launcher_foreground` v gradientovém kruhu — obrázek se načítá přes existující komponentu `AssetImageFromPath` (`AssetImage.kt`), stejně jako ostatní média z `mediaassets`.
+
 ## [2.2.5] - 2026-07-25
 - Doplněny chybějící vizuály na 3 obrazovkách: úvodní stránky onboardingu (`OnboardingScreen.kt`) měly u prvních 4 kroků reálně prázdné lottie soubory (`onboarding_welcome.json`, `onboarding_alex.json`, `onboarding_points.json`, `onboarding_test.json` — placeholdery bez vrstev) a zobrazovalo se jen prázdné místo. Nově se v takovém případě zobrazí statická náhrada — bílá Material ikona na barevném gradientovém kruhu (stejný styl jako `SectionMilestoneBadge`/ikony lekcí), pro stránku o Alexovi existující bitmapa lva (`AlexHappy.png`).
 - `TestScreen.kt` a `TestStatsScreen.kt`: prázdný stav grafu skóre (dokud uživatel nemá žádný pokus o zkoušku) měl jen jednořádkový text a velký prázdný prostor po grafu — nahrazeno ikonou grafu (`Icons.Filled.BarChart`) v gradientovém kruhu nad textem (`EmptyScoresChartPlaceholder` v `ScoresChart.kt`).
