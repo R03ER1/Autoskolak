@@ -2,8 +2,8 @@
 
 > **Verze plánu:** 1.2  
 > **Datum:** 2026-07-25 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.1.2  
-> **Postup:** **158 / 165 kroků hotových (~96 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 142 (plné SRS), krok 155 (staré styly/témata), krok 165 (release checklist).  
+> **Aktuální verze aplikace:** 2.1.3  
+> **Postup:** **159 / 165 kroků hotových (~96 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 částečně hotové (viz poznámka níže), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 142 (plné SRS), krok 165 (release checklist).  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
@@ -184,7 +184,7 @@
 | 152 | Testování zvuků a haptic feedback | 12 | ✅ |
 | 153 | Odstranění starých Activity souborů | 13 | ⬜ |
 | 154 | Odstranění starých XML layoutů | 13 | ⬜ |
-| 155 | Odstranění starých stylů a témat | 13 | ⬜ |
+| 155 | Odstranění starých stylů a témat | 13 | ✅ (smazán jen prokazatelně mrtvý kód — `Widget.Autokolk`, `...BottomNav.TransparentIndicator`, `...Popup(.Animation)`, mrtvé barvy `progress_track`/`progress_indicator`/`switch_thumb_on`/`switch_track_on`, prázdný `dimens.xml`; zbylé `Theme.Autokolk.*`/`Widget.Autokolk.Button*`/`ThemeOverlay.Autokolk.SwitchNeutral` zůstávají, protože je stále referencují aktivní legacy Activity a `activity_settings.xml`) |
 | 156 | Performance audit — recomposition | 13 | ✅ (statický audit + oprava hotová; runtime Layout Inspector měření vyžaduje fyzické zařízení, mimo headless prostředí) |
 | 157 | Performance audit — animace | 13 | ✅ (shimmer animace nyní respektuje low-perf/reduced-motion; reálné FPS profilování vyžaduje fyzické zařízení) |
 | 158 | Performance audit — image loading | 13 | ✅ (async `AssetImageFromPath` + shimmer/retry + centrální Coil `ImageLoader` v `App.kt`) |
