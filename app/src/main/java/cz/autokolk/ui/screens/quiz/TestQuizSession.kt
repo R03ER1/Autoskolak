@@ -54,6 +54,7 @@ import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.sound.QuizTestCountdownSoundEffect
 import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.util.rememberIsExpandedLandscape
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -137,6 +138,8 @@ private fun TestQuizSessionReadyContent(
 ) {
     val total = state.questions.size.coerceAtLeast(1)
     val progress = ((state.index + 1).toFloat() / total.toFloat()).coerceIn(0f, 1f)
+    // Krok 161 (tablet/landscape): stejná side-by-side úprava jako v QuizScreen.
+    val isExpandedLandscape = rememberIsExpandedLandscape()
 
     val pagerState = rememberPagerState(
         initialPage = state.index.coerceIn(0, state.questions.lastIndex.coerceAtLeast(0)),
@@ -201,22 +204,57 @@ private fun TestQuizSessionReadyContent(
                         userScrollEnabled = state.runPhase == TestRunPhase.Running,
                     ) { page ->
                         val question = state.questions[page]
-                        Column(
-                            Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
-                        ) {
-                            QuizMedia(imagePath = question.imagePath, videoPath = question.videoPath)
-                            Spacer(Modifier.height(12.dp))
-                            key(question.id, state.answersByQuestionId[question.id]) {
-                                QuestionContent(
-                                    question = question,
-                                    awaitingAdvance = false,
-                                    pendingAnswerKey = null,
-                                    isTest = true,
-                                    onPick = { vm.selectAnswer(it) },
-                                    testSelectionKey = state.answersByQuestionId[question.id],
-                                )
+                        val hasMedia = !question.imagePath.isNullOrBlank() || !question.videoPath.isNullOrBlank()
+                        if (isExpandedLandscape && hasMedia) {
+                            Row(Modifier.fillMaxSize()) {
+                                Box(
+                                    Modifier
+                                        .weight(0.42f)
+                                        .fillMaxSize()
+                                        .padding(end = 8.dp),
+                                ) {
+                                    QuizMedia(
+                                        imagePath = question.imagePath,
+                                        videoPath = question.videoPath,
+                                        modifier = Modifier.align(Alignment.Center),
+                                    )
+                                }
+                                Column(
+                                    Modifier
+                                        .weight(0.58f)
+                                        .fillMaxSize()
+                                        .verticalScroll(rememberScrollState()),
+                                ) {
+                                    key(question.id, state.answersByQuestionId[question.id]) {
+                                        QuestionContent(
+                                            question = question,
+                                            awaitingAdvance = false,
+                                            pendingAnswerKey = null,
+                                            isTest = true,
+                                            onPick = { vm.selectAnswer(it) },
+                                            testSelectionKey = state.answersByQuestionId[question.id],
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            Column(
+                                Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                            ) {
+                                QuizMedia(imagePath = question.imagePath, videoPath = question.videoPath)
+                                Spacer(Modifier.height(12.dp))
+                                key(question.id, state.answersByQuestionId[question.id]) {
+                                    QuestionContent(
+                                        question = question,
+                                        awaitingAdvance = false,
+                                        pendingAnswerKey = null,
+                                        isTest = true,
+                                        onPick = { vm.selectAnswer(it) },
+                                        testSelectionKey = state.answersByQuestionId[question.id],
+                                    )
+                                }
                             }
                         }
                     }

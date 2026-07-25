@@ -45,6 +45,7 @@ import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.lessonHeroTransitionKey
 import cz.autokolk.ui.util.HapticFeedback
+import cz.autokolk.ui.util.rememberIsExpandedWidth
 import kotlinx.coroutines.delay
 
 @Composable
@@ -61,6 +62,12 @@ fun HomeScreen(
     val listState = rememberLazyListState()
     val context = LocalContext.current
     val density = LocalDensity.current
+    // Krok 161 (tablet/landscape): na širších obrazovkách (>= 600dp) path dostane širší
+    // sinusovou vlnu a uzly jsou o kousek větší, ať cesta nevypadá na tabletu "stažená"
+    // do úzkého sloupce vlevo.
+    val isExpandedWidth = rememberIsExpandedWidth()
+    val pathMaxOffsetDp = if (isExpandedWidth) 420.0 else 250.0
+    val lessonNodeSize = if (isExpandedWidth) 80.dp else 64.dp
 
     var sheetLesson by remember { mutableStateOf<GlobalLesson?>(null) }
     var sheetDisplay by remember { mutableStateOf(1) }
@@ -208,11 +215,18 @@ fun HomeScreen(
                         }
                     }
                     is HomePathRow.LessonItem -> {
-                        val offsetDp = HomePathListBuilder.horizontalOffsetDp(row.waveIndex)
+                        val offsetDp = HomePathListBuilder.horizontalOffsetDp(
+                            row.waveIndex,
+                            baseMaxOffsetDp = pathMaxOffsetDp,
+                        )
                         Row(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(start = offsetDp.coerceIn(0, 280).dp, top = 6.dp, bottom = 6.dp),
+                                .padding(
+                                    start = offsetDp.coerceIn(0, pathMaxOffsetDp.toInt() + 30).dp,
+                                    top = 6.dp,
+                                    bottom = 6.dp,
+                                ),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val root = pathRootCoords
@@ -244,6 +258,7 @@ fun HomeScreen(
                                         sheetLesson = row.lesson
                                         sheetDisplay = row.displayNumber
                                     },
+                                    size = lessonNodeSize,
                                     transitionKey = lessonHeroTransitionKey(row.lesson.lessonNumber),
                                     accessibilityLabel = "Lekce ${row.displayNumber}: ${row.subtitle}. ${lessonNodeStateLabel(row.nodeState)}.",
                                 )

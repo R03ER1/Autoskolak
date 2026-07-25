@@ -45,9 +45,11 @@ import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.animation.AnimatedBackground
 import cz.autokolk.ui.components.animation.ConfettiOverlay
 import cz.autokolk.ui.components.animation.FloatingReward
+import androidx.compose.foundation.layout.Row
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.lessonHeroTransitionKey
 import cz.autokolk.ui.theme.AccentCyan
+import cz.autokolk.ui.util.rememberIsExpandedLandscape
 @Composable
 fun QuizScreen(
     navController: NavHostController,
@@ -157,6 +159,10 @@ fun QuizScreen(
         }
     }
 
+    // Krok 161 (tablet/landscape): na širokém displeji v landscape (tablet, ne běžný telefon
+    // na boku) se médium otázky zobrazí vlevo a text otázky/odpovědi vpravo místo pod sebou.
+    val isExpandedLandscape = rememberIsExpandedLandscape()
+
     val total = state.questions.size.coerceAtLeast(1)
     val progress = ((state.index + 1).toFloat() / total.toFloat()).coerceIn(0f, 1f)
     val currentQuestion = state.questions.getOrNull(state.index)
@@ -239,27 +245,62 @@ fun QuizScreen(
                         label = "quizQuestion",
                     ) { idx ->
                         val question = state.questions.getOrNull(idx) ?: return@AnimatedContent
-                        Column(
-                            Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
-                        ) {
-                            QuizMedia(imagePath = question.imagePath, videoPath = question.videoPath)
-                            Spacer(Modifier.height(12.dp))
-                            QuestionContent(
-                                question = question,
-                                awaitingAdvance = state.awaitingAdvance,
-                                pendingAnswerKey = state.pendingAnswerKey,
-                                isTest = false,
-                                onPick = { vm.selectAnswer(it) },
-                                eliminatedOptionKeys = state.eliminatedOptionKeys,
-                                hintLine = if (state.hintVisible) {
-                                    question.explanation?.takeIf { it.isNotBlank() }
-                                        ?: "Přečti zadání znovu — někdy stačí vyloučit jednu z možností."
-                                } else {
-                                    null
-                                },
-                            )
+                        val hasMedia = !question.imagePath.isNullOrBlank() || !question.videoPath.isNullOrBlank()
+                        val hintLine = if (state.hintVisible) {
+                            question.explanation?.takeIf { it.isNotBlank() }
+                                ?: "Přečti zadání znovu — někdy stačí vyloučit jednu z možností."
+                        } else {
+                            null
+                        }
+                        if (isExpandedLandscape && hasMedia) {
+                            Row(Modifier.fillMaxSize()) {
+                                Box(
+                                    Modifier
+                                        .weight(0.42f)
+                                        .fillMaxSize()
+                                        .padding(end = 8.dp),
+                                ) {
+                                    QuizMedia(
+                                        imagePath = question.imagePath,
+                                        videoPath = question.videoPath,
+                                        modifier = Modifier.align(Alignment.Center),
+                                    )
+                                }
+                                Column(
+                                    Modifier
+                                        .weight(0.58f)
+                                        .fillMaxSize()
+                                        .verticalScroll(rememberScrollState()),
+                                ) {
+                                    QuestionContent(
+                                        question = question,
+                                        awaitingAdvance = state.awaitingAdvance,
+                                        pendingAnswerKey = state.pendingAnswerKey,
+                                        isTest = false,
+                                        onPick = { vm.selectAnswer(it) },
+                                        eliminatedOptionKeys = state.eliminatedOptionKeys,
+                                        hintLine = hintLine,
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                Modifier
+                                    .fillMaxSize()
+                                    .verticalScroll(rememberScrollState()),
+                            ) {
+                                QuizMedia(imagePath = question.imagePath, videoPath = question.videoPath)
+                                Spacer(Modifier.height(12.dp))
+                                QuestionContent(
+                                    question = question,
+                                    awaitingAdvance = state.awaitingAdvance,
+                                    pendingAnswerKey = state.pendingAnswerKey,
+                                    isTest = false,
+                                    onPick = { vm.selectAnswer(it) },
+                                    eliminatedOptionKeys = state.eliminatedOptionKeys,
+                                    hintLine = hintLine,
+                                )
+                            }
                         }
                     }
                 }
