@@ -257,8 +257,8 @@ fun HomeScreen(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 LessonNode(
-                                    iconFileName = remember(row.lesson.subcategory) {
-                                        mapSubcategoryToIconAsset(row.lesson.subcategory.trim().lowercase())
+                                    icon = remember(row.lesson.subcategory) {
+                                        iconForSubcategory(row.lesson.subcategory.trim().lowercase())
                                     },
                                     sectionColor = row.sectionColor,
                                     state = row.nodeState,

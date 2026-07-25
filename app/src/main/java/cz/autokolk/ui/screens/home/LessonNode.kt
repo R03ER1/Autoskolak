@@ -7,18 +7,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.components.progress.RingProgress
 import cz.autokolk.ui.navigation.LocalNavAnimatedVisibilityScope
 import cz.autokolk.ui.navigation.LocalSharedTransitionScope
@@ -44,7 +44,7 @@ enum class LessonNodeState {
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LessonNode(
-    iconFileName: String,
+    icon: ImageVector,
     @Suppress("UNUSED_PARAMETER") sectionColor: Color,
     state: LessonNodeState,
     ringProgress: Float,
@@ -63,7 +63,6 @@ fun LessonNode(
         LessonNodeState.PERFECT -> listOf(SuccessGreen, SuccessGreen.copy(alpha = 0.85f))
         else -> listOf(AccentCyan, AccentTeal)
     }
-    val assetPath = "images/lesson_icons/$iconFileName"
 
     val sharedTransitionScope = LocalSharedTransitionScope.current
     val visibilityScope = LocalNavAnimatedVisibilityScope.current
@@ -108,14 +107,19 @@ fun LessonNode(
                 trackColor = ErrorRed.copy(alpha = 0.4f),
                 gradient = ringColors,
             ) {
-                AssetImageFromPath(
-                    assetPath = assetPath,
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
                         .size(size - 6.dp)
                         .background(DarkSurfaceVariant.copy(alpha = 0.15f), CircleShape),
-                    contentScale = ContentScale.Fit,
-                )
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size((size - 6.dp) * 0.56f),
+                    )
+                }
             }
         } else {
             Box(
@@ -134,11 +138,11 @@ fun LessonNode(
                     .border(2.dp, GlassWhite.copy(alpha = 0.35f), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                AssetImageFromPath(
-                    assetPath = assetPath,
+                Icon(
+                    imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(size - 8.dp),
-                    contentScale = ContentScale.Fit,
+                    tint = Color.White,
+                    modifier = Modifier.size((size - 8.dp) * 0.56f),
                 )
             }
         }

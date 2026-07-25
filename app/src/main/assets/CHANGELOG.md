@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.1] - 2026-07-25
+- Nové minimalistické ikony lekcí na hlavní obrazovce — nahradily staré nekonzistentní obrázky za jednotný, čistý styl.
+
 ## [2.2.0] - 2026-07-25
 - **Milník: dokončen redesign plán na 162/165 kroků (~98 %).** Fáze 1–13 kompletní kromě kroku 165 (finální manuální QA a release checklist na fyzickém zařízení — crash-free test na API 24–35, LeakCanary, plynulost animací naživo, back navigace, edge-to-edge vzhled). Verze zvednuta na 2.2.0 jako milník ukončení implementační části redesignu; drobné opravy a doladění mohou pokračovat i po tomto milníku.
 
