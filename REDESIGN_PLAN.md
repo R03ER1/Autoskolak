@@ -1,9 +1,9 @@
 # Autoškolák — Kompletní redesign plán
 
-> **Verze plánu:** 1.3  
+> **Verze plánu:** 1.4  
 > **Datum:** 2026-07-25 (poslední aktualizace)  
-> **Aktuální verze aplikace:** 2.1.6  
-> **Postup:** **162 / 165 kroků hotových (~98 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 dokončeny (odstranění posledních 6 legacy Activity — Results/Streak/Practice/TestAttempt/TestAttemptStats/TestResults — a jejich XML layoutů, s přesměrováním starých vstupních bodů do Compose, viz poznámky u kroků), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové, krok 142 (spaced repetition pro revizi chyb) hotov — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. Zbývá: krok 165 (release checklist).  
+> **Aktuální verze aplikace:** 2.2.0 — milník: implementační část redesignu dokončena  
+> **Postup:** **162 / 165 kroků hotových (~98 %)** — fáze 1–12 kompletní, krok 164 (interstitial ads v Compose flow) hotov, kroky 141 (odznaky na lesson path), 143 (sdílení PNG karty) a 41 (shared element transitions LessonNode → Quiz) hotové, kroky 153–154 dokončeny (odstranění posledních 6 legacy Activity — Results/Streak/Practice/TestAttempt/TestAttemptStats/TestResults — a jejich XML layoutů, s přesměrováním starých vstupních bodů do Compose, viz poznámky u kroků), krok 155 (staré styly/témata) hotov, kroky 156–163 (performance/a11y/tablet audit, reduced motion, ProGuard/R8, app size) hotové, krok 142 (spaced repetition pro revizi chyb) hotov — viz poznámky u jednotlivých kroků pro known limitations vyžadující fyzické zařízení. **Verze 2.2.0 označuje dokončení celé implementační (kódové) části plánu** — jediný zbývající krok je 165 (finální manuální QA a release checklist na fyzickém zařízení: crash-free test API 24–35, LeakCanary, plynulost animací naživo, back navigace, edge-to-edge vzhled), který nelze provést headless a musí ho odzkoušet uživatel/testeři na reálném zařízení.  
 > **Cíl:** Moderní, hravá aplikace s glassmorphism designem, Jetpack Compose, single-activity architekturou, bohatými animacemi a gamifikací. Cílová skupina 16–25 let (Gen Z).
 
 ---
