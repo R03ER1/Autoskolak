@@ -25,3 +25,5 @@ app/release/
 .artifacts/
 .kotlin/
 /.idea/planningMode.xml
+scripts/__pycache__/
+__pycache__/
