@@ -30,6 +30,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _dailyChallenges = MutableStateFlow<List<DailyChallengeUi>>(emptyList())
     val dailyChallenges: StateFlow<List<DailyChallengeUi>> = _dailyChallenges.asStateFlow()
 
+    /** Krok 142: počet otázek naplánovaných k revizi dnes (spaced repetition), pro Home připomínku. */
+    private val _dueMistakeCount = MutableStateFlow(0)
+    val dueMistakeCount: StateFlow<Int> = _dueMistakeCount.asStateFlow()
+
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
         refresh()
     }
@@ -56,6 +60,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             _reorderedPlan.value = reordered
             _pathRows.value = HomePathListBuilder.buildRows(lessonProgress, reordered)
             _dailyChallenges.value = lessonProgress.snapshotDailyChallenges()
+            _dueMistakeCount.value = lessonProgress.getDueUserMistakeCount()
         }
     }
 

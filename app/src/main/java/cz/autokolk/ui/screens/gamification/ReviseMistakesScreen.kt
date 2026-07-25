@@ -29,8 +29,9 @@ import cz.autokolk.ui.navigation.navigateToTab
 fun ReviseMistakesScreen(navController: NavHostController) {
     val context = LocalContext.current
     val lp = LessonProgress(context)
-    val (ok, wrong) = lp.getPracticeStatus(LessonProgress.CATEGORY_USER_MISTAKES)
-    val n = wrong.size
+    val (ok, _) = lp.getPracticeStatus(LessonProgress.CATEGORY_USER_MISTAKES)
+    // Krok 142: nabízíme jen otázky naplánované k revizi dnes (nebo dříve), ne celý seznam chyb.
+    val n = lp.getDueUserMistakeIds().size
 
     AnimatedBackground(Modifier.fillMaxSize()) {
         Column(

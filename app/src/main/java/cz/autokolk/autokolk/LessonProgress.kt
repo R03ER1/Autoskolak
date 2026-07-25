@@ -98,6 +98,9 @@ class LessonProgress(private val context: Context) {
         /** XP navíc při otevření mystery boxu — musí odpovídat [openMysteryBox]. */
         private const val MYSTERY_BOX_BONUS_XP = 8
 
+        /** Krok 142: spaced-repetition rozvrh pro chybné otázky (nový, čistě přídavný klíč). */
+        private const val KEY_MISTAKE_REVIEW_SCHEDULE = "mistake_review_schedule_v1"
+
         private const val KEY_ACTIVE_VISUAL_STYLE = "active_visual_style"
         private const val KEY_VISUAL_NEON_OWNED = "visual_style_neon_grid_owned"
         private const val KEY_VISUAL_SUNSET_OWNED = "visual_style_sunset_warm_owned"
@@ -355,17 +358,77 @@ class LessonProgress(private val context: Context) {
         val id = questionId.trim()
         if (id.isEmpty()) return
         val map = readMistakeStreakMap()
+        val wasMistake = (map[id] ?: 0) > 0
         if (isCorrect) {
             map.remove(id)
         } else {
             map[id] = (map[id] ?: 0) + 1
         }
         writeMistakeStreakMap(map)
+        updateReviewScheduleOnAnswer(id, isCorrect, wasMistake)
     }
 
     fun getMistakeConsecutiveCount(questionId: String): Int {
         return readMistakeStreakMap()[questionId.trim()] ?: 0
     }
+
+    // -------------------- Krok 142: spaced repetition rozvrh chybných otázek --------------------
+    private fun readReviewScheduleMap(): MutableMap<String, ReviewScheduleEntry> {
+        val json = prefs.getString(KEY_MISTAKE_REVIEW_SCHEDULE, null)
+        if (json.isNullOrEmpty()) return mutableMapOf()
+        return try {
+            val type = object : TypeToken<MutableMap<String, ReviewScheduleEntry>>() {}.type
+            gson.fromJson<MutableMap<String, ReviewScheduleEntry>>(json, type) ?: mutableMapOf()
+        } catch (_: Exception) {
+            mutableMapOf()
+        }
+    }
+
+    private fun writeReviewScheduleMap(map: Map<String, ReviewScheduleEntry>) {
+        prefs.edit().putString(KEY_MISTAKE_REVIEW_SCHEDULE, gson.toJson(map)).apply()
+    }
+
+    /**
+     * Aktualizuje spaced-repetition rozvrh (krok 142) při každé odpovědi na otázku kdekoli v appce.
+     * Nový, čistě přídavný záznam — chybějící klíč (staré/legacy uložené progressy bez tohoto pole)
+     * se bezpečně interpretuje jako "stage 0 / okamžitě k dispozici" (viz [MistakeReviewScheduler.isDue]).
+     */
+    private fun updateReviewScheduleOnAnswer(id: String, isCorrect: Boolean, wasMistake: Boolean) {
+        val schedule = readReviewScheduleMap()
+        val hadEntry = schedule.containsKey(id)
+        if (!isCorrect) {
+            if (hadEntry) {
+                schedule.remove(id)
+                writeReviewScheduleMap(schedule)
+            }
+            return
+        }
+        // Correct answer: only questions that are (or were) an active mistake enter/advance the ladder.
+        if (!wasMistake && !hadEntry) return
+        val next = MistakeReviewScheduler.onCorrectAnswer(schedule[id], System.currentTimeMillis())
+        if (next == null) {
+            schedule.remove(id)
+        } else {
+            schedule[id] = next
+        }
+        writeReviewScheduleMap(schedule)
+    }
+
+    /**
+     * Krok 142: podmnožina "Tvoje chyby" ([CATEGORY_USER_MISTAKES]), která je dnes (nebo dříve)
+     * naplánovaná k opakování podle spaced-repetition rozvrhu. Otázky čekající na pozdější
+     * interval se v revizní obrazovce nenabízí — i když formálně zůstávají v seznamu chyb.
+     */
+    fun getDueUserMistakeIds(): Set<String> {
+        val (_, wrong) = getPracticeStatus(CATEGORY_USER_MISTAKES)
+        if (wrong.isEmpty()) return wrong
+        val schedule = readReviewScheduleMap()
+        val now = System.currentTimeMillis()
+        return wrong.filterTo(mutableSetOf()) { id -> MistakeReviewScheduler.isDue(schedule[id], now) }
+    }
+
+    /** Počet otázek dnes (nebo dříve) naplánovaných k revizi — pro Home připomínku. */
+    fun getDueUserMistakeCount(): Int = getDueUserMistakeIds().size
 
     // -------------------- Practice mode storage --------------------
     private data class PracticeStore(
@@ -401,12 +464,17 @@ class LessonProgress(private val context: Context) {
             val store = readPracticeStore()
             val byCategory = store.answersByCategory[cat] ?: emptyMap()
             val streaks = readMistakeStreakMap()
+            // Krok 142: otázky rozjeté ve spaced-repetition žebříčku (poslední odpověď byla
+            // správná, ale ještě nevyčerpaly celou posloupnost intervalů) zůstávají "wrong"
+            // (čekají na pozdější revizi), i když jejich mistake-streak už je 0.
+            val schedule = readReviewScheduleMap()
             val correct = byCategory.filter { (id, ok) ->
-                ok && (streaks[id] ?: 0) == 0
+                ok && (streaks[id] ?: 0) == 0 && !schedule.containsKey(id)
             }.keys
             val wrong = mutableSetOf<String>()
             streaks.forEach { (id, n) -> if (n > 0) wrong.add(id) }
             byCategory.forEach { (id, ok) -> if (!ok) wrong.add(id) }
+            wrong.addAll(schedule.keys)
             return Pair(correct, wrong)
         }
         val store = readPracticeStore()

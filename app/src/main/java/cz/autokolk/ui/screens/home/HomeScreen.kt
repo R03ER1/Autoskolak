@@ -59,6 +59,7 @@ fun HomeScreen(
     val reordered by vm.reorderedPlan.collectAsStateWithLifecycle()
     val randomEvent by vm.randomEvent.collectAsStateWithLifecycle()
     val dailyChallenges by vm.dailyChallenges.collectAsStateWithLifecycle()
+    val dueMistakeCount by vm.dueMistakeCount.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -143,6 +144,14 @@ fun HomeScreen(
         ) {
             item(key = "daily_challenges") {
                 DailyChallengesRow(challenges = dailyChallenges)
+            }
+            if (dueMistakeCount > 0) {
+                item(key = "review_reminder") {
+                    ReviewReminderCard(
+                        dueCount = dueMistakeCount,
+                        onClick = { navController.navigate(Route.ReviseMistakes.route) },
+                    )
+                }
             }
             if (seasonalMessage != null) {
                 item(key = "seasonal_banner") {

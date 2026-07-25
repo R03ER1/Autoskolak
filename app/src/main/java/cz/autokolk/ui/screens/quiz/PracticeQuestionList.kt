@@ -39,8 +39,11 @@ object PracticeQuestionList {
 
     private fun buildUserMistakesList(lessonProgress: LessonProgress, practiceMode: Int): List<Question> {
         val cat = LessonProgress.CATEGORY_USER_MISTAKES
-        val (correctIds, wrongIds) = lessonProgress.getPracticeStatus(cat)
-        val wrongOnly = lessonProgress.getQuestionsForIds(wrongIds).sortedWith(
+        val (correctIds, _) = lessonProgress.getPracticeStatus(cat)
+        // Krok 142: nabízíme jen otázky, které jsou dnes (nebo dříve) naplánované k revizi
+        // podle spaced-repetition rozvrhu — ne celý (potenciálně větší) seznam chyb najednou.
+        val dueWrongIds = lessonProgress.getDueUserMistakeIds()
+        val wrongOnly = lessonProgress.getQuestionsForIds(dueWrongIds).sortedWith(
             compareByDescending<Question> { lessonProgress.getMistakeConsecutiveCount(it.id) }
                 .thenBy { it.id.toIntOrNull() ?: 0 },
         )
