@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.9] - 2026-08-04
+- Fix: po úspěšném "oživení" vyhladovělého Alexe (podržení tlačítka na obrazovce `AlexDeathScreen`) se uživatel dostal na rozbitou prázdnou obrazovku bez textu a bez tlačítka, ze které nešlo pokračovat dál. Příčina: `LaunchedEffect(pressed)` obsahoval automatický přechod zpět (`delay` + `popBackStack`) navázaný na klíč `pressed` — jakmile se po dokončení gesta skrylo tlačítko (`revived == true`), zrušil se i `pointerInput`, což vynutilo `pressed = false` a tím i restart/zrušení právě běžící korutiny dřív, než stihla navigaci provést. Opraveno rozdělením logiky na dvě korutiny (revive gesto vs. konfety) a přidáním explicitního stavu "$jméno zachráněn!" s tlačítkem "Pokračovat" (styl `PrimaryGradientButton`), které uživatele bezpečně vrátí zpět na stránku Alexe.
+
 ## [2.2.8] - 2026-08-04
 - Fix: logo na splash obrazovce ve skutečnosti ukazovalo "android robota" — `R.drawable.ic_launcher_foreground` byl omylem ponechaný výchozí placeholder ikona ze šablony Android Studia, nikdy neaktualizovaný na skutečné logo appky (skutečná ikona appky používá jiné, density-specifické `mipmap/ic_launcher*` soubory). Opraveno vytvořením lokální statické kopie `IconSign.png` jako `app/src/main/res/drawable-nodpi/ic_logo_splash.png` (součást základního APK, ne on-demand modulu `mediaassets`) a jejím zobrazením přes `painterResource(R.drawable.ic_logo_splash)` na splash obrazovce — logo appky (lev v autě + "L" značka + wordmark) je tak vždy okamžitě dostupné bez rizika placeholderu i při prvním spuštění. Onboarding stránka zůstává beze změny na `IconSign.png` přes `mediaassets`.
 

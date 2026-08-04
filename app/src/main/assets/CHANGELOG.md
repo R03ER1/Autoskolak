@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.9] - 2026-08-04
+- Fix: po podržení tlačítka a "oživení" vyhladovělého lva se objevovala rozbitá prázdná obrazovka bez možnosti pokračovat. Teď se po úspěšném oživení zobrazí hláška "zachráněn!" a tlačítko "Pokračovat", které tě vrátí zpátky ke svému lvovi.
+
 ## [2.2.8] - 2026-08-04
 - Fix: na načítací obrazovce se omylem zobrazoval generický "android robot" placeholder místo skutečného loga appky. Teď je tam napevno zabudované skutečné logo Autoškoláka (lev v autě), vždy dostupné hned od prvního spuštění appky.
 

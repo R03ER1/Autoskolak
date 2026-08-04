@@ -39,8 +39,11 @@ import cz.autokolk.AlexDeadBitmapLoader
 import cz.autokolk.HungerManager
 import cz.autokolk.LessonProgress
 import cz.autokolk.ui.components.animation.ConfettiOverlay
+import cz.autokolk.ui.components.buttons.PrimaryGradientButton
+import cz.autokolk.ui.components.media.AssetImageFromPath
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.theme.ErrorRed
+import cz.autokolk.ui.theme.SuccessGreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.math.max
@@ -55,6 +58,9 @@ fun AlexDeathScreen(navController: NavHostController) {
     val deadBitmap = remember {
         AlexDeadBitmapLoader.load(context.assets)?.asImageBitmap()
     }
+    val happyFacePath = remember {
+        AlexAssetResolver.firstExistingAlexFace(context, AlexMood.Happy, lessonProgress.isSunglassesEnabled())
+    }
 
     val holdProgress = remember { Animatable(0f) }
     val lionRotation = remember { Animatable(90f) }
@@ -65,6 +71,13 @@ fun AlexDeathScreen(navController: NavHostController) {
 
     val holdDurationMs = 3000L
 
+    // Pozn.: tato korutina NESMÍ záviset na `pressed` v okamžiku dokončení revive gesta —
+    // jakmile se `revived` nastaví na true, tlačítko (Box s pointerInput níže) zmizí
+    // z kompozice, což zruší probíhající `tryAwaitRelease()` a ve `finally` nastaví
+    // `pressed = false`. Změna klíče `pressed` by LaunchedEffect(pressed) restartovala
+    // a zrušila by rozběhnutou korutinu dřív, než stihne dokončit revive (proto dřív
+    // obrazovka po podržení "zamrzla" bez možnosti pokračovat). Konfety a přechod na
+    // stav "zachráněn" proto řeší samostatný LaunchedEffect(revived) níže.
     LaunchedEffect(pressed) {
         if (!pressed || revived) return@LaunchedEffect
         holdStart = System.currentTimeMillis()
@@ -72,13 +85,9 @@ fun AlexDeathScreen(navController: NavHostController) {
             val elapsed = System.currentTimeMillis() - holdStart
             if (elapsed >= holdDurationMs) {
                 hungerManager.setCurrentHunger(50)
-                revived = true
-                confetti = true
                 holdProgress.snapTo(1f)
                 lionRotation.snapTo(0f)
-                delay(1200)
-                confetti = false
-                navController.popBackStack(Route.Alex.route, inclusive = false)
+                revived = true
                 return@LaunchedEffect
             }
             val p = elapsed.toFloat() / holdDurationMs
@@ -90,6 +99,13 @@ fun AlexDeathScreen(navController: NavHostController) {
             holdProgress.animateTo(0f, tween(200, easing = LinearEasing))
             lionRotation.animateTo(90f, tween(200, easing = LinearEasing))
         }
+    }
+
+    LaunchedEffect(revived) {
+        if (!revived) return@LaunchedEffect
+        confetti = true
+        delay(1200)
+        confetti = false
     }
 
     Box(
@@ -105,21 +121,32 @@ fun AlexDeathScreen(navController: NavHostController) {
             modifier = Modifier.padding(24.dp),
         ) {
             Text(
-                "$lionName vyhladověl!",
+                if (revived) "$lionName zachráněn!" else "$lionName vyhladověl!",
                 style = MaterialTheme.typography.headlineLarge,
-                color = ErrorRed,
+                color = if (revived) SuccessGreen else ErrorRed,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                "Podrž prst na tlačítku a vrať svého lva zpět.",
+                if (revived) {
+                    "Podařilo se! $lionName má zase sytost 50 % a čeká na tebe."
+                } else {
+                    "Podrž prst na tlačítku a vrať svého lva zpět."
+                },
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(32.dp))
 
-            if (deadBitmap != null && !revived) {
+            if (revived) {
+                AssetImageFromPath(
+                    assetPath = "images/alex/$happyFacePath",
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(220.dp),
+                )
+            } else if (deadBitmap != null) {
                 Image(
                     bitmap = deadBitmap,
                     contentDescription = null,
@@ -133,7 +160,14 @@ fun AlexDeathScreen(navController: NavHostController) {
 
             Spacer(Modifier.height(40.dp))
 
-            if (!revived) {
+            if (revived) {
+                PrimaryGradientButton(
+                    text = "Pokračovat",
+                    onClick = {
+                        navController.popBackStack(Route.Alex.route, inclusive = false)
+                    },
+                )
+            } else {
                 Box(
                     modifier = Modifier
                         .size(96.dp)
