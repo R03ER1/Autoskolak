@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.11] - 2026-08-04
+- Dialog bonusového kola je teď méně průhledný — obsah obrazovky pod ním už skrz něj neprosvítá a je lépe čitelný.
+- Tlačítko "Zatočit!" teď při vyčerpání denních točení viditelně zešedne, takže je na první pohled jasné, že dnes už nejde použít.
+
 ## [2.2.10] - 2026-08-04
 - Bonusové kolo má nový, hezčí vzhled — teď ladí s jemným "glass" stylem zbytku appky místo staré křiklavé barevné palety.
 - Kolo teď nabízí víc druhů výher: kromě mincí i extra kola navíc, dočasné neomezené životy nebo bonusovou truhlu — a na každém dílku kola hned vidíš, co můžeš vyhrát, ještě než zatočíš.

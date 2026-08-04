@@ -56,6 +56,7 @@ import cz.autokolk.ui.theme.AccentCyan
 import cz.autokolk.ui.theme.AccentGradientEnd
 import cz.autokolk.ui.theme.AccentGradientStart
 import cz.autokolk.ui.theme.AccentTeal
+import cz.autokolk.ui.theme.DarkSurface
 import cz.autokolk.ui.theme.ErrorRed
 import cz.autokolk.ui.theme.GlassTone
 import cz.autokolk.ui.theme.TextPrimary
@@ -92,136 +93,154 @@ fun BonusWheelDialog(
     }
 
     Dialog(onDismissRequest = { if (!isSpinning) onDismiss() }) {
-        GlassCard(
-            // Dialog nemá barevné/rozostřené pozadí za sebou (jen systémový scrim) — pevný
-            // tmavý tón zajišťuje čitelnost v obou režimech, stejně jako u QuizNoLivesOverlay.
-            tone = GlassTone.Dark,
-            shape = MaterialTheme.shapes.large,
-            modifier = Modifier.fillMaxWidth(),
+        Box(
+            // Krok 2.2.11: samotný "fake glass" fill (GlassTone.Dark) je jen ~5% bílá —
+            // nad libovolným obsahem obrazovky (bez vlastního rozostření za sebou) to bylo
+            // moc průsvitné a prosvítal skrz obsah pod dialogem (např. karty "Denní výzvy").
+            // Řešeno lokálně JEN pro tento dialog přidáním téměř neprůhledné tmavé podkladové
+            // vrstvy pod stávající GlassCard — sdílený GlassTokens/glassPalette pro GlassTone.Dark
+            // zůstává beze změny, takže ostatní místa (QuizNoLivesOverlay, EventOverlay,
+            // TutorialOverlay) vypadají a chovají se úplně stejně jako dřív.
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large)
+                .background(DarkSurface.copy(alpha = 0.9f)),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            GlassCard(
+                // Dialog nemá barevné/rozostřené pozadí za sebou (jen systémový scrim) — pevný
+                // tmavý tón zajišťuje čitelnost v obou režimech, stejně jako u QuizNoLivesOverlay.
+                tone = GlassTone.Dark,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Box(
-                    Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(Brush.linearGradient(listOf(AccentGradientStart, AccentGradientEnd))),
-                    contentAlignment = Alignment.Center,
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("🎡", style = MaterialTheme.typography.headlineSmall)
-                }
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    "Bonusové kolo",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Dnes zbývá $remaining točení",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    "▼",
-                    color = WarningAmber,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Spacer(Modifier.height(4.dp))
-                WheelGraphic(sizeDp = 220.dp, rotationDegrees = rotation.value)
-                Spacer(Modifier.height(16.dp))
-                errorMsg?.let {
-                    Text(
-                        it,
-                        color = AccentCyan,
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-                resultText?.let { text ->
-                    Text(
-                        text,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = WarningAmber,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                }
-                when {
-                    resultText != null || (errorMsg != null && !isSpinning) -> {
-                        PrimaryGradientButton(
-                            text = "Zavřít",
-                            onClick = onDismiss,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                    Box(
+                        Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(Brush.linearGradient(listOf(AccentGradientStart, AccentGradientEnd))),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text("🎡", style = MaterialTheme.typography.headlineSmall)
                     }
-                    else -> {
-                        PrimaryGradientButton(
-                            text = if (isSpinning) "Točí se…" else "Zatočit!",
-                            onClick = {
-                                if (isSpinning) return@PrimaryGradientButton
-                                val result = lessonProgress.rollBonusWheel()
-                                if (result == null) {
-                                    errorMsg = "Dnes už nemáš žádné točení."
-                                    return@PrimaryGradientButton
-                                }
-                                errorMsg = null
-                                isSpinning = true
-                                scope.launch {
-                                    val n = BONUS_WHEEL_SEGMENTS.size
-                                    val sweep = 360f / n
-                                    val segmentCenter = result.segmentIndex * sweep - 90f + sweep / 2f
-                                    // Pointer je nahoře (úhel -90°) — dopočítá se rotace tak, aby na
-                                    // něm po zastavení skutečně ležel vylosovaný segment.
-                                    val desiredMod = (((-90f - segmentCenter) % 360f) + 360f) % 360f
-                                    val currentMod = ((rotation.value % 360f) + 360f) % 360f
-                                    val deltaToTarget = ((desiredMod - currentMod) + 360f) % 360f
-                                    val target = rotation.value + 360f * 5 + deltaToTarget
-                                    val animJob = launch {
-                                        rotation.animateTo(
-                                            target,
-                                            animationSpec = tween(2800, easing = FastOutSlowInEasing),
-                                        )
-                                    }
-                                    // Tikot podle segmentů — zpomalování s časem imituje realistické kolo.
-                                    launch {
-                                        var interval = 60L
-                                        while (animJob.isActive) {
-                                            SoundManager.play(SoundManager.Sound.WHEEL_TICK, volume = 0.7f)
-                                            delay(interval)
-                                            interval = (interval + 15L).coerceAtMost(260L)
-                                        }
-                                    }
-                                    animJob.join()
-                                    isSpinning = false
-                                    remaining = lessonProgress.getBonusWheelRollsRemainingToday()
-                                    resultText = when (result.type) {
-                                        BonusWheelRewardType.COINS -> "+${result.coins} mincí"
-                                        BonusWheelRewardType.CHEST -> "🎁 Truhla: +${result.coins} mincí!"
-                                        BonusWheelRewardType.EXTRA_SPINS -> "🔄 +${result.extraSpins} kola navíc!"
-                                        BonusWheelRewardType.UNLIMITED_LIVES ->
-                                            "❤️ Neomezené životy na ${result.unlimitedLivesMinutes} min!"
-                                    }
-                                    haptic.onAchievement()
-                                    try {
-                                        view.performHapticFeedback(HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-                                    } catch (_: Throwable) {
-                                    }
-                                    SoundManager.play(SoundManager.Sound.WHEEL_WIN)
-                                    SoundManager.play(SoundManager.Sound.COIN, volume = 0.7f)
-                                }
-                            },
-                            enabled = !isSpinning && remaining > 0,
-                            modifier = Modifier.fillMaxWidth(),
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        "Bonusové kolo",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = TextPrimary,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Dnes zbývá $remaining točení",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextSecondary,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "▼",
+                        color = WarningAmber,
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    WheelGraphic(sizeDp = 220.dp, rotationDegrees = rotation.value)
+                    Spacer(Modifier.height(16.dp))
+                    errorMsg?.let {
+                        Text(
+                            it,
+                            color = AccentCyan,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
                         )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                    resultText?.let { text ->
+                        Text(
+                            text,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = WarningAmber,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+                    when {
+                        resultText != null || (errorMsg != null && !isSpinning) -> {
+                            PrimaryGradientButton(
+                                text = "Zavřít",
+                                onClick = onDismiss,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                        else -> {
+                            PrimaryGradientButton(
+                                text = if (isSpinning) "Točí se…" else "Zatočit!",
+                                onClick = {
+                                    if (isSpinning) return@PrimaryGradientButton
+                                    val result = lessonProgress.rollBonusWheel()
+                                    if (result == null) {
+                                        errorMsg = "Dnes už nemáš žádné točení."
+                                        return@PrimaryGradientButton
+                                    }
+                                    errorMsg = null
+                                    isSpinning = true
+                                    scope.launch {
+                                        val n = BONUS_WHEEL_SEGMENTS.size
+                                        val sweep = 360f / n
+                                        val segmentCenter = result.segmentIndex * sweep - 90f + sweep / 2f
+                                        // Pointer je nahoře (úhel -90°) — dopočítá se rotace tak, aby na
+                                        // něm po zastavení skutečně ležel vylosovaný segment.
+                                        val desiredMod = (((-90f - segmentCenter) % 360f) + 360f) % 360f
+                                        val currentMod = ((rotation.value % 360f) + 360f) % 360f
+                                        val deltaToTarget = ((desiredMod - currentMod) + 360f) % 360f
+                                        val target = rotation.value + 360f * 5 + deltaToTarget
+                                        val animJob = launch {
+                                            rotation.animateTo(
+                                                target,
+                                                animationSpec = tween(2800, easing = FastOutSlowInEasing),
+                                            )
+                                        }
+                                        // Tikot podle segmentů — zpomalování s časem imituje realistické kolo.
+                                        launch {
+                                            var interval = 60L
+                                            while (animJob.isActive) {
+                                                SoundManager.play(SoundManager.Sound.WHEEL_TICK, volume = 0.7f)
+                                                delay(interval)
+                                                interval = (interval + 15L).coerceAtMost(260L)
+                                            }
+                                        }
+                                        animJob.join()
+                                        isSpinning = false
+                                        remaining = lessonProgress.getBonusWheelRollsRemainingToday()
+                                        resultText = when (result.type) {
+                                            BonusWheelRewardType.COINS -> "+${result.coins} mincí"
+                                            BonusWheelRewardType.CHEST -> "🎁 Truhla: +${result.coins} mincí!"
+                                            BonusWheelRewardType.EXTRA_SPINS -> "🔄 +${result.extraSpins} kola navíc!"
+                                            BonusWheelRewardType.UNLIMITED_LIVES ->
+                                                "❤️ Neomezené životy na ${result.unlimitedLivesMinutes} min!"
+                                        }
+                                        haptic.onAchievement()
+                                        try {
+                                            view.performHapticFeedback(HapticFeedbackConstantsCompat.CONTEXT_CLICK)
+                                        } catch (_: Throwable) {
+                                        }
+                                        SoundManager.play(SoundManager.Sound.WHEEL_WIN)
+                                        SoundManager.play(SoundManager.Sound.COIN, volume = 0.7f)
+                                    }
+                                },
+                                // Krok 2.2.11: appka nemá pro PrimaryGradientButton žádný jiný "disabled"
+                                // vizuál než tento — enabled=false teď navíc přepne na šedý/ztlumený
+                                // vzhled (viz PrimaryGradientButton.kt), takže "Zatočit!" už je jasně
+                                // vidět jako nedostupné při 0 zbývajících točeních, ne jen neklikatelné.
+                                enabled = !isSpinning && remaining > 0,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
             }

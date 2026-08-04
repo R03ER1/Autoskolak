@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -68,8 +69,9 @@ fun PrimaryGradientButton(
     )
 
     // Krok 160: v reduced-motion / low-power režimu shimmer neběží (čistě dekorativní).
+    // Disabled tlačítko shimmer nepotřebuje vůbec — je to jasný signál "nedostupné".
     val lowPerformanceMode = rememberLowPerformanceModeEnabled()
-    val shimmerActive = shimmerEnabled && !lowPerformanceMode
+    val shimmerActive = shimmerEnabled && !lowPerformanceMode && enabled
     val shimmerPhase = if (shimmerActive) {
         val shimmer = rememberInfiniteTransition(label = "primaryGradientShimmer")
         val animatedPhase by shimmer.animateFloat(
@@ -90,17 +92,29 @@ fun PrimaryGradientButton(
     val secondary = MaterialTheme.colorScheme.secondary
     val onGradient = MaterialTheme.colorScheme.onPrimary
 
+    // Standardní Material3 vzhled pro disabled stav (stejné alpha hodnoty jako výchozí
+    // ButtonDefaults.disabledContainerColor/disabledContentColor) — bez barevného gradientu
+    // a bez glow stínu, ať je na první pohled jasné, že tlačítko není momentálně dostupné.
+    val disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    val disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    val backgroundBrush = if (enabled) {
+        Brush.horizontalGradient(listOf(primary, secondary))
+    } else {
+        SolidColor(disabledContainerColor)
+    }
+    val contentColor = if (enabled) onGradient else disabledContentColor
+
     Box(
         modifier = modifier
             .scale(scale)
             .shadow(
-                elevation = elevation,
+                elevation = if (enabled) elevation else 0.dp,
                 shape = PillShape,
-                ambientColor = primary.copy(alpha = 0.3f),
-                spotColor = secondary.copy(alpha = 0.3f),
+                ambientColor = primary.copy(alpha = if (enabled) 0.3f else 0f),
+                spotColor = secondary.copy(alpha = if (enabled) 0.3f else 0f),
             )
             .clip(PillShape)
-            .background(Brush.horizontalGradient(listOf(primary, secondary)))
+            .background(backgroundBrush)
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
@@ -147,13 +161,13 @@ fun PrimaryGradientButton(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = onGradient,
+                        tint = contentColor,
                     )
                     Spacer(Modifier.width(8.dp))
                 }
                 Text(
                     text = text,
-                    color = onGradient,
+                    color = contentColor,
                     fontWeight = FontWeight.Bold,
                 )
             }

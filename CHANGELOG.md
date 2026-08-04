@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.11] - 2026-08-04
+- Fix: dialog "Bonusové kolo" byl po redesignu do glassmorphism stylu příliš průhledný — obsah obrazovky pod ním (např. karty "Denní výzvy") skrz něj prosvítal a ztěžoval čitelnost. Řešeno lokálně jen pro tento dialog přidáním téměř neprůhledné tmavé podkladové vrstvy (`DarkSurface` s alfa 0.9) pod stávající `GlassCard`, beze změny sdíleného `GlassTokens`/`glassPalette` pro `GlassTone.Dark` — ostatní místa se stejným tónem (`QuizNoLivesOverlay`, `EventOverlay`, `TutorialOverlay`) zůstávají vizuálně nezměněná.
+- Fix: tlačítko "Zatočit!" v bonusovém kole bylo při vyčerpání denních točení (0 zbývá) už funkčně nedostupné (`enabled = false`), ale vizuálně vypadalo úplně stejně jako aktivní (tyrkysovo-zelený gradient) — nebylo poznat, že nejde použít. `PrimaryGradientButton` teď pro `enabled = false` zobrazuje standardní ztlumený/šedý Material3 vzhled (bez gradientu, glow stínu a shimmeru) — oprava se tak konzistentně promítá i do ostatních tlačítek v appce používajících stejnou komponentu s podmíněným `enabled` (např. "Koupit" v obchodě, "Otevřít mystery box").
+
 ## [2.2.10] - 2026-08-04
 - Redesign: dialog "Bonusové kolo" (`BonusWheelDialog`) přepracován do glassmorphism stylu — místo plochého tmavého boxu teď používá stejný `GlassCard` pattern (tón `GlassTone.Dark`) jako např. `QuizNoLivesOverlay`, s gradientovým odznakem 🎡 nad nadpisem. Barvy segmentů kola sjednoceny na harmonickou paletu z theme (`AccentCyan`/`AccentTeal`/`AccentBlue`/`WarningAmber`/`ErrorRed` s jemným radiálním přechodem a tmavými oddělovači) místo původních křiklavých nesourodých barev.
 - Feature: bonusové kolo nabízí kromě mincí i další typy odměn — extra 3 točení navíc, dočasné neomezené životy na 30 minut, a "truhla" (+45 mincí). Všech 8 segmentů má pevně dané, viditelné číslo/ikonu (🪙/🔄/❤️∞/🎁) čitelné ještě PŘED roztočením; kolo se navíc po zatočení vizuálně zastaví přesně na vylosovaném segmentu (dřív animace jela nezávisle na výsledku).
