@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.7] - 2026-08-04
+- Splash obrazovka (`SplashScreen.kt`): logo vráceno z `IconSign.png` (modul `mediaassets`) zpět na lokální vektorový zdroj `ic_launcher_foreground` v gradientovém kruhu (velikost zachována, 160dp). Splash obrazovka totiž sama spouští stahování on-demand modulu `mediaassets` — logo z něj by při úplně prvním spuštění appky mohlo krátce zobrazit shimmer/error placeholder, než se modul stáhne. Onboarding stránka ("Vítej v Autoškoláku!") nadále používá `IconSign.png` přes `AssetImageFromPath`, protože tam běží až po dokončení stahování modulu.
+
 ## [2.2.6] - 2026-07-25
 - Statická náhrada na úvodní onboarding stránce ("Vítej v Autoškoláku!") a logo na načítací (splash) obrazovce nahrazeny reálnou grafikou značky (`IconSign.png` z modulu `mediaassets`) místo dosavadní Material ikony/`ic_launcher_foreground` v gradientovém kruhu — obrázek se načítá přes existující komponentu `AssetImageFromPath` (`AssetImage.kt`), stejně jako ostatní média z `mediaassets`.
 

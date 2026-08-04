@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.7] - 2026-08-04
+- Logo na načítací obrazovce je zase to původní (vždy okamžitě dostupné), aby se při prvním spuštění appky nikdy nezobrazil placeholder místo něj. Logo na úvodní onboarding stránce zůstává beze změny.
+
 ## [2.2.6] - 2026-07-25
 - Na úvodní obrazovce onboardingu ("Vítej v Autoškoláku!") a na načítací obrazovce je teď místo dosavadní jednoduché ikony vidět skutečné logo Autoškoláka.
 
