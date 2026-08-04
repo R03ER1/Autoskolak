@@ -235,7 +235,7 @@ fun CoinShopScreen(navController: NavHostController) {
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                "Bonusové kolo — zbývá $wheelLeft/3",
+                "Bonusové kolo — zbývá $wheelLeft točení",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.Start),

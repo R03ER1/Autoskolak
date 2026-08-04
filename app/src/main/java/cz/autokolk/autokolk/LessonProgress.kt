@@ -43,6 +43,51 @@ data class GlobalLesson(
 )
 
 /**
+ * Typy odměn bonusového kola (2.2.10). Sdílený model mezi logikou ([LessonProgress.rollBonusWheel])
+ * a UI ([cz.autokolk.ui.screens.gamification.BonusWheelDialog], Home FAB) — obě strany musí
+ * vidět stejnou sadu segmentů, aby čísla zobrazená před roztočením odpovídala skutečné odměně.
+ */
+enum class BonusWheelRewardType { COINS, EXTRA_SPINS, UNLIMITED_LIVES, CHEST }
+
+/** Statická definice jednoho segmentu kola — pozice v [BONUS_WHEEL_SEGMENTS] odpovídá pozici na kole. */
+data class BonusWheelSegmentSpec(
+    val type: BonusWheelRewardType,
+    /** Váha pro losování; součet všech vah v [BONUS_WHEEL_SEGMENTS] musí být 100. */
+    val weight: Int,
+    val coins: Int = 0,
+    val extraSpins: Int = 0,
+    val unlimitedLivesMinutes: Int = 0,
+)
+
+/** Výsledek jednoho zatočení — jaký typ padl a na jakém indexu segmentu (pro zarovnání animace). */
+data class BonusWheelResult(
+    val type: BonusWheelRewardType,
+    val segmentIndex: Int,
+    val coins: Int = 0,
+    val extraSpins: Int = 0,
+    val unlimitedLivesMinutes: Int = 0,
+)
+
+/**
+ * Fixní sada 8 segmentů bonusového kola (2.2.10) — typ i číslo odměny jsou vidět v UI ještě
+ * PŘED roztočením (žádné skryté rozmezí). Váhy dohromady dávají 100 %; "slabé" mincové
+ * segmenty (index 0 a 2) navíc podléhají pity mechanice v [LessonProgress.rollBonusWheel].
+ */
+val BONUS_WHEEL_SEGMENTS: List<BonusWheelSegmentSpec> = listOf(
+    BonusWheelSegmentSpec(BonusWheelRewardType.COINS, weight = 22, coins = 15),
+    BonusWheelSegmentSpec(BonusWheelRewardType.EXTRA_SPINS, weight = 8, extraSpins = 3),
+    BonusWheelSegmentSpec(BonusWheelRewardType.COINS, weight = 20, coins = 25),
+    BonusWheelSegmentSpec(BonusWheelRewardType.UNLIMITED_LIVES, weight = 6, unlimitedLivesMinutes = 30),
+    BonusWheelSegmentSpec(BonusWheelRewardType.COINS, weight = 16, coins = 40),
+    BonusWheelSegmentSpec(BonusWheelRewardType.CHEST, weight = 10, coins = 45),
+    BonusWheelSegmentSpec(BonusWheelRewardType.COINS, weight = 12, coins = 60),
+    BonusWheelSegmentSpec(BonusWheelRewardType.COINS, weight = 6, coins = 100),
+)
+
+/** Indexy "slabých" mincových segmentů v [BONUS_WHEEL_SEGMENTS] — používá pity mechanika. */
+private val WEAK_WHEEL_SEGMENT_INDICES = setOf(0, 2)
+
+/**
  * Central user progress, economy, streak, and practice persistence.
  * Refactor direction (audit A2): split by domain (persistence vs streak vs economy) instead of growing this file further.
  */
@@ -77,6 +122,8 @@ class LessonProgress(private val context: Context) {
         private const val KEY_XP_BY_DAY_JSON = "xp_by_day_json"
         private const val KEY_LESSONS_BY_DAY_JSON = "lessons_by_day_json"
         private const val KEY_DOUBLE_XP_UNTIL_MS = "double_xp_until_ms"
+        /** Dočasné neomezené životy (např. výhra z bonusového kola) — analog [KEY_DOUBLE_XP_UNTIL_MS]. */
+        private const val KEY_UNLIMITED_LIVES_UNTIL_MS = "unlimited_lives_until_ms"
         private const val KEY_PENDING_LEVEL_UP = "pending_level_up_level"
         private const val KEY_PENDING_LEVEL_TITLE = "pending_level_up_title"
         private const val KEY_PENDING_LEVEL_BONUS_COINS = "pending_level_up_bonus_coins"
@@ -1250,7 +1297,28 @@ class LessonProgress(private val context: Context) {
     }
 
     // --- Hearts (Lives) tracking ---
-    fun hasInfiniteLives(): Boolean = prefs.getBoolean("infinite_lives", false)
+    /** Trvalý permanentní flag (pokud existuje) NEBO aktivní dočasný bonus z [activateUnlimitedLivesForMinutes]. */
+    fun hasInfiniteLives(): Boolean {
+        if (prefs.getBoolean("infinite_lives", false)) return true
+        return getUnlimitedLivesRemainingMs() > 0L
+    }
+
+    /** Zbývající milisekundy dočasného bonusu neomezených životů (0, pokud není aktivní). */
+    fun getUnlimitedLivesRemainingMs(): Long {
+        val until = prefs.getLong(KEY_UNLIMITED_LIVES_UNTIL_MS, 0L)
+        return (until - System.currentTimeMillis()).coerceAtLeast(0L)
+    }
+
+    /**
+     * Aktivuje dočasné neomezené životy na [minutes] minut (např. výhra z bonusového kola).
+     * Prodlužuje existující aktivní bonus, pokud už běží — stejný vzor jako [activateDoubleXpForMinutes].
+     */
+    fun activateUnlimitedLivesForMinutes(minutes: Int) {
+        val addMs = minutes.coerceIn(1, 240) * 60_000L
+        val now = System.currentTimeMillis()
+        val base = prefs.getLong(KEY_UNLIMITED_LIVES_UNTIL_MS, 0L).coerceAtLeast(now)
+        prefs.edit().putLong(KEY_UNLIMITED_LIVES_UNTIL_MS, base + addMs).apply()
+    }
 
     /**
      * Returns current hearts after applying time-based recharge. Also persists any regeneration.
@@ -1648,30 +1716,59 @@ class LessonProgress(private val context: Context) {
     }
 
     /**
-     * Bonusové kolo (max 3× denně), odměna v mincích; pity přidává bonus po slabých tocích.
+     * Bonusové kolo (max 3× denně, navýšitelné segmentem [BonusWheelRewardType.EXTRA_SPINS]).
+     * Vrací [BonusWheelResult] s typem odměny a indexem vylosovaného segmentu z [BONUS_WHEEL_SEGMENTS]
+     * (pro zarovnání animace kola), nebo `null`, pokud dnes už nezbývá žádné točení.
+     *
+     * Pity: po 3 "slabých" tocích v řadě (nízké mincové segmenty, [WEAK_WHEEL_SEGMENT_INDICES])
+     * je pro následující tah tato dvojice segmentů z losování vyřazena — zaručí lepší výsledek.
      */
-    fun rollBonusWheel(): Int {
+    fun rollBonusWheel(): BonusWheelResult? {
         val today = todayString()
         if (prefs.getString(KEY_WHEEL_DAY, null) != today) {
             prefs.edit().putString(KEY_WHEEL_DAY, today).putInt(KEY_WHEEL_COUNT_DAY, 0).apply()
         }
+        if (getBonusWheelRollsRemainingToday() <= 0) return null
         val cnt = prefs.getInt(KEY_WHEEL_COUNT_DAY, 0)
-        if (cnt >= 3) return 0
         prefs.edit().putInt(KEY_WHEEL_COUNT_DAY, cnt + 1).apply()
+
         val pity = prefs.getInt(KEY_WHEEL_PITY, 0)
-        val rng = java.util.Random()
-        val r = rng.nextInt(100)
-        val base = when {
-            r < 40 -> 8 + rng.nextInt(12)
-            r < 78 -> 18 + rng.nextInt(17)
-            else -> 32 + rng.nextInt(28)
+        val pool = if (pity >= 3) {
+            BONUS_WHEEL_SEGMENTS.indices.filter { it !in WEAK_WHEEL_SEGMENT_INDICES }
+        } else {
+            BONUS_WHEEL_SEGMENTS.indices.toList()
         }
-        val bonus = pity * 8
-        val coins = (base + bonus).coerceIn(5, 130)
-        val newPity = if (coins < 22) (pity + 1).coerceAtMost(6) else 0
+        val totalWeight = pool.sumOf { BONUS_WHEEL_SEGMENTS[it].weight }
+        var roll = java.util.Random().nextInt(totalWeight)
+        var chosen = pool.first()
+        for (i in pool) {
+            val w = BONUS_WHEEL_SEGMENTS[i].weight
+            if (roll < w) {
+                chosen = i
+                break
+            }
+            roll -= w
+        }
+        val newPity = if (chosen in WEAK_WHEEL_SEGMENT_INDICES) (pity + 1).coerceAtMost(6) else 0
         prefs.edit().putInt(KEY_WHEEL_PITY, newPity).apply()
-        addPoints(coins)
-        return coins
+
+        val segment = BONUS_WHEEL_SEGMENTS[chosen]
+        when (segment.type) {
+            BonusWheelRewardType.COINS, BonusWheelRewardType.CHEST -> addPoints(segment.coins)
+            BonusWheelRewardType.EXTRA_SPINS -> {
+                // Odečtením od "použitých" tahů dneška navýší efektivní zbývající počet o extraSpins.
+                val used = prefs.getInt(KEY_WHEEL_COUNT_DAY, 0)
+                prefs.edit().putInt(KEY_WHEEL_COUNT_DAY, used - segment.extraSpins).apply()
+            }
+            BonusWheelRewardType.UNLIMITED_LIVES -> activateUnlimitedLivesForMinutes(segment.unlimitedLivesMinutes)
+        }
+        return BonusWheelResult(
+            type = segment.type,
+            segmentIndex = chosen,
+            coins = segment.coins,
+            extraSpins = segment.extraSpins,
+            unlimitedLivesMinutes = segment.unlimitedLivesMinutes,
+        )
     }
 
     fun openMysteryBox(): Int {
