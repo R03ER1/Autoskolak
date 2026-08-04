@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.8] - 2026-08-04
+- Fix: logo na splash obrazovce ve skutečnosti ukazovalo "android robota" — `R.drawable.ic_launcher_foreground` byl omylem ponechaný výchozí placeholder ikona ze šablony Android Studia, nikdy neaktualizovaný na skutečné logo appky (skutečná ikona appky používá jiné, density-specifické `mipmap/ic_launcher*` soubory). Opraveno vytvořením lokální statické kopie `IconSign.png` jako `app/src/main/res/drawable-nodpi/ic_logo_splash.png` (součást základního APK, ne on-demand modulu `mediaassets`) a jejím zobrazením přes `painterResource(R.drawable.ic_logo_splash)` na splash obrazovce — logo appky (lev v autě + "L" značka + wordmark) je tak vždy okamžitě dostupné bez rizika placeholderu i při prvním spuštění. Onboarding stránka zůstává beze změny na `IconSign.png` přes `mediaassets`.
+
 ## [2.2.7] - 2026-08-04
 - Splash obrazovka (`SplashScreen.kt`): logo vráceno z `IconSign.png` (modul `mediaassets`) zpět na lokální vektorový zdroj `ic_launcher_foreground` v gradientovém kruhu (velikost zachována, 160dp). Splash obrazovka totiž sama spouští stahování on-demand modulu `mediaassets` — logo z něj by při úplně prvním spuštění appky mohlo krátce zobrazit shimmer/error placeholder, než se modul stáhne. Onboarding stránka ("Vítej v Autoškoláku!") nadále používá `IconSign.png` přes `AssetImageFromPath`, protože tam běží až po dokončení stahování modulu.
 

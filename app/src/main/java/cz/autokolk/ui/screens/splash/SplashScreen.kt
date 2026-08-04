@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -56,7 +54,6 @@ import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.screens.onboarding.OnboardingPreferences
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.DarkBackground
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
@@ -260,37 +257,30 @@ fun SplashScreen(navController: NavHostController) {
 }
 
 /**
- * Logo aplikace na načítací obrazovce — úmyslně **lokální** vektorový zdroj
- * ([R.drawable.ic_launcher_foreground], stejná grafika jako skutečná ikona appky),
- * ne obrázek z `mediaassets`. Tahle obrazovka totiž sama teprve spouští stažení
- * on-demand modulu `mediaassets` (viz `startOrCheckDfm`), takže logo z něj by
- * při úplně prvním spuštění appky mohlo krátce zobrazit shimmer/error placeholder,
- * než se modul stáhne. Na onboarding obrazovce (spouští se až po dokončení
- * stahování) naopak `IconSign.png` z `mediaassets` zůstává — viz `OnboardingScreen.kt`.
+ * Logo aplikace na načítací obrazovce — úmyslně **lokální statický PNG** zdroj
+ * ([R.drawable.ic_logo_splash], kopie `mediaassets/src/main/assets/images/IconSign.png`
+ * uložená přímo v `res/drawable-nodpi/` základního modulu `app`), ne obrázek
+ * načítaný za běhu z `mediaassets`. Tahle obrazovka totiž sama teprve spouští
+ * stažení on-demand modulu `mediaassets` (viz `startOrCheckDfm`), takže logo
+ * odtamtud by při úplně prvním spuštění appky mohlo krátce zobrazit
+ * shimmer/error placeholder, než se modul stáhne — místní kopie je proto vždy
+ * okamžitě součástí základního APK/instalace, bez závislosti na stažení.
+ *
+ * Pozn.: dřívější `R.drawable.ic_launcher_foreground` byl omylem ponechaný
+ * výchozí "android robot" placeholder z šablony Android Studia (nikdy
+ * neaktualizovaný na skutečné logo appky) — skutečná ikona appky používá jiné,
+ * density-specifické `mipmap/ic_launcher*` zdroje. `IconSign.png` už obsahuje
+ * kompletní vizuál (lev, auto, "L" značka, wordmark), takže se nevkládá do
+ * žádného rámečku/kruhu — stejně jako na onboarding stránce.
  */
 @Composable
 private fun AppLogo() {
-    Box(
-        modifier = Modifier
-            .size(160.dp)
-            .background(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        AccentTeal.copy(alpha = 0.85f),
-                        AccentCyan.copy(alpha = 0.55f),
-                    ),
-                ),
-                shape = CircleShape,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = "Autoškolák",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(110.dp),
-        )
-    }
+    Image(
+        painter = painterResource(R.drawable.ic_logo_splash),
+        contentDescription = "Autoškolák",
+        contentScale = ContentScale.Fit,
+        modifier = Modifier.size(160.dp),
+    )
 }
 
 @Composable

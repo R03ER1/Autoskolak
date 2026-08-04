@@ -7,6 +7,9 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.8] - 2026-08-04
+- Fix: na načítací obrazovce se omylem zobrazoval generický "android robot" placeholder místo skutečného loga appky. Teď je tam napevno zabudované skutečné logo Autoškoláka (lev v autě), vždy dostupné hned od prvního spuštění appky.
+
 ## [2.2.7] - 2026-08-04
 - Logo na načítací obrazovce je zase to původní (vždy okamžitě dostupné), aby se při prvním spuštění appky nikdy nezobrazil placeholder místo něj. Logo na úvodní onboarding stránce zůstává beze změny.
 
