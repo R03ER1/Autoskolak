@@ -35,11 +35,13 @@ import cz.autokolk.GlobalLesson
 import cz.autokolk.SeasonalEvents
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.badges.SectionMilestoneBadge
+import cz.autokolk.ui.components.buttons.BonusWheelFab
 import cz.autokolk.ui.components.feedback.RandomEventOverlay
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.lessonHeroTransitionKey
+import cz.autokolk.ui.screens.gamification.BonusWheelDialog
 import cz.autokolk.ui.util.HapticFeedback
 import cz.autokolk.ui.util.rememberIsExpandedWidth
 import kotlinx.coroutines.delay
@@ -68,6 +70,13 @@ fun HomeScreen(
 
     var sheetLesson by remember { mutableStateOf<GlobalLesson?>(null) }
     var sheetDisplay by remember { mutableStateOf(1) }
+    var showBonusWheelDialog by remember { mutableStateOf(false) }
+    // prefsRevision bumpne při jakékoli změně LessonProgress (viz LessonProgress.prefsRevision) —
+    // díky tomu se badge se zbývajícími točeními samo přepočítá i po zatočení z jiné obrazovky (obchod).
+    val lessonProgressRevision by vm.lessonProgress.prefsRevision.collectAsStateWithLifecycle()
+    val bonusWheelRollsRemaining = remember(lessonProgressRevision) {
+        vm.lessonProgress.getBonusWheelRollsRemainingToday()
+    }
 
     LaunchedEffect(Unit) {
         vm.tryShowRandomEventIfDue()
@@ -276,6 +285,30 @@ fun HomeScreen(
         RandomEventOverlay(
             event = randomEvent,
             onDismiss = { vm.dismissRandomEvent() },
+        )
+
+        // Roh s plovoucími rychlými tlačítky (levý dolní roh, nad bottom nav barem — obsah
+        // Home obrazovky je už omezen nad bottom bar v AutokolkApp, takže zarovnání do rohu
+        // tohoto Boxu tlačítko automaticky nezakryje). Column záměrně — sem lze v budoucnu
+        // přidat další lákavá tlačítka (truhly apod.) jako další prvky pod bonusové kolo.
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = 16.dp),
+        ) {
+            BonusWheelFab(
+                rollsRemaining = bonusWheelRollsRemaining,
+                onClick = { showBonusWheelDialog = true },
+            )
+            // Budoucí místo pro další rohová tlačítka (např. denní truhla) — přidávej sem
+            // s mezerou Spacer(Modifier.height(12.dp)) nad dalším prvkem.
+        }
+    }
+
+    if (showBonusWheelDialog) {
+        BonusWheelDialog(
+            lessonProgress = vm.lessonProgress,
+            onDismiss = { showBonusWheelDialog = false },
         )
     }
 

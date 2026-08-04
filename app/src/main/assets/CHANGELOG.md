@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.10] - 2026-08-04
+- Bonusové kolo má nový, hezčí vzhled — teď ladí s jemným "glass" stylem zbytku appky místo staré křiklavé barevné palety.
+- Kolo teď nabízí víc druhů výher: kromě mincí i extra kola navíc, dočasné neomezené životy nebo bonusovou truhlu — a na každém dílku kola hned vidíš, co můžeš vyhrát, ještě než zatočíš.
+- Na hlavní obrazovce s lekcemi je nové tlačítko vlevo dole s malým otáčejícím se kolem — ukazuje, kolik ti dnes zbývá točení, a jedním klepnutím otevře bonusové kolo.
+
 ## [2.2.9] - 2026-08-04
 - Fix: po podržení tlačítka a "oživení" vyhladovělého lva se objevovala rozbitá prázdná obrazovka bez možnosti pokračovat. Teď se po úspěšném oživení zobrazí hláška "zachráněn!" a tlačítko "Pokračovat", které tě vrátí zpátky ke svému lvovi.
 

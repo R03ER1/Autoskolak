@@ -7,6 +7,11 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.10] - 2026-08-04
+- Redesign: dialog "Bonusové kolo" (`BonusWheelDialog`) přepracován do glassmorphism stylu — místo plochého tmavého boxu teď používá stejný `GlassCard` pattern (tón `GlassTone.Dark`) jako např. `QuizNoLivesOverlay`, s gradientovým odznakem 🎡 nad nadpisem. Barvy segmentů kola sjednoceny na harmonickou paletu z theme (`AccentCyan`/`AccentTeal`/`AccentBlue`/`WarningAmber`/`ErrorRed` s jemným radiálním přechodem a tmavými oddělovači) místo původních křiklavých nesourodých barev.
+- Feature: bonusové kolo nabízí kromě mincí i další typy odměn — extra 3 točení navíc, dočasné neomezené životy na 30 minut, a "truhla" (+45 mincí). Všech 8 segmentů má pevně dané, viditelné číslo/ikonu (🪙/🔄/❤️∞/🎁) čitelné ještě PŘED roztočením; kolo se navíc po zatočení vizuálně zastaví přesně na vylosovaném segmentu (dřív animace jela nezávisle na výsledku).
+- Feature: nové plovoucí tlačítko v levém dolním rohu Home obrazovky — mini animované kolo (pomalu se otáčí) s odznakem počtu zbývajících dnešních točení, po klepnutí otevře stejný dialog bonusového kola jako v obchodě/nastavení. Tlačítko má vlastní stín (elevation) nad pozadím a je umístěné v `Column` kontejneru připraveném na další budoucí rohová tlačítka (např. denní truhla).
+
 ## [2.2.9] - 2026-08-04
 - Fix: po úspěšném "oživení" vyhladovělého Alexe (podržení tlačítka na obrazovce `AlexDeathScreen`) se uživatel dostal na rozbitou prázdnou obrazovku bez textu a bez tlačítka, ze které nešlo pokračovat dál. Příčina: `LaunchedEffect(pressed)` obsahoval automatický přechod zpět (`delay` + `popBackStack`) navázaný na klíč `pressed` — jakmile se po dokončení gesta skrylo tlačítko (`revived == true`), zrušil se i `pointerInput`, což vynutilo `pressed = false` a tím i restart/zrušení právě běžící korutiny dřív, než stihla navigaci provést. Opraveno rozdělením logiky na dvě korutiny (revive gesto vs. konfety) a přidáním explicitního stavu "$jméno zachráněn!" s tlačítkem "Pokračovat" (styl `PrimaryGradientButton`), které uživatele bezpečně vrátí zpět na stránku Alexe.
 
