@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.12] - 2026-08-05
+- Feature: dialog "Mystery box" (`MysteryBoxDialog`) — holý gradientový čtverec s textovým "?"/"✓" nahrazen ilustrací dárkové krabičky (`ic_gift_box`, zdroj Tabler Icons, MIT licence — viz `mediaassets/src/main/assets/icons/gift.svg`). Nová sdílená komponenta `MysteryBoxGraphic` zachovává původní žluto-tyrkysový gradient (ladí s theme paletou) a po otevření zobrazí malý odznak s fajfkou v pravém horním rohu jako vizuální potvrzení "otevřeno", místo dřívějšího nahrazení celého obsahu velkým "✓".
+- Feature: nové plovoucí tlačítko `MysteryBoxFab` v levém dolním rohu Home obrazovky — mini verze nové grafiky dárkové krabičky s odznakem počtu zbývajících dnešních otevření, vlastní stín (elevation) a po klepnutí otevře existující dialog "Mystery box" (žádná duplicitní logika). Umístěno v `Column` kontejneru nad `BonusWheelFab`.
+
 ## [2.2.11] - 2026-08-04
 - Fix: dialog "Bonusové kolo" byl po redesignu do glassmorphism stylu příliš průhledný — obsah obrazovky pod ním (např. karty "Denní výzvy") skrz něj prosvítal a ztěžoval čitelnost. Řešeno lokálně jen pro tento dialog přidáním téměř neprůhledné tmavé podkladové vrstvy (`DarkSurface` s alfa 0.9) pod stávající `GlassCard`, beze změny sdíleného `GlassTokens`/`glassPalette` pro `GlassTone.Dark` — ostatní místa se stejným tónem (`QuizNoLivesOverlay`, `EventOverlay`, `TutorialOverlay`) zůstávají vizuálně nezměněná.
 - Fix: tlačítko "Zatočit!" v bonusovém kole bylo při vyčerpání denních točení (0 zbývá) už funkčně nedostupné (`enabled = false`), ale vizuálně vypadalo úplně stejně jako aktivní (tyrkysovo-zelený gradient) — nebylo poznat, že nejde použít. `PrimaryGradientButton` teď pro `enabled = false` zobrazuje standardní ztlumený/šedý Material3 vzhled (bez gradientu, glow stínu a shimmeru) — oprava se tak konzistentně promítá i do ostatních tlačítek v appce používajících stejnou komponentu s podmíněným `enabled` (např. "Koupit" v obchodě, "Otevřít mystery box").

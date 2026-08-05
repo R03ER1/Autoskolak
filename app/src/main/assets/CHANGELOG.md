@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.12] - 2026-08-05
+- Mystery box má nový vzhled — místo prázdného čtverce s otazníkem teď uvidíš hezkou ilustraci dárkové krabičky, a po otevření se navíc objeví malý odznak s fajfkou.
+- Na hlavní obrazovce s lekcemi je nové tlačítko vlevo dole (nad kolem) s ikonou dárkové krabičky — ukazuje, kolik ti dnes zbývá otevření mystery boxu, a jedním klepnutím ho otevře.
+
 ## [2.2.11] - 2026-08-04
 - Dialog bonusového kola je teď méně průhledný — obsah obrazovky pod ním už skrz něj neprosvítá a je lépe čitelný.
 - Tlačítko "Zatočit!" teď při vyčerpání denních točení viditelně zešedne, takže je na první pohled jasné, že dnes už nejde použít.

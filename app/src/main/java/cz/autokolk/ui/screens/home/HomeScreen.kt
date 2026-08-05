@@ -36,12 +36,14 @@ import cz.autokolk.SeasonalEvents
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.badges.SectionMilestoneBadge
 import cz.autokolk.ui.components.buttons.BonusWheelFab
+import cz.autokolk.ui.components.buttons.MysteryBoxFab
 import cz.autokolk.ui.components.feedback.RandomEventOverlay
 import cz.autokolk.ui.components.glass.GlassCard
 import cz.autokolk.ui.components.progress.AnimatedProgressBar
 import cz.autokolk.ui.navigation.Route
 import cz.autokolk.ui.navigation.lessonHeroTransitionKey
 import cz.autokolk.ui.screens.gamification.BonusWheelDialog
+import cz.autokolk.ui.screens.gamification.MysteryBoxDialog
 import cz.autokolk.ui.util.HapticFeedback
 import cz.autokolk.ui.util.rememberIsExpandedWidth
 import kotlinx.coroutines.delay
@@ -71,11 +73,16 @@ fun HomeScreen(
     var sheetLesson by remember { mutableStateOf<GlobalLesson?>(null) }
     var sheetDisplay by remember { mutableStateOf(1) }
     var showBonusWheelDialog by remember { mutableStateOf(false) }
+    var showMysteryBoxDialog by remember { mutableStateOf(false) }
     // prefsRevision bumpne při jakékoli změně LessonProgress (viz LessonProgress.prefsRevision) —
-    // díky tomu se badge se zbývajícími točeními samo přepočítá i po zatočení z jiné obrazovky (obchod).
+    // díky tomu se badge se zbývajícími točeními/otevřeními samo přepočítá i po použití z jiné
+    // obrazovky (obchod).
     val lessonProgressRevision by vm.lessonProgress.prefsRevision.collectAsStateWithLifecycle()
     val bonusWheelRollsRemaining = remember(lessonProgressRevision) {
         vm.lessonProgress.getBonusWheelRollsRemainingToday()
+    }
+    val mysteryBoxOpensRemaining = remember(lessonProgressRevision) {
+        vm.lessonProgress.getMysteryBoxOpensRemainingToday()
     }
 
     LaunchedEffect(Unit) {
@@ -296,11 +303,16 @@ fun HomeScreen(
                 .align(Alignment.BottomStart)
                 .padding(start = 16.dp, bottom = 16.dp),
         ) {
+            MysteryBoxFab(
+                opensRemaining = mysteryBoxOpensRemaining,
+                onClick = { showMysteryBoxDialog = true },
+            )
+            Spacer(Modifier.height(12.dp))
             BonusWheelFab(
                 rollsRemaining = bonusWheelRollsRemaining,
                 onClick = { showBonusWheelDialog = true },
             )
-            // Budoucí místo pro další rohová tlačítka (např. denní truhla) — přidávej sem
+            // Budoucí místo pro další rohová tlačítka — přidávej sem
             // s mezerou Spacer(Modifier.height(12.dp)) nad dalším prvkem.
         }
     }
@@ -309,6 +321,13 @@ fun HomeScreen(
         BonusWheelDialog(
             lessonProgress = vm.lessonProgress,
             onDismiss = { showBonusWheelDialog = false },
+        )
+    }
+
+    if (showMysteryBoxDialog) {
+        MysteryBoxDialog(
+            lessonProgress = vm.lessonProgress,
+            onDismiss = { showMysteryBoxDialog = false },
         )
     }
 
