@@ -2,21 +2,19 @@ package cz.autokolk.ui.screens.gamification
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -47,8 +46,8 @@ import cz.autokolk.R
 import cz.autokolk.audio.SoundManager
 import cz.autokolk.ui.components.buttons.PrimaryGradientButton
 import cz.autokolk.ui.util.rememberHaptic
+import cz.autokolk.ui.util.rememberLowPerformanceModeEnabled
 import cz.autokolk.ui.theme.AccentCyan
-import cz.autokolk.ui.theme.AccentTeal
 import cz.autokolk.ui.theme.DarkSurface
 import cz.autokolk.ui.theme.TextPrimary
 import cz.autokolk.ui.theme.TextSecondary
@@ -63,7 +62,10 @@ fun MysteryBoxDialog(
     val view = LocalView.current
     val haptic = rememberHaptic()
     val scope = rememberCoroutineScope()
+    val lowPerformanceMode = rememberLowPerformanceModeEnabled()
     val scale = remember { Animatable(1f) }
+    val shake = remember { Animatable(0f) }
+    val glow = remember { Animatable(0f) }
     var phase by remember { mutableStateOf(BoxPhase.Idle) }
     var resultCoins by remember { mutableStateOf<Int?>(null) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
@@ -101,7 +103,10 @@ fun MysteryBoxDialog(
             MysteryBoxGraphic(
                 sizeDp = 140.dp,
                 opened = resultCoins != null,
-                modifier = Modifier.scale(scale.value),
+                glowAlpha = glow.value,
+                modifier = Modifier
+                    .scale(scale.value)
+                    .rotate(shake.value),
             )
             Spacer(Modifier.height(16.dp))
             errorMsg?.let {
@@ -154,10 +159,21 @@ fun MysteryBoxDialog(
                                     errorMsg = null
                                     phase = BoxPhase.Opening
                                     scope.launch {
-                                        scale.animateTo(1.12f, tween(180, easing = FastOutSlowInEasing))
-                                        scale.animateTo(0.95f, tween(120, easing = FastOutSlowInEasing))
-                                        scale.animateTo(1.08f, tween(140, easing = FastOutSlowInEasing))
-                                        scale.animateTo(1f, tween(160, easing = FastOutSlowInEasing))
+                                        if (lowPerformanceMode) {
+                                            // Reduced motion / power save — bez "zatřesení" a spring
+                                            // odskoku, jen krátké zvětšení a zpět (funkční část
+                                            // animace, ne čistě dekorativní, proto zůstává).
+                                            scale.animateTo(1.05f, tween(120, easing = FastOutSlowInEasing))
+                                            scale.animateTo(1f, tween(120, easing = FastOutSlowInEasing))
+                                        } else {
+                                            // Truhla se před otevřením krátce "zatřese", jako by se
+                                            // chystala vyskočit víko.
+                                            shake.animateTo(-8f, tween(55, easing = FastOutSlowInEasing))
+                                            shake.animateTo(8f, tween(85, easing = FastOutSlowInEasing))
+                                            shake.animateTo(-6f, tween(75, easing = FastOutSlowInEasing))
+                                            shake.animateTo(5f, tween(65, easing = FastOutSlowInEasing))
+                                            shake.animateTo(0f, tween(60, easing = FastOutSlowInEasing))
+                                        }
                                         val coins = lessonProgress.openMysteryBox()
                                         phase = BoxPhase.Done
                                         remaining = lessonProgress.getMysteryBoxOpensRemainingToday()
@@ -172,6 +188,35 @@ fun MysteryBoxDialog(
                                             }
                                             SoundManager.play(SoundManager.Sound.WHEEL_WIN)
                                             SoundManager.play(SoundManager.Sound.COIN, volume = 0.7f)
+                                            if (lowPerformanceMode) {
+                                                glow.snapTo(0.7f)
+                                                glow.animateTo(0f, tween(200, easing = FastOutSlowInEasing))
+                                            } else {
+                                                // "Pop" odskok při zobrazení otevřené truhly (spring
+                                                // s přestřelením) + krátký záblesk zlaté záře, obě
+                                                // animace běží paralelně (samostatné korutiny).
+                                                launch {
+                                                    scale.snapTo(0.85f)
+                                                    scale.animateTo(
+                                                        1.15f,
+                                                        spring(
+                                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                            stiffness = Spring.StiffnessMedium,
+                                                        ),
+                                                    )
+                                                    scale.animateTo(
+                                                        1f,
+                                                        spring(
+                                                            dampingRatio = Spring.DampingRatioLowBouncy,
+                                                            stiffness = Spring.StiffnessLow,
+                                                        ),
+                                                    )
+                                                }
+                                                launch {
+                                                    glow.snapTo(1f)
+                                                    glow.animateTo(0f, tween(600, easing = FastOutSlowInEasing))
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -193,54 +238,43 @@ private enum class BoxPhase {
 }
 
 /**
- * Grafika krabičky mystery boxu — sdílená mezi [MysteryBoxDialog] a [cz.autokolk.ui.components.buttons.MysteryBoxFab]
- * (analogicky k [WheelGraphic] pro bonusové kolo). Zaoblený čtverec se stejným žluto-tyrkysovým
- * gradientem jako dřív (ladí s theme paletou), uprostřed ikonka dárkové krabičky (ic_gift_box,
- * zdroj Tabler Icons — MIT licence, viz mediaassets/src/main/assets/icons/gift.svg) místo dřívějšího
- * holého "?" textu. Po otevření ([opened] = true) přibude malý odznak s fajfkou v pravém horním rohu,
- * který krabičku vizuálně "highlightne" jako otevřenou, aniž by mizel samotný grafický motiv.
+ * Grafika truhly mystery boxu — sdílená mezi [MysteryBoxDialog] a [cz.autokolk.ui.components.buttons.MysteryBoxFab]
+ * (analogicky k [WheelGraphic] pro bonusové kolo). Pozadí je STEJNÝ tmavý radiální gradient jako za
+ * kolem v [WheelGraphic] (`Color(0xFF12162A)` → `Color(0xFF1A1F36)`) — konzistentní glassmorphism
+ * "podklad" pro obě grafiky. Uprostřed se podle [opened] přepíná celá ikona mezi zavřenou
+ * (`ic_chest_closed`) a otevřenou (`ic_chest_open`) truhlou — žádný malý odznak navíc, celý motiv
+ * se "transformuje". [glowAlpha] (0f–1f) přidá krátký zlatý záblesk za truhlou v okamžiku otevření.
  */
 @Composable
 fun MysteryBoxGraphic(
     sizeDp: Dp,
     opened: Boolean,
     modifier: Modifier = Modifier,
+    glowAlpha: Float = 0f,
 ) {
     Box(
         modifier
             .size(sizeDp)
             .clip(RoundedCornerShape(sizeDp * (16f / 140f)))
-            .background(
-                Brush.verticalGradient(
-                    listOf(WarningAmber.copy(alpha = 0.9f), AccentCyan.copy(alpha = 0.5f)),
-                ),
-            ),
+            .background(Brush.radialGradient(listOf(Color(0xFF12162A), Color(0xFF1A1F36)))),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_gift_box),
-            contentDescription = null,
-            modifier = Modifier.size(sizeDp * 0.5f),
-            tint = Color.White,
-        )
-        if (opened) {
+        if (glowAlpha > 0f) {
             Box(
                 Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = -(sizeDp * 0.08f), y = sizeDp * 0.08f)
-                    .size(sizeDp * 0.3f)
-                    .clip(CircleShape)
-                    .background(AccentTeal)
-                    .border(width = (sizeDp.value / 90f).dp, color = DarkSurface, shape = CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(sizeDp * 0.18f),
-                )
-            }
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            listOf(WarningAmber.copy(alpha = 0.55f * glowAlpha), Color.Transparent),
+                        ),
+                    ),
+            )
         }
+        Icon(
+            painter = painterResource(if (opened) R.drawable.ic_chest_open else R.drawable.ic_chest_closed),
+            contentDescription = null,
+            modifier = Modifier.size(sizeDp * 0.56f),
+            tint = if (opened) WarningAmber else Color.White,
+        )
     }
 }

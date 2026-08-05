@@ -7,6 +7,10 @@ This file follows a simple format inspired by Keep a Changelog.
 ## [Unreleased]
 -
 
+## [2.2.13] - 2026-08-05
+- Mystery box má teď truhlu místo dárečku — vypadá jako pořádná pirátská truhla, která se po otevření viditelně změní z zavřené na otevřenou se zlatou září uvnitř.
+- Otevírání Mystery boxu je teď mnohem šťavnatější — truhla se před otevřením zatřese a po odhalení odměny "vyskočí" s pružným odskokem a krátkým zábleskem, plus vibrace přesně v okamžiku otevření.
+
 ## [2.2.12] - 2026-08-05
 - Mystery box má nový vzhled — místo prázdného čtverce s otazníkem teď uvidíš hezkou ilustraci dárkové krabičky, a po otevření se navíc objeví malý odznak s fajfkou.
 - Na hlavní obrazovce s lekcemi je nové tlačítko vlevo dole (nad kolem) s ikonou dárkové krabičky — ukazuje, kolik ti dnes zbývá otevření mystery boxu, a jedním klepnutím ho otevře.

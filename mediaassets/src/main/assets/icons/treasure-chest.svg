@@ -1,0 +1,17 @@
+<!--
+  Zdroj: Tabler Icons (https://tabler.io/icons/icon/treasure-chest), ikona "treasure-chest", outline varianta.
+  Licence: MIT (c) tabler-icons contributors  https://github.com/tabler/tabler-icons/blob/main/LICENSE
+  Voln pou~itelné v komerních i nekomerních projektech, bez nutnosti uvádt autora.
+  Pou~ito jako podklad pro app/src/main/res/drawable/ic_chest_closed.xml (Mystery box  zavYená truhla).
+
+  Poznámka k "otevYené" variant (ic_chest_open.xml): v ~ádné CC0/MIT ikonové sad se nenaael
+  odpovídající "otevYený" pandán ve stejném line-art stylu (jediná nalezená "open-treasure-chest"
+  ikona je z game-icons.net, licence CC BY 3.0  vy~aduje atribuci, a navíc jiný vizuální styl 
+  detailní vyplnná silueta místo jednoduchých linek). ic_chest_open.xml je proto vlastní derivát
+  (stejná 24x24 mYí~ka, stejná tlouaeka áry 2, stejné vodorovné pozice boních páso x=8/x=17
+  jako v této ikon), ne sta~ený/copy-pasted zdroj  z hlediska licence v poYádku i samostatn
+  (originální kreslba), MIT navíc modifikace explicitn dovoluje.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 19h16a1 1 0 0 0 1-1V9a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v9a1 1 0 0 0 1 1m-1-8h18m-5-6v14M8 5v14m4-8v2" />
+</svg>

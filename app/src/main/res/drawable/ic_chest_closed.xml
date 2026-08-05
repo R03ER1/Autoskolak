@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Zdroj: mediaassets/src/main/assets/icons/treasure-chest.svg (Tabler Icons, MIT licence). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M4,19h16a1,1,0,0,0,1,-1V9a4,4,0,0,0,-4,-4H7a4,4,0,0,0,-4,4v9a1,1,0,0,0,1,1m-1,-8h18m-5,-6v14M8,5v14m4,-8v2" />
+</vector>

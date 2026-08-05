@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Vlastní derivát ic_chest_closed.xml (viz mediaassets/src/main/assets/icons/treasure-chest.svg,
+  Tabler Icons, MIT licence) — "otevřená" varianta truhly. Žádná CC0/MIT ikonová sada nemá hotový
+  otevřený pandán ve stejném line-art stylu (jediný nalezený "open-treasure-chest" je z game-icons.net
+  pod CC BY 3.0, navíc jiný vyplněný styl), proto je nakreslená ručně: stejná 24x24 mřížka, stejná
+  tloušťka čáry (2) a stejné x-pozice bočních pásů (8/17) jako v uzavřené variantě, aby přechod mezi
+  oběma stavy vypadal jako "stejný objekt" — otevřený spodní díl (bez horní hrany), víko odsazené
+  nahoře (mezera = otevřeno) a tři jiskřičky v mezeře symbolizující zář/odměnu uvnitř.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Spodní díl truhly (otevřený vrch, zaoblené dolní rohy). -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M4,11v7a1,1,0,0,0,1,1h14a1,1,0,0,0,1,-1v-7" />
+    <!-- Boční kovové pásy (stejné x-pozice jako v zavřené variantě). -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M8,11v8" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M17,11v8" />
+    <!-- Víko, odsazené nahoře (mezera symbolizuje "otevřeno"). -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M5,8L6,3H18L19,8" />
+    <!-- Jiskřičky/zář v mezeře. -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M9,9.5l-1,-2" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M12,9v-2.5" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M15,9.5l1,-2" />
+</vector>

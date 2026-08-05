@@ -32,7 +32,7 @@ import cz.autokolk.ui.theme.GlassWhite
 /**
  * Plovoucí tlačítko rychlého přístupu k mystery boxu — zobrazuje se v levém dolním rohu
  * Home obrazovky (viz [cz.autokolk.ui.screens.home.HomeScreen], kontejner `HomeCornerFabColumn`),
- * nad [BonusWheelFab]. Vizuálně: mini verze [MysteryBoxGraphic] (stejná grafika dárkové krabičky
+ * nad [BonusWheelFab]. Vizuálně: mini verze [MysteryBoxGraphic] (stejná grafika zavřené truhly
  * jako v dialogu, jen menší), badge s počtem zbývajících otevření dnes, a stín/elevation pro
  * vizuální "vyvýšení" nad pozadím — analogicky k [BonusWheelFab].
  */
